@@ -10,11 +10,11 @@ module.exports = function toServerlessCloudFormation(arc) {
     'http',
     'static',
     'tables',
-    //queues
-    //events
-    //scheduled
-    //ws
-    //indexes
+    'indexes',
+    //'events',
+    //'scheduled'
+    //'queues',
+    //'ws'
   ]
 
   let supported = pragma=> supports.includes(pragma)

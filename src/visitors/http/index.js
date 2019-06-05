@@ -23,7 +23,7 @@ module.exports = function http(arc, template) {
   if (!template.Resources)
     template.Resources = {}
 
-  if (!template.Outputs) 
+  if (!template.Outputs)
     template.Outputs = {}
 
   // construct the api resource
@@ -84,10 +84,10 @@ module.exports = function http(arc, template) {
         FunctionName: {Ref: 'GetIndex'},
         Action: 'lambda:InvokeFunction',
         Principal: 'apigateway.amazonaws.com',
-        SourceArn: { 
-          'Fn::Sub': [ 
-            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${restApiId}/*/*', 
-            {restApiId: {'Ref': appname}} 
+        SourceArn: {
+          'Fn::Sub': [
+            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${restApiId}/*/*',
+            {restApiId: {'Ref': appname}}
           ]
         }
       }
@@ -97,10 +97,10 @@ module.exports = function http(arc, template) {
   // add the deployment url to the output
   template.Outputs.ProductionURL = {
     Description: 'Deployment URL',
-    Value: { 
-      'Fn::Sub': [ 
-        'https://${restApiId}.execute-api.${AWS::Region}.amazonaws.com/production/', 
-        {restApiId: {'Ref': appname}} 
+    Value: {
+      'Fn::Sub': [
+        'https://${restApiId}.execute-api.${AWS::Region}.amazonaws.com/production/',
+        {restApiId: {'Ref': appname}}
       ]
     },
     //Export: {Name: 'WebRootUrl'}

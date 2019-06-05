@@ -17,7 +17,7 @@ module.exports = function addStatic(arc, template) {
       'x-amazon-apigateway-integration': {
         uri: {
           'Fn::Sub': [
-            'http://${bukkit}.s3.${AWS::Region}.amazonaws.com/{proxy}', 
+            'http://${bukkit}.s3.${AWS::Region}.amazonaws.com/{proxy}',
             {bukkit: {'Ref': 'StaticBucket'}}
           ]
         },

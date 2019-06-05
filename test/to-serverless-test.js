@@ -1,4 +1,4 @@
-let fs = require('fs')
+//let fs = require('fs')
 let test = require('tape')
 let parse = require('@architect/parser')
 let package = require('../')
