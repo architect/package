@@ -1,4 +1,4 @@
-let toLogicalID = require('../to-logical-id')
+let toLogicalID = require('@architect/utils/to-logical-id')
 
 module.exports = function addStatic(arc, template) {
 

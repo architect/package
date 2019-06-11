@@ -1,6 +1,6 @@
+let toLogicalID = require('@architect/utils/to-logical-id')
 let clean = require('./clean')
 let getTTL = require('./get-ttl')
-let toLogicalID = require('../to-logical-id')
 let getKeySchema = require('./get-key-schema')
 let getAttributeDefinitions = require('./get-attribute-definitions')
 

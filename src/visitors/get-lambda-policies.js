@@ -1,4 +1,4 @@
-let toLogicalID = require('../to-logical-id')
+let toLogicalID = require('@architect/utils/to-logical-id')
 
 module.exports = function getPolicies(arc) {
 
@@ -16,6 +16,14 @@ module.exports = function getPolicies(arc) {
   // add permission to read from static bucket
   if (arc.static) {
     policies.push({S3ReadPolicy: {BucketName: {Ref: 'StaticBucket'}}})
+  }
+
+  // add permission to pub/sub sns topics
+  if (arc.events) {
+    arc.events.forEach(event=> {
+      let name = `${toLogicalID(event)}Topic`
+      policies.push({SNSCrudPolicy: {TopicName: {Ref: name}}})
+    })
   }
 
   return policies

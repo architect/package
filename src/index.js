@@ -6,17 +6,7 @@ let visitors = require('./visitors')
  */
 module.exports = function toServerlessCloudFormation(arc) {
 
-  let supports = [
-    'http',
-    'static',
-    'tables',
-    'indexes',
-    //'events',
-    //'scheduled'
-    //'queues',
-    //'ws'
-  ]
-
+  let supports = Object.keys(visitors)
   let supported = pragma=> supports.includes(pragma)
   let httpFirst = (x, y)=> x == 'http'? -1 : y == 'http'? 1 : 0
   let pragmas = Object.keys(arc).filter(supported).sort(httpFirst)

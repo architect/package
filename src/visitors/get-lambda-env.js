@@ -1,4 +1,4 @@
-let toLogicalID = require('../to-logical-id')
+let toLogicalID = require('@architect/utils/to-logical-id')
 let parse = require('@architect/parser')
 let fs = require('fs')
 let path = require('path')

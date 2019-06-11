@@ -1,10 +1,12 @@
-let getLambdaName = require('../get-lambda-name')
+let toLogicalID = require('@architect/utils/to-logical-id')
+
+let getApiProps = require('./get-api-properties')
 let unexpress = require('./un-express-route')
-let toLogicalID = require('../to-logical-id')
-let getApiProperties = require('./get-api-properties')
-let getPropertyHelper = require('./get-lambda-config')
-let getEnv = require('./get-lambda-env')
-let getPolicies = require('./get-lambda-policies')
+
+let getEnv = require('../get-lambda-env')
+let getPolicies = require('../get-lambda-policies')
+let getLambdaName = require('../get-lambda-name')
+let getPropertyHelper = require('../get-lambda-config')
 
 /**
  * visit arc.http and merge in AWS::Serverless resources
@@ -13,7 +15,7 @@ module.exports = function http(arc, template) {
 
   // base props
   let Type = 'AWS::Serverless::Api'
-  let Properties = getApiProperties(arc)
+  let Properties = getApiProps(arc)
   let appname = toLogicalID(arc.app[0])
 
   // construct the runtime env
