@@ -1,7 +1,6 @@
 let getEnv = require('../get-lambda-env')
 let toLogicalID = require('@architect/utils/to-logical-id')
 let getPropertyHelper = require('../get-lambda-config')
-let getPolicies = require('../get-lambda-policies')
 
 /**
  * visit arc.events and merge in AWS::Serverless resources
@@ -15,13 +14,14 @@ module.exports = function statics(arc, template) {
   if (!template.Outputs)
     template.Outputs = {}
 
+  let appname = toLogicalID(arc.app[0])
+
   arc.events.forEach(event=> {
 
     // create the lambda
     let name = toLogicalID(event)
     let code = `./src/events/${event}`
     let prop = getPropertyHelper(arc, code) // helper function for getting props
-    let policies = getPolicies(arc, code)
     let env = getEnv(arc)
 
     template.Resources[name] = {
@@ -33,7 +33,12 @@ module.exports = function statics(arc, template) {
         MemorySize: prop('memory'),
         Timeout: prop('timeout'),
         Environment: {Variables: env},
-        Policies: policies,
+        Role: {
+          'Fn::Sub': [
+            'arn:aws:iam::${AWS::AccountId}:role/${roleName}',
+            {roleName: {'Ref': `${appname}Role`}}
+          ]
+        },
         Events: {}
       }
     }

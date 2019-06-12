@@ -4,7 +4,6 @@ let getApiProps = require('./get-api-properties')
 let unexpress = require('./un-express-route')
 
 let getEnv = require('../get-lambda-env')
-let getPolicies = require('../get-lambda-policies')
 let getLambdaName = require('../get-lambda-name')
 let getPropertyHelper = require('../get-lambda-config')
 
@@ -39,8 +38,6 @@ module.exports = function http(arc, template) {
     let name = toLogicalID(getLambdaName(`${method.toLowerCase()}${path}`)) // GetIndex
     let code = `./src/http/${method}${getLambdaName(route[1])}` // ./src/http/get-index
     let prop = getPropertyHelper(arc, code) // returns a helper function for getting props
-    let policies = getPolicies(arc, code)
-
     // adding lambda resources
     template.Resources[name] = {
       Type: 'AWS::Serverless::Function',
@@ -51,7 +48,12 @@ module.exports = function http(arc, template) {
         MemorySize: prop('memory'),
         Timeout: prop('timeout'),
         Environment: {Variables: env},
-        Policies: policies,
+        Role: {
+          'Fn::Sub': [
+            'arn:aws:iam::${AWS::AccountId}:role/${roleName}',
+            {roleName: {'Ref': `${appname}Role`}}
+          ]
+        },
         Events: {}
       }
     }
