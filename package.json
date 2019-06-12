@@ -1,13 +1,13 @@
 {
   "name": "@architect/package",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Package .arc for deployment with Cloudformation",
   "main": "src/index.js",
   "scripts": {
     "lint": "eslint . --fix",
-    "t":"node scripts/start && npm run sam:package && npm run sam:deploy",
-    "sam:package":"sam package --template-file sam.json --output-template-file out.yaml --s3-bucket cf-sam-deployments-east",
-    "sam:deploy":"sam deploy --template-file out.yaml --stack-name CheekyStaging --s3-bucket cf-sam-deployments-east --capabilities CAPABILITY_IAM",
+    "t": "node scripts/start && npm run sam:package && npm run sam:deploy",
+    "sam:package": "sam package --template-file sam.json --output-template-file out.yaml --s3-bucket cf-sam-deployments-east",
+    "sam:deploy": "sam deploy --template-file out.yaml --stack-name CheekyStaging --s3-bucket cf-sam-deployments-east --capabilities CAPABILITY_IAM",
     "test": "tape test/* | tap-spec"
   },
   "author": "Brian LeRoux <b@brian.io>",
