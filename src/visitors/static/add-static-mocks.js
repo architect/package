@@ -15,8 +15,9 @@ module.exports = function addStaticMocks(arc, template) {
 
   let appname = toLogicalID(arc.app[0])
   let publicDir = path.join(process.cwd(), 'public')
-  let staticAssets = path.join(publicDir, '/**/*')
-  let assets = glob.sync(staticAssets)
+  // ONLY inline html/css/js/svg
+  let staticAssets = path.join(publicDir, '/**/*+(.html|.svg|.css|.js|.mjs)')
+  let assets = glob.sync(staticAssets, {nodir:true})
 
   assets.forEach(asset=> {
 
