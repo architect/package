@@ -29,9 +29,9 @@ function getOpenApi(arc) {
 function getPaths(routes) {
 
   let dir = path.join(__dirname, 'vtl')
-  let vtl = fs.readFileSync(path.join(dir, 'request.vtl')).toString()
-  let vtlForm = fs.readFileSync(path.join(dir, 'request-form-post.vtl')).toString()
-  let vtlBinary = fs.readFileSync(path.join(dir, 'request-binary.vtl')).toString()
+  //let vtl = fs.readFileSync(path.join(dir, 'request.vtl')).toString()
+  //let vtlForm = fs.readFileSync(path.join(dir, 'request-form-post.vtl')).toString()
+  //let vtlBinary = fs.readFileSync(path.join(dir, 'request-binary.vtl')).toString()
   let resVtl = fs.readFileSync(path.join(dir, 'response.vtl')).toString()
   let result = {}
 
@@ -63,6 +63,7 @@ function getPaths(routes) {
           },
           passthroughBehavior: 'when_no_match',
           httpMethod: 'POST',
+          /*
           requestTemplates: {
             'application/json': vtl,
             'application/octet-stream': vtlBinary,
@@ -74,9 +75,9 @@ function getPaths(routes) {
             'text/html': vtl,
             'text/javascript': vtl,
             'text/plain': vtl,
-          },
+          },*/
           contentHandling: 'CONVERT_TO_TEXT',
-          type: 'aws'
+          type: 'aws_proxy' //'aws'
         }
       }
     }
