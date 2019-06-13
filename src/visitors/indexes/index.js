@@ -1,3 +1,4 @@
+let getAttributeDefinitions = require('../tables/get-attribute-definitions')
 let toLogicalID = require('@architect/utils/to-logical-id')
 let getGSI = require('./get-gsi-name')
 let getKeySchema = require('../tables/get-key-schema')
@@ -19,18 +20,46 @@ module.exports = function indices(arc, template) {
     let tbl = Object.keys(index)[0]
     let attr = index[tbl]
     let keys = Object.keys(clean(attr))
-    let TableName = `${toLogicalID(tbl)}Table`
-    let ref = template.Resources[TableName]
 
+    let TableName = `${toLogicalID(tbl)}Table`
+    let IndexName = getGSI(attr)
+    let KeySchema = getKeySchema(attr, keys)
+    let Projection = {ProjectionType: 'ALL'}
+
+    let ref = template.Resources[TableName]
     if (!ref)
       throw ReferenceError('@indexes failure: ' + TableName + ' is undefined')
 
+    // write in the index
     ref.Properties.GlobalSecondaryIndexes = [{
-      IndexName: getGSI(attr),
-      KeySchema: getKeySchema(attr, keys),
-      Projection: {ProjectionType: 'ALL'}
+      IndexName,
+      KeySchema,
+      Projection, 
     }]
+
+    // ensure the attribute defns match
+    ref.Properties.AttributeDefinitions = dedup(ref, attr)
   })
 
   return template
+}
+
+function dedup(ref, attr) {
+  let tmp = {}
+  // write in current attrs
+  ref.Properties.AttributeDefinitions.forEach(def=> {
+    tmp[def.AttributeName] = def.AttributeType
+  })
+  // overwrite w key schema values
+  let schemas = getAttributeDefinitions(attr) 
+  schemas.forEach(def=> {
+    tmp[def.AttributeName] = def.AttributeType
+  })
+  // reseralize into cfn
+  return Object.keys(tmp).map(key=> {
+    return {
+      AttributeName: key,
+      AttributeType: tmp[key]
+    }
+  })
 }
