@@ -3,19 +3,77 @@ let test = require('tape')
 let parse = require('@architect/parser')
 let package = require('../')
 
-let mockArcFile = `@app
+let mockArcFile = `
+@app
 cheeky
+
 @tables
-cats
-  catID *String
+accounts
+  accountID *String
+
+activity
+  appID *String
+  ts **String
+
+apis
+  apiID *String
+
+apps
+  appID *String
+
+apps-accounts
+  accountID *String
+  appID **String
+
+builds
+  buildID *String
 
 @indexes
-cats
-  flufferID *String
-  catID **String
+accounts
+  appID *String
+
+accounts
+  login *String
+
+accounts
+  username *String
+
+activity
+  accountID *String
+
+activity
+  event *String
+
+apis
+  name *String
+
+apis
+  region *String
+
+apps
+  accountID *String
+
+apps
+  name *String
+
+apps
+  repository *String
+
+apps
+  token *String
+
+apps-accounts
+  accountID *String
+
+apps-accounts
+  appID *String
+
+builds
+  appID_env *String
+  ts **String
 `
 
-test('@indexes', t=> {
+test.only('@indexes', t=> {
   t.plan(1)
   let arc = parse(mockArcFile)
   let serverless = package(arc)

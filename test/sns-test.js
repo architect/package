@@ -11,7 +11,7 @@ sneeze
 say-hi
 `
 
-test.only('@events', t=> {
+test('@events', t=> {
   t.plan(1)
   let arc = parse(mockArcFile)
   let serverless = package(arc)

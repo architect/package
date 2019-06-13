@@ -31,11 +31,14 @@ module.exports = function indices(arc, template) {
       throw ReferenceError('@indexes failure: ' + TableName + ' is undefined')
 
     // write in the index
-    ref.Properties.GlobalSecondaryIndexes = [{
+    if (!ref.Properties.GlobalSecondaryIndexes)
+      ref.Properties.GlobalSecondaryIndexes = []
+
+    ref.Properties.GlobalSecondaryIndexes.push({
       IndexName,
       KeySchema,
       Projection,
-    }]
+    })
 
     // ensure the attribute defns match
     ref.Properties.AttributeDefinitions = dedup(ref, attr)
