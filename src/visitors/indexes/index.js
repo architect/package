@@ -34,7 +34,7 @@ module.exports = function indices(arc, template) {
     ref.Properties.GlobalSecondaryIndexes = [{
       IndexName,
       KeySchema,
-      Projection, 
+      Projection,
     }]
 
     // ensure the attribute defns match
@@ -51,7 +51,7 @@ function dedup(ref, attr) {
     tmp[def.AttributeName] = def.AttributeType
   })
   // overwrite w key schema values
-  let schemas = getAttributeDefinitions(attr) 
+  let schemas = getAttributeDefinitions(attr)
   schemas.forEach(def=> {
     tmp[def.AttributeName] = def.AttributeType
   })
