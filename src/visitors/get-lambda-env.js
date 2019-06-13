@@ -15,7 +15,7 @@ module.exports = function getEnv(arc) {
   if (arc.static) {
     env.ARC_STATIC_BUCKET = {Ref: 'StaticBucket'}
   }
-  // yikes tradeoffs... now we need to reconcile the dynamo table name w upcased env var
+  /*
   if (arc.tables) {
     arc.tables.forEach(table=> {
       let tbl = Object.keys(table)[0]
@@ -23,7 +23,7 @@ module.exports = function getEnv(arc) {
       let val = {Ref: `${toLogicalID(tbl)}Table`}
       env[key] = val
     })
-  }
+  }*/
   let arcFile = path.join('.', '.arc-env')
   let exists = fs.existsSync(arcFile)
   if (exists) {

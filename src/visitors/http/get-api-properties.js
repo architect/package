@@ -1,6 +1,6 @@
 let toLogicalID = require('@architect/utils/to-logical-id')
-let path = require('path')
-let fs = require('fs')
+//let path = require('path')
+//let fs = require('fs')
 
 let getLambdaName = require('../get-lambda-name')
 let unexpress = require('./un-express-route')
@@ -28,11 +28,11 @@ function getOpenApi(arc) {
 
 function getPaths(routes) {
 
-  let dir = path.join(__dirname, 'vtl')
+  //let dir = path.join(__dirname, 'vtl')
   //let vtl = fs.readFileSync(path.join(dir, 'request.vtl')).toString()
   //let vtlForm = fs.readFileSync(path.join(dir, 'request-form-post.vtl')).toString()
   //let vtlBinary = fs.readFileSync(path.join(dir, 'request-binary.vtl')).toString()
-  let resVtl = fs.readFileSync(path.join(dir, 'response.vtl')).toString()
+  //let resVtl = fs.readFileSync(path.join(dir, 'response.vtl')).toString()
   let result = {}
 
   routes.forEach(route=> {
@@ -56,9 +56,10 @@ function getPaths(routes) {
             default: {
               statusCode: '200', // lol
               contentHandling: 'CONVERT_TO_TEXT',
+              /*
               responseTemplates: {
                 'text/html': resVtl
-              }
+              }*/
             }
           },
           passthroughBehavior: 'when_no_match',
