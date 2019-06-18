@@ -1,10 +1,45 @@
 let {version} = require('../package.json')
 let visitors = require('./visitors')
+let nested = require('./nested')
+let count = require('./resource-count')
 
 /**
  * returns AWS::Serverless JSON for a given (parsed) .arc file
  */
-module.exports = function toServerlessCloudFormation(arc) {
+module.exports = toServerlessCloudFormation
+
+// if its greater than 150 resources
+// create template files for nested stacks
+// otherwise just create a single sam template
+function toServerlessCloudFormation(arc) {
+  let exec = count(arc) > 100? toCFN : toSAM
+  return exec(arc)
+}
+
+// alias out direct methods
+toServerlessCloudFormation.toCFN = toCFN
+toServerlessCloudFormation.toSAM = toSAM
+
+/**
+ * @param {Object} arc - parsed arfile
+ * @returns {CloudFormation} template
+ */
+function toCFN(arc) {
+  let appname = arc.app[0]
+  let template = {}
+  template[`${appname}-cfn.json`] = nested.base(arc)
+  if (arc.http)
+    template[`${appname}-cfn-http.json`] = nested.http(arc)
+  if (arc.events)
+    template[`${appname}-cfn-events.json`] = nested.events(arc)
+  return template
+}
+
+/**
+ * @param {Object} arc - parsed arfile
+ * @returns {CloudFormation::Serverless} template
+ */
+function toSAM(arc) {
 
   // allowed list of pragmas ['http', 'globals'...etc]
   let supports = Object.keys(visitors)

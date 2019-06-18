@@ -7,7 +7,7 @@ let unexpress = require('./un-express-route')
 
 module.exports = function getApiProperties(arc) {
   return {
-    Name: toLogicalID(arc.app[0]),
+    //Name: toLogicalID(arc.app[0]),
     StageName: 'production',
     DefinitionBody: getOpenApi(arc),
     EndpointConfiguration: 'REGIONAL',

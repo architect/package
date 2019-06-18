@@ -73,7 +73,7 @@ builds
   ts **String
 `
 
-test.only('@indexes', t=> {
+test('@indexes', t=> {
   t.plan(1)
   let arc = parse(mockArcFile)
   let serverless = package(arc)

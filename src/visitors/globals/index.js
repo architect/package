@@ -33,9 +33,9 @@ module.exports = function http(arc, template) {
     }
   }
 
-  // enables logs
+  // enables logs and capability reflection
   template.Resources[name].Properties.Policies.push({
-    PolicyName: 'ArcCloudWatchLogsPolicy',
+    PolicyName: 'ArcGlobalPolicy',
     PolicyDocument: {
       Statement: [{
         Effect: 'Allow',
@@ -46,6 +46,16 @@ module.exports = function http(arc, template) {
           'logs:DescribeLogStreams'
         ],
         Resource: 'arn:aws:logs:*:*:*'
+      },
+      {
+        Effect: 'Allow',
+        Action: 'iam:GetRolePolicy',
+        Resource: {
+            'Fn::Sub': [
+              'arn:aws:iam::${AWS::AccountId}:role/${name}',
+              {role: {'Ref': name}}
+            ]
+          }
       }]
     }
   })
@@ -117,7 +127,7 @@ module.exports = function http(arc, template) {
           Effect: 'Allow',
           Action: [
             'sns:Publish',
-            'sns:ListTopics'
+            //'sns:ListTopics'
           ],
           Resource: getTopicArns(arc.events),
         }]

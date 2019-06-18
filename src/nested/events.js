@@ -1,20 +1,23 @@
-let getEnv = require('../get-lambda-env')
 let toLogicalID = require('@architect/utils/to-logical-id')
-let getPropertyHelper = require('../get-lambda-config')
+let {version} = require('../../package.json')
+let getEnv = require('../visitors/get-lambda-env')
+let getPropertyHelper = require('../visitors/get-lambda-config')
 
-/**
- * visit arc.events and merge in AWS::Serverless resources
- */
-module.exports = function statics(arc, template) {
+module.exports = function nestEvents(arc) {
 
-  // ensure cf standard sections exist
-  if (!template.Resources)
-    template.Resources = {}
-
-  if (!template.Outputs)
-    template.Outputs = {}
-
-  let appname = toLogicalID(arc.app[0])
+  let template = {
+    AWSTemplateFormatVersion: '2010-09-09',
+    Transform: 'AWS::Serverless-2016-10-31',
+    Description: `Exported by architect/package@${version} on ${new Date(Date.now()).toISOString()}`,
+    Parameters: {
+      Role: {
+        Description: 'IAM Role ARN',
+        Type: 'String'
+      }
+    },
+    Resources: {},
+    Outputs: {}
+  }
 
   arc.events.forEach(event=> {
 
@@ -23,6 +26,11 @@ module.exports = function statics(arc, template) {
     let code = `./src/events/${event}`
     let prop = getPropertyHelper(arc, code) // helper function for getting props
     let env = getEnv(arc)
+
+    template.Parameters[`${name}Topic`] = {
+      Type: 'String',
+      Description: 'SNS Topic ARN'
+    }
 
     template.Resources[name] = {
       Type: 'AWS::Serverless::Function',
@@ -33,12 +41,7 @@ module.exports = function statics(arc, template) {
         MemorySize: prop('memory'),
         Timeout: prop('timeout'),
         Environment: {Variables: env},
-        Role: {
-          'Fn::Sub': [
-            'arn:aws:iam::${AWS::AccountId}:role/${roleName}',
-            {roleName: {'Ref': `${appname}Role`}}
-          ]
-        },
+        Role: {Ref: 'Role'},
         Events: {}
       }
     }
@@ -59,25 +62,6 @@ module.exports = function statics(arc, template) {
       Type: 'SNS',
       Properties: {
         Topic: {'Ref': `${name}Topic`}
-      }
-    }
-
-    // create the sns topic
-    template.Resources[`${name}Topic`] = {
-      Type: 'AWS::SNS::Topic',
-      Properties: {
-        DisplayName: name,
-        Subscription: []
-      }
-    }
-
-    template.Outputs[`${name}SnsTopic`] = {
-      Description: 'An SNS Topic',
-      Value: {Ref: `${name}Topic`},
-      Export: {
-        Name: {
-          'Fn::Join': [":", [appname, {Ref:'AWS::StackName'}, `${name}Topic`]]
-        }
       }
     }
   })

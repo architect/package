@@ -104,10 +104,14 @@ module.exports = function http(arc, template) {
     Value: {
       'Fn::Sub': [
         'https://${restApiId}.execute-api.${AWS::Region}.amazonaws.com/production/',
-        {restApiId: {'Ref': appname}}
+        {restApiId: {Ref: appname}}
       ]
     },
-    //Export: {Name: 'WebRootUrl'}
+    Export: {
+      Name: {
+        'Fn::Join': [":", [appname, {Ref:'AWS::StackName'}, 'API']]
+      }
+    }
   }
 
   return template

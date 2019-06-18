@@ -8,6 +8,7 @@
     "t": "node scripts/start && npm run sam:package && npm run sam:deploy",
     "sam:package": "sam package --template-file sam.json --output-template-file out.yaml --s3-bucket cf-sam-deployments-east",
     "sam:deploy": "sam deploy --template-file out.yaml --stack-name CheekyStaging --s3-bucket cf-sam-deployments-east --capabilities CAPABILITY_IAM",
+    "nested:package": "sam package --template-file cheeky-cfn.json --output-template-file out.yaml --s3-bucket cf-sam-deployments-east",
     "test": "tape test/* | tap-spec"
   },
   "author": "Brian LeRoux <b@brian.io>",
@@ -19,7 +20,10 @@
     "mime-types": "^2.1.24"
   },
   "devDependencies": {
+    "aws-sdk": "^2.477.0",
     "eslint": "^5.16.0",
+    "run-parallel": "^1.1.9",
+    "run-series": "^1.1.8",
     "tap-spec": "^5.0.0",
     "tape": "^4.10.2"
   }

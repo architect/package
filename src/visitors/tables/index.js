@@ -8,8 +8,14 @@ let getAttributeDefinitions = require('./get-attribute-definitions')
  * visit arc.tables and merge in AWS::Serverless resources
  */
 module.exports = function tables(arc, template) {
+
   if (!template.Resources)
     template.Resources = {}
+
+  if (!template.Outputs)
+    template.Outputs = {}
+
+  let appname = toLogicalID(arc.app[0])
 
   arc.tables.forEach(table=> {
 
@@ -22,15 +28,14 @@ module.exports = function tables(arc, template) {
     let TableName = toLogicalID(tbl)
     let AttributeDefinitions = getAttributeDefinitions(clean(attr))
 
+
     template.Resources[`${TableName}Table`] = {
       Type: 'AWS::DynamoDB::Table',
       //DeletionPolicy: 'Retain',
       Properties: {
         KeySchema,
-        //TableName: tbl,
         AttributeDefinitions,
         BillingMode: 'PAY_PER_REQUEST',
-        //GlobalSecondaryIndexes: [ GlobalSecondaryIndex, ... ],
         //StreamSpecification: StreamSpecification,
       }
     }
@@ -42,8 +47,17 @@ module.exports = function tables(arc, template) {
       }
     }
 
+    template.Outputs[`${TableName}Table`] = {
+      Description: 'A DynamoDB Table',
+      Value: {Ref: `${TableName}Table`},
+      Export: {
+        Name: {
+          'Fn::Join': [":", [appname, {Ref:'AWS::StackName'}, `${TableName}Table`]]
+        }
+      }
+    }
+
     // TODO if stream defined
-    // TODO if indexes defined
   })
   return template
 }

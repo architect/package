@@ -1,7 +1,7 @@
 node_modules/
 src/events
 src/http
-scripts
 .arc
 sam.json
 out.yaml
+cheeky-cfn*
