@@ -96,7 +96,7 @@ module.exports = function deploy(params, callback) {
       parallel({
         http(callback) {
           let Key = `${appname}-cfn-http.yaml`
-          let Body = fs.readFileSync(path.join(process.cwd(), `${appname}-cfn-http.yaml`))
+          let Body = fs.readFileSync(path.join(process.cwd(), Key))
           s3.putObject({
             Bucket: bucket,
             Key,
@@ -105,7 +105,7 @@ module.exports = function deploy(params, callback) {
         },
         events(callback) {
           let Key = `${appname}-cfn-events.yaml`
-          let Body = fs.readFileSync(path.join(process.cwd(), `${appname}-cfn-events.yaml`))
+          let Body = fs.readFileSync(path.join(process.cwd(), Key))
           s3.putObject({
             Bucket: bucket,
             Key,

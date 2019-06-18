@@ -8,7 +8,7 @@ let count = require('./resource-count')
  */
 module.exports = toServerlessCloudFormation
 
-// if its greater than 150 resources
+// if its greater than 100 resources
 // create template files for nested stacks
 // otherwise just create a single sam template
 function toServerlessCloudFormation(arc) {

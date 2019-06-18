@@ -148,7 +148,6 @@ module.exports = function http(arc, template) {
 
   if (arc.queues) {
     //allow lambdas to publish to queues
-
   }
 
   return template

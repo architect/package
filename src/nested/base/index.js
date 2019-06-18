@@ -113,6 +113,9 @@ module.exports = function globals(arc) {
       let name = `${toLogicalID(event)}Topic`
       template.Resources.Events.Properties.Parameters[name] = {Ref: name}
     })
+    if (arc.static) {
+      template.Resources.Events.Properties.Parameters.StaticBucket = {Ref: 'StaticBucket'}
+    }
   }
 
   return template

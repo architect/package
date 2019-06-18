@@ -19,6 +19,13 @@ module.exports = function nestEvents(arc) {
     Outputs: {}
   }
 
+  if (arc.static) {
+    template.Parameters.StaticBucket = {
+      Type: 'String',
+      Description: 'Static Bucket ARN'
+    }
+  }
+
   arc.events.forEach(event=> {
 
     // create the lambda
