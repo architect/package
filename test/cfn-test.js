@@ -18,6 +18,7 @@ cheeky
 @aws
 bucket cf-sam-deployments-east
 
+@static
 @http
 get /
 get /foo

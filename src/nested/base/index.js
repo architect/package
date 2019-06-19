@@ -17,6 +17,7 @@ module.exports = function globals(arc) {
     AWSTemplateFormatVersion: '2010-09-09',
     Transform: 'AWS::Serverless-2016-10-31',
     Description: `Exported by architect/package@${version} on ${new Date(Date.now()).toISOString()}`,
+    Outputs: {},
     Resources: {
       Role: {
         Type: 'AWS::IAM::Role',
@@ -87,8 +88,15 @@ module.exports = function globals(arc) {
         }
       }
     }
+    template.Outputs.API = {
+      Value: {'Fn::GetAtt': ['HTTP', 'Outputs.ProductionURL']}
+    }
     if (arc.static) {
       template.Resources.HTTP.Properties.Parameters.StaticBucket = {Ref: 'StaticBucket'}
+      template.Outputs.Public = {
+        Value: {'Fn::GetAtt': ['StaticBucket', 'WebsiteURL']},
+        Description: 'Static assets hosted on S3'
+      }
     }
   }
 
@@ -112,6 +120,10 @@ module.exports = function globals(arc) {
     arc.events.forEach(event=> {
       let name = `${toLogicalID(event)}Topic`
       template.Resources.Events.Properties.Parameters[name] = {Ref: name}
+      template.Outputs[name] = {
+        Value: {'Fn::GetAtt': [name, 'TopicName']},
+        Description: 'SNS Topic'
+      }
     })
     if (arc.static) {
       template.Resources.Events.Properties.Parameters.StaticBucket = {Ref: 'StaticBucket'}
