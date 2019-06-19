@@ -99,19 +99,19 @@ module.exports = function http(arc, template) {
   }
 
   // add the deployment url to the output
-  template.Outputs.ProductionURL = {
-    Description: 'Deployment URL',
+  template.Outputs.API = {
+    Description: 'API Gateway',
     Value: {
       'Fn::Sub': [
         'https://${restApiId}.execute-api.${AWS::Region}.amazonaws.com/production/',
         {restApiId: {Ref: appname}}
       ]
-    },
+    }/*,
     Export: {
       Name: {
         'Fn::Join': [":", [appname, {Ref:'AWS::StackName'}, 'API']]
       }
-    }
+    }*/
   }
 
   return template

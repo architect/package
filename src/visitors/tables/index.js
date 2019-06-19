@@ -15,7 +15,7 @@ module.exports = function tables(arc, template) {
   if (!template.Outputs)
     template.Outputs = {}
 
-  let appname = toLogicalID(arc.app[0])
+  //let appname = toLogicalID(arc.app[0])
 
   arc.tables.forEach(table=> {
 
@@ -48,13 +48,14 @@ module.exports = function tables(arc, template) {
     }
 
     template.Outputs[`${TableName}Table`] = {
-      Description: 'A DynamoDB Table',
+      Description: 'Dynamo Table',
       Value: {Ref: `${TableName}Table`},
+      /*
       Export: {
         Name: {
           'Fn::Join': [":", [appname, {Ref:'AWS::StackName'}, `${TableName}Table`]]
         }
-      }
+      }*/
     }
 
     // TODO if stream defined

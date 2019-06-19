@@ -89,13 +89,14 @@ module.exports = function globals(arc) {
       }
     }
     template.Outputs.API = {
-      Value: {'Fn::GetAtt': ['HTTP', 'Outputs.ProductionURL']}
+      Value: {'Fn::GetAtt': ['HTTP', 'Outputs.API']},
+      Description: 'API Gateway'
     }
     if (arc.static) {
       template.Resources.HTTP.Properties.Parameters.StaticBucket = {Ref: 'StaticBucket'}
       template.Outputs.Public = {
         Value: {'Fn::GetAtt': ['StaticBucket', 'WebsiteURL']},
-        Description: 'Static assets hosted on S3'
+        Description: 'S3 Bucket'
       }
     }
   }
