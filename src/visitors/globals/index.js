@@ -10,11 +10,11 @@ module.exports = function http(arc, template) {
   if (!template.Resources)
     template.Resources = {}
 
-  let appname = arc.app[0]
-  let name = `${toLogicalID(appname)}Role`
+  //let appname = arc.app[0]
+  //let name = `${toLogicalID(appname)}Role`
 
   // construct a least priv iam role
-  template.Resources[name] = {
+  template.Resources.Role = {
     Type: 'AWS::IAM::Role',
     Properties: {
       AssumeRolePolicyDocument: {
@@ -32,9 +32,29 @@ module.exports = function http(arc, template) {
       // PermissionsBoundary
     }
   }
+  template.Resources.RoleReflectionPolicy = {
+    Type: 'AWS::IAM::Policy',
+    DependsOn: 'Role',
+    Properties: {
+      PolicyName: `ArcRoleReflectionPolicy`,
+      PolicyDocument: {
+        Statement: [{
+          Effect: 'Allow',
+          Action: 'iam:GetRolePolicy',
+          Resource: {
+            'Fn::Sub': [
+              'arn:aws:iam::${AWS::AccountId}:role/${role}',
+              {role: {'Ref': 'Role'}}
+            ]
+          }
+        }]
+      },
+      Roles: [{'Ref': 'Role'}],
+    }
+  }
 
   // enables logs and capability reflection
-  template.Resources[name].Properties.Policies.push({
+  template.Resources.Role.Properties.Policies.push({
     PolicyName: 'ArcGlobalPolicy',
     PolicyDocument: {
       Statement: [{
@@ -46,23 +66,13 @@ module.exports = function http(arc, template) {
           'logs:DescribeLogStreams'
         ],
         Resource: 'arn:aws:logs:*:*:*'
-      },
-      {
-        Effect: 'Allow',
-        Action: 'iam:GetRolePolicy',
-        Resource: {
-            'Fn::Sub': [
-              'arn:aws:iam::${AWS::AccountId}:role/${name}',
-              {role: {'Ref': name}}
-            ]
-          }
       }]
     }
   })
 
   // allow lambdas read/write on the static bucket
   if (arc.static) {
-    template.Resources[name].Properties.Policies.push({
+    template.Resources.Role.Properties.Policies.push({
       PolicyName: 'ArcStaticBucketPolicy',
       PolicyDocument: {
         Statement: [{
@@ -85,7 +95,7 @@ module.exports = function http(arc, template) {
 
   // allow lambdas to CRUD tables
   if (arc.tables) {
-    template.Resources[name].Properties.Policies.push({
+    template.Resources.Role.Properties.Policies.push({
       PolicyName: 'ArcDynamoPolicy',
       PolicyDocument: {
         Statement: [{
@@ -120,7 +130,7 @@ module.exports = function http(arc, template) {
 
   // allow lambdas to publish to events
   if (arc.events) {
-    template.Resources[name].Properties.Policies.push({
+    template.Resources.Role.Properties.Policies.push({
       PolicyName: 'ArcSimpleNotificationServicePolicy',
       PolicyDocument: {
         Statement: [{

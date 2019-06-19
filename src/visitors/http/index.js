@@ -51,7 +51,7 @@ module.exports = function http(arc, template) {
         Role: {
           'Fn::Sub': [
             'arn:aws:iam::${AWS::AccountId}:role/${roleName}',
-            {roleName: {'Ref': `${appname}Role`}}
+            {roleName: {'Ref': `Role`}}
           ]
         },
         Events: {}
