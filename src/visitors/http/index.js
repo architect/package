@@ -35,7 +35,7 @@ module.exports = function http(arc, template) {
 
     let method = route[0] // get, post, put, delete, patch
     let path = unexpress(route[1]) // from /foo/:bar to /foo/{bar}
-    let name = toLogicalID(getLambdaName(`${method.toLowerCase()}${path}`)) // GetIndex
+    let name = toLogicalID(getLambdaName(`${method.toLowerCase()}${path}`).replace(/000/g, '')) // GetIndex
     let code = `./src/http/${method}${getLambdaName(route[1])}` // ./src/http/get-index
     let prop = getPropertyHelper(arc, code) // returns a helper function for getting props
     // adding lambda resources
