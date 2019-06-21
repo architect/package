@@ -4,6 +4,7 @@ let statics = require('./static')
 let tables = require('./tables')
 let indexes = require('./indexes')
 let events = require('./events')
+let scheduled = require('./scheduled')
 
 module.exports = {
   globals,
@@ -12,4 +13,5 @@ module.exports = {
   tables,
   indexes,
   events,
+  scheduled,
 }

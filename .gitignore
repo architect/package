@@ -1,6 +1,7 @@
 node_modules/
 src/events
 src/http
+src/scheduled
 .arc
 sam.json
 out.yaml

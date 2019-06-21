@@ -62,57 +62,33 @@ module.exports = function deploy(params, callback) {
     },
 
     function packageHTTP(callback) {
-      series([
-        function base(callback) {
+      series(Object.keys(cfn).map(k=> {
+        return function(callback) {
           samPackage({
-            filename: `${appname}-cfn.json`,
-            bucket,
-            log,
-            verbose,
-          }, callback)
-        },
-        function http(callback) {
-          samPackage({
-            filename: `${appname}-cfn-http.json`,
-            bucket,
-            log,
-            verbose,
-          }, callback)
-        },
-        function events(callback) {
-          samPackage({
-            filename: `${appname}-cfn-events.json`,
+            filename: k,
             bucket,
             log,
             verbose,
           }, callback)
         }
-      ], callback)
+      }), callback)
     },
 
     // upload the nested templates
     function uploadToS3(callback) {
       let s3 = new aws.S3
-      parallel({
-        http(callback) {
-          let Key = `${appname}-cfn-http.yaml`
+      parallel(Object.keys(cfn).map(k=> {
+        return function(callback) {
+          let Key = k.replace('json', 'yaml')
+          console.log(path.join(process.cwd(), Key))
           let Body = fs.readFileSync(path.join(process.cwd(), Key))
           s3.putObject({
             Bucket: bucket,
             Key,
             Body,
           }, callback)
-        },
-        events(callback) {
-          let Key = `${appname}-cfn-events.yaml`
-          let Body = fs.readFileSync(path.join(process.cwd(), Key))
-          s3.putObject({
-            Bucket: bucket,
-            Key,
-            Body,
-          }, callback)
-        },
-      }, callback)
+        }
+      }), callback)
     },
 
     // deploy base
@@ -132,6 +108,7 @@ module.exports = function deploy(params, callback) {
     },
 
     function cleanup(callback) {
+      /*
       let files = [
         `${appname}-cfn-events.json`,
         `${appname}-cfn-events.yaml`,
@@ -145,6 +122,8 @@ module.exports = function deploy(params, callback) {
         }
       })
       parallel(files, callback)
+      */
+      callback()
     }
 
   ], callback)

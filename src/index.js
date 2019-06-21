@@ -22,7 +22,7 @@ toServerlessCloudFormation.toSAM = toSAM
 
 /**
  * @param {Object} arc - parsed arfile
- * @returns {CloudFormation} template
+ * @returns {Object} templates - nested template files for packaging/deployment
  */
 function toCFN(arc) {
   let appname = arc.app[0]
@@ -32,6 +32,8 @@ function toCFN(arc) {
     template[`${appname}-cfn-http.json`] = nested.http(arc)
   if (arc.events)
     template[`${appname}-cfn-events.json`] = nested.events(arc)
+  if (arc.scheduled)
+    template[`${appname}-cfn-scheduled.json`] = nested.scheduled(arc)
   return template
 }
 

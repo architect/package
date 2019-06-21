@@ -18,26 +18,11 @@ cheeky
 @aws
 bucket cf-sam-deployments-east
 
-@static
 @http
 get /
-get /foo
 
-@events
-lol
-sneeze
-
-@tables
-foo
-  barID *String
-
-cat
-  catID *String
-  bar **String
-
-@indexes
-foo
-  bazID *String
+@scheduled
+daily rate(10 minutes)
   `
   let arc = parse(arcfile)
   deploy({arc, log:true, verbose:true}, function done(err, result) {
