@@ -105,7 +105,11 @@ module.exports = function globals(arc, template) {
             'dynamodb:DeleteItem',
             'dynamodb:GetItem',
             'dynamodb:Query',
-            'dynamodb:UpdateItem'
+            'dynamodb:UpdateItem',
+            'dynamodb:GetRecords',
+            'dynamodb:GetShardIterator',
+            'dynamodb:DescribeStream',
+            'dynamodb:ListStreams'
           ],
           Resource: getTableArns(arc.tables),
         }]

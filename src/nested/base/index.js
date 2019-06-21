@@ -1,9 +1,9 @@
 let toLogicalID = require('@architect/utils/to-logical-id')
+let events = require('./events')
 let policy = require('./policy')
+let queues = require('./queues')
 let statics = require('./static')
 let tables = require('./tables')
-let events = require('./events')
-let queues = require('./queues')
 let {version} = require('../../../package.json')
 
 /**
@@ -59,6 +59,7 @@ module.exports = function globals(arc) {
     }
   }
 
+  // mix in global assets that we need to secure w the IAM Role
   if (arc.static)
     template = statics(arc, template)
 
@@ -71,7 +72,7 @@ module.exports = function globals(arc) {
   if (arc.queues)
     template = queues(arc, template)
 
-  // start nesting!
+  // start nesting templates for functions!
   let appname = arc.app[0]
   let bucket = arc.aws.find(t=> t[0] === 'bucket')[1]
 
@@ -183,6 +184,33 @@ module.exports = function globals(arc) {
     })
     if (arc.static) {
       template.Resources.Queues.Properties.Parameters.StaticBucket = {Ref: 'StaticBucket'}
+    }
+  }
+
+  // nest table streams stack
+  let hasStream = tbl=> tbl[Object.keys(tbl)[0]].hasOwnProperty('stream')
+  if (arc.tables && arc.tables.some(hasStream)) {
+    template.Resources.Tables = {
+      Type: 'AWS::CloudFormation::Stack',
+      Properties: {
+        TemplateURL: {
+          'Fn::Sub': [
+            'http://${bucket}.s3.${AWS::Region}.amazonaws.com/${file}',
+            {bucket, file: `${appname}-cfn-tables.yaml`}
+          ]
+        },
+        Parameters: {
+          Role: {'Fn::GetAtt': ['Role', 'Arn']}
+        }
+      }
+    }
+    arc.tables.forEach(table=> {
+      let tbl = Object.keys(table)[0]
+      let name = `${toLogicalID(tbl)}Table`
+      template.Resources.Tables.Properties.Parameters[name] = {'Fn::GetAtt': [name, 'StreamArn']}
+    })
+    if (arc.static) {
+      template.Resources.Tables.Properties.Parameters.StaticBucket = {Ref: 'StaticBucket'}
     }
   }
 

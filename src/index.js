@@ -25,17 +25,28 @@ toServerlessCloudFormation.toSAM = toSAM
  * @returns {Object} templates - nested template files for packaging/deployment
  */
 function toCFN(arc) {
+
+  let hasStream = tbl=> tbl[Object.keys(tbl)[0]].hasOwnProperty('stream')
   let appname = arc.app[0]
   let template = {}
+
   template[`${appname}-cfn.json`] = nested.base(arc)
+
   if (arc.http)
     template[`${appname}-cfn-http.json`] = nested.http(arc)
+
   if (arc.events)
     template[`${appname}-cfn-events.json`] = nested.events(arc)
+
   if (arc.scheduled)
     template[`${appname}-cfn-scheduled.json`] = nested.scheduled(arc)
+
   if (arc.queues)
     template[`${appname}-cfn-queues.json`] = nested.queues(arc)
+
+  if (arc.tables && arc.tables.some(hasStream))
+    template[`${appname}-cfn-tables.json`] = nested.tables(arc)
+
   return template
 }
 

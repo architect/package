@@ -18,11 +18,10 @@ cheeky
 @aws
 bucket cf-sam-deployments-east
 
-@http
-get /
-
-@queues
-super-q
+@tables
+cats
+  catID *String
+  stream true
   `
   let arc = parse(arcfile)
   deploy({arc, log:true, verbose:true}, function done(err, result) {

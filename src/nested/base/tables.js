@@ -3,6 +3,7 @@ let toLogicalID = require('@architect/utils/to-logical-id')
 
 module.exports = function tables(arc, template) {
   template = visitTables(arc, template)
+  template = stripFunctions(arc, template)
   template.Resources.Role.Properties.Policies.push({
     PolicyName: 'ArcDynamoPolicy',
     PolicyDocument: {
@@ -16,7 +17,11 @@ module.exports = function tables(arc, template) {
           'dynamodb:DeleteItem',
           'dynamodb:GetItem',
           'dynamodb:Query',
-          'dynamodb:UpdateItem'
+          'dynamodb:UpdateItem',
+          'dynamodb:GetRecords',
+          'dynamodb:GetShardIterator',
+          'dynamodb:DescribeStream',
+          'dynamodb:ListStreams'
         ],
         Resource: getTableArns(arc.tables),
       }]
@@ -34,5 +39,23 @@ module.exports = function tables(arc, template) {
       }
     })
   }
+  return template
+}
+
+// remove stream functions
+function stripFunctions(arc, template) {
+  arc.tables.forEach(table=> {
+
+    let tbl = Object.keys(table)[0]
+    let attr = table[tbl]
+    let hasLambda = attr.hasOwnProperty('stream')
+    let TableName = toLogicalID(tbl)
+
+    if (hasLambda) {
+      let name = `${TableName}Stream`
+      delete template.Resources[name]
+    }
+  })
+  //console.log('nested/base/tables', template.Resources)
   return template
 }

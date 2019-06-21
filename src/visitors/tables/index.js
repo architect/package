@@ -1,8 +1,13 @@
 let toLogicalID = require('@architect/utils/to-logical-id')
+
 let clean = require('./clean')
 let getTTL = require('./get-ttl')
+let getHasLambda = require('./get-has-lambda')
 let getKeySchema = require('./get-key-schema')
-let getAttributeDefinitions = require('./get-attribute-definitions')
+let getAttributes = require('./get-attribute-definitions')
+
+let getEnv = require('../get-lambda-env')
+let getPropertyHelper = require('../get-lambda-config')
 
 /**
  * visit arc.tables and merge in AWS::Serverless resources
@@ -15,8 +20,6 @@ module.exports = function tables(arc, template) {
   if (!template.Outputs)
     template.Outputs = {}
 
-  //let appname = toLogicalID(arc.app[0])
-
   arc.tables.forEach(table=> {
 
     let tbl = Object.keys(table)[0]
@@ -25,9 +28,9 @@ module.exports = function tables(arc, template) {
 
     let KeySchema = getKeySchema(attr, keys)
     let hasTTL = getTTL(attr)
+    let hasLambda = getHasLambda(attr)
     let TableName = toLogicalID(tbl)
-    let AttributeDefinitions = getAttributeDefinitions(clean(attr))
-
+    let AttributeDefinitions = getAttributes(clean(attr))
 
     template.Resources[`${TableName}Table`] = {
       Type: 'AWS::DynamoDB::Table',
@@ -36,7 +39,6 @@ module.exports = function tables(arc, template) {
         KeySchema,
         AttributeDefinitions,
         BillingMode: 'PAY_PER_REQUEST',
-        //StreamSpecification: StreamSpecification,
       }
     }
 
@@ -47,18 +49,61 @@ module.exports = function tables(arc, template) {
       }
     }
 
+    /*
     template.Outputs[`${TableName}Table`] = {
       Description: 'Dynamo Table',
       Value: {Ref: `${TableName}Table`},
-      /*
       Export: {
-        Name: {
-          'Fn::Join': [":", [appname, {Ref:'AWS::StackName'}, `${TableName}Table`]]
-        }
-      }*/
-    }
+        Name: {'Fn::Join': [":", [appname, {Ref:'AWS::StackName'}, `${TableName}Table`]]}
+      }
+    }*/
 
-    // TODO if stream defined
+    if (hasLambda) {
+      // creates the stream
+      template.Resources[`${TableName}Table`].Properties.StreamSpecification = {
+        StreamViewType: 'NEW_AND_OLD_IMAGES'
+      }
+
+      let name = `${TableName}Stream`
+      let code = `./src/tables/${tbl}`
+      let prop = getPropertyHelper(arc, code) // helper function for getting props
+      let env = getEnv(arc)
+
+      template.Resources[name] = {
+        Type: 'AWS::Serverless::Function',
+        Properties: {
+          Handler: 'index.handler',
+          CodeUri: code,
+          Runtime: prop('runtime'),
+          MemorySize: prop('memory'),
+          Timeout: prop('timeout'),
+          Environment: {Variables: env},
+          Role: {Ref: `Role`}
+        },
+        Events: {}
+      }
+
+      let concurrency = prop('concurrency')
+      if (concurrency != 'unthrottled') {
+        template.Resources[name].Properties.ReservedConcurrentExecutions = concurrency
+      }
+
+      let layers = prop('layers')
+      if (Array.isArray(layers) && layers.length > 0) {
+        template.Resources[name].Properties.Layers = layers
+      }
+
+      // construct the event source so SAM can wire the permissions
+      let eventName = `${name}Event`
+      template.Resources[name].Events[eventName] = {
+        Type: 'DynamoDB',
+        Properties: {
+          Stream: {'Fn::GetAtt': [`${TableName}Table`, 'StreamArn']},
+          StartingPosition: 'TRIM_HORIZON'
+        }
+      }
+    }
   })
+
   return template
 }
