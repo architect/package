@@ -34,6 +34,8 @@ function toCFN(arc) {
     template[`${appname}-cfn-events.json`] = nested.events(arc)
   if (arc.scheduled)
     template[`${appname}-cfn-scheduled.json`] = nested.scheduled(arc)
+  if (arc.queues)
+    template[`${appname}-cfn-queues.json`] = nested.queues(arc)
   return template
 }
 

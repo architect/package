@@ -4,14 +4,11 @@ let toLogicalID = require('@architect/utils/to-logical-id')
  *
  * - AWS::IAM::Role
  */
-module.exports = function http(arc, template) {
+module.exports = function globals(arc, template) {
 
   // interpolate required shape
   if (!template.Resources)
     template.Resources = {}
-
-  //let appname = arc.app[0]
-  //let name = `${toLogicalID(appname)}Role`
 
   // construct a least priv iam role
   template.Resources.Role = {
@@ -27,11 +24,11 @@ module.exports = function http(arc, template) {
           Action: 'sts:AssumeRole'
         }]
       },
-      Policies: [],
-      // ManagedPolicyArns
-      // PermissionsBoundary
+      Policies: []
     }
   }
+
+  // allow runtime to reflect permissions
   template.Resources.RoleReflectionPolicy = {
     Type: 'AWS::IAM::Policy',
     DependsOn: 'Role',
@@ -156,8 +153,36 @@ module.exports = function http(arc, template) {
     }
   }
 
+  // allow lambdas to publish to queues
   if (arc.queues) {
-    //allow lambdas to publish to queues
+    template.Resources.Role.Properties.Policies.push({
+      PolicyName: 'ArcSimpleQueueServicePolicy',
+      PolicyDocument: {
+        Statement: [{
+          Effect: 'Allow',
+          Action: [
+            'sqs:SendMessageBatch',
+            'sqs:SendMessage',
+            'sqs:ReceiveMessage',
+            'sqs:DeleteMessage',
+            'sqs:GetQueueAttributes',
+          ],
+          Resource: '*'//getQueueArns(arc.queues),
+        }]
+      }
+    })
+    /*
+    function getQueueArns(queues) {
+      return queues.map(q=> {
+        let name = `${toLogicalID(q)}Queue`
+        return {
+          'Fn::Sub': [
+            'arn:aws:sqs:${AWS::Region}:${AWS::AccountId}:${queue}',
+            {queue: {Ref: name}}
+          ]
+        }
+      })
+    }*/
   }
 
   return template

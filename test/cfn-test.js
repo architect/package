@@ -21,8 +21,8 @@ bucket cf-sam-deployments-east
 @http
 get /
 
-@scheduled
-daily rate(10 minutes)
+@queues
+super-q
   `
   let arc = parse(arcfile)
   deploy({arc, log:true, verbose:true}, function done(err, result) {

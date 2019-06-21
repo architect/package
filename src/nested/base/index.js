@@ -3,6 +3,7 @@ let policy = require('./policy')
 let statics = require('./static')
 let tables = require('./tables')
 let events = require('./events')
+let queues = require('./queues')
 let {version} = require('../../../package.json')
 
 /**
@@ -66,6 +67,9 @@ module.exports = function globals(arc) {
 
   if (arc.events)
     template = events(arc, template)
+
+  if (arc.queues)
+    template = queues(arc, template)
 
   // start nesting!
   let appname = arc.app[0]
@@ -153,6 +157,32 @@ module.exports = function globals(arc) {
     }
     if (arc.static) {
       template.Resources.Scheduled.Properties.Parameters.StaticBucket = {Ref: 'StaticBucket'}
+    }
+  }
+
+  // nest a queues stack
+  // passing in references to sqs queue arns and role
+  if (arc.queues) {
+    template.Resources.Queues = {
+      Type: 'AWS::CloudFormation::Stack',
+      Properties: {
+        TemplateURL: {
+          'Fn::Sub': [
+            'http://${bucket}.s3.${AWS::Region}.amazonaws.com/${file}',
+            {bucket, file: `${appname}-cfn-queues.yaml`}
+          ]
+        },
+        Parameters: {
+          Role: {'Fn::GetAtt': ['Role', 'Arn']}
+        }
+      }
+    }
+    arc.queues.forEach(event=> {
+      let name = `${toLogicalID(event)}Queue`
+      template.Resources.Queues.Properties.Parameters[name] = {'Fn::GetAtt': [name, 'Arn']}
+    })
+    if (arc.static) {
+      template.Resources.Queues.Properties.Parameters.StaticBucket = {Ref: 'StaticBucket'}
     }
   }
 
