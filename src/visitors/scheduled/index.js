@@ -34,7 +34,12 @@ module.exports = function visitScheduled(arc, template) {
         MemorySize: prop('memory'),
         Timeout: prop('timeout'),
         Environment: {Variables: env},
-        Role: {Ref: `Role`},
+        Role: {
+          'Fn::Sub': [
+            'arn:aws:iam::${AWS::AccountId}:role/${roleName}',
+            {roleName: {'Ref': `Role`}}
+          ]
+        },
         Events: {}
       }
     }

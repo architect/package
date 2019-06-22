@@ -25,7 +25,7 @@ module.exports = function nestScheduled(arc) {
     if (template.Resources[k].Type === 'AWS::DynamoDB::Table') {
       delete template.Resources[k]
     }
-  }) 
+  })
 
   if (arc.static) {
     template.Parameters.StaticBucket = {
@@ -84,7 +84,7 @@ module.exports = function nestScheduled(arc) {
       template.Resources[name].Events[eventName] = {
         Type: 'DynamoDB',
         Properties: {
-          Stream: {Ref: `${toLogicalID(name)}Table`},
+          Stream: {Ref: `${TableName}Table`},
           StartingPosition: 'TRIM_HORIZON'
         }
       }

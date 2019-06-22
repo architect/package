@@ -64,11 +64,11 @@ module.exports = function nestQueues(arc) {
     }
 
     // construct the event source so SAM can wire the permissions
-    let eventName = `${name}Event`
+    let eventName = `${name}QueueEvent`
     template.Resources[name].Properties.Events[eventName] = {
       Type: 'SQS',
       Properties: {
-        Queue: {Ref: `${name}Queue`}
+        Queue: {'Fn::GetAtt': [`${name}Queue`, 'Arn']}
       }
     }
   })

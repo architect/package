@@ -1,0 +1,86 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Exported by architect/package@1.0.17 on 2019-06-22T00:39:08.970Z
+Resources:
+  AccountsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      KeySchema:
+      - AttributeName: accountID
+        KeyType: HASH
+      AttributeDefinitions:
+      - AttributeName: accountID
+        AttributeType: S
+      - AttributeName: email
+        AttributeType: S
+      BillingMode: PAY_PER_REQUEST
+      GlobalSecondaryIndexes:
+      - IndexName: email-index
+        KeySchema:
+        - AttributeName: email
+          KeyType: HASH
+        Projection:
+          ProjectionType: ALL
+  Role:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: lambda.amazonaws.com
+          Action: sts:AssumeRole
+      Policies:
+      - PolicyName: ArcGlobalPolicy
+        PolicyDocument:
+          Statement:
+          - Effect: Allow
+            Action:
+            - logs:CreateLogGroup
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+            - logs:DescribeLogStreams
+            Resource: arn:aws:logs:*:*:*
+      - PolicyName: ArcDynamoPolicy
+        PolicyDocument:
+          Statement:
+          - Effect: Allow
+            Action:
+            - dynamodb:BatchGetItem
+            - dynamodb:BatchWriteItem
+            - dynamodb:PutItem
+            - dynamodb:DeleteItem
+            - dynamodb:GetItem
+            - dynamodb:Query
+            - dynamodb:UpdateItem
+            - dynamodb:GetRecords
+            - dynamodb:GetShardIterator
+            - dynamodb:DescribeStream
+            - dynamodb:ListStreams
+            Resource:
+            - Fn::Sub:
+              - arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tablename}
+              - tablename:
+                  Ref: AccountsTable
+            - Fn::Sub:
+              - arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tablename}/stream/*
+              - tablename:
+                  Ref: AccountsTable
+  RoleReflectionPolicy:
+    Type: AWS::IAM::Policy
+    DependsOn: Role
+    Properties:
+      PolicyName: ArcRoleReflectionPolicy
+      PolicyDocument:
+        Statement:
+        - Effect: Allow
+          Action: iam:GetRolePolicy
+          Resource:
+            Fn::Sub:
+            - arn:aws:iam::${AWS::AccountId}:role/${role}
+            - role:
+                Ref: Role
+      Roles:
+      - Ref: Role
+Outputs: {}

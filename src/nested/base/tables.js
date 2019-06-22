@@ -31,13 +31,19 @@ module.exports = function tables(arc, template) {
     let flip = tbl=> Object.keys(tbl)[0]
     return tbls.map(flip).map(table=> {
       let name = `${toLogicalID(table)}Table`
-      return {
+      return [{
         'Fn::Sub': [
           'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tablename}',
           {tablename: {'Ref': name}}
         ]
-      }
-    })
+      },
+      {
+        'Fn::Sub': [
+          'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tablename}/stream/*',
+          {tablename: {'Ref': name}}
+        ]
+      }]
+    }).reduce((a, b)=> a.concat(b), [])
   }
   return template
 }

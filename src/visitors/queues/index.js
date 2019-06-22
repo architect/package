@@ -33,7 +33,12 @@ module.exports = function visitQueues(arc, template) {
         MemorySize: prop('memory'),
         Timeout: prop('timeout'),
         Environment: {Variables: env},
-        Role: {Ref: `Role`},
+        Role: {
+          'Fn::Sub': [
+            'arn:aws:iam::${AWS::AccountId}:role/${roleName}',
+            {roleName: {'Ref': `Role`}}
+          ]
+        },
         Events: {}
       }
     }
@@ -49,11 +54,11 @@ module.exports = function visitQueues(arc, template) {
     }
 
     // construct the event source so SAM can wire the permissions
-    let eventName = `${name}Queue`
+    let eventName = `${name}QueueEvent`
     template.Resources[name].Properties.Events[eventName] = {
       Type: 'SQS',
       Properties: {
-        Topic: {Ref: `${name}Queue`}
+        Queue: {'Fn::GetAtt': [`${name}Queue`, 'Arn']}
       }
     }
 
@@ -64,11 +69,11 @@ module.exports = function visitQueues(arc, template) {
     }
 
     template.Outputs[`${name}SqsQueue`] = {
-      Description: 'An SQS Topic',
-      Value: {Ref: `${name}Topic`},
+      Description: 'An SQS Queue',
+      Value: {Ref: `${name}Queue`},
       Export: {
         Name: {
-          'Fn::Join': [":", [appname, {Ref:'AWS::StackName'}, `${name}Topic`]]
+          'Fn::Join': [":", [appname, {Ref:'AWS::StackName'}, `${name}Queue`]]
         }
       }
     }
