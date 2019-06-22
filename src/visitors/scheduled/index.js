@@ -14,8 +14,6 @@ module.exports = function visitScheduled(arc, template) {
   if (!template.Outputs)
     template.Outputs = {}
 
-  //let appname = toLogicalID(arc.app[0])
-
   // we leave the bucket name generation up to cloudfront
   arc.scheduled.forEach(vector=> {
 
