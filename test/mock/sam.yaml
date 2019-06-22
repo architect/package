@@ -1,7 +1,184 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Exported by architect/package@1.0.17 on 2019-06-22T00:39:08.970Z
+Description: Exported by architect/package@1.0.18 on 2019-06-22T20:04:11.294Z
 Resources:
+  Testapp:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: production
+      DefinitionBody:
+        openapi: 3.0.1
+        info:
+          title: testapp
+        paths:
+          /:
+            get:
+              responses:
+                '200':
+                  description: 200 response
+              x-amazon-apigateway-integration:
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetIndex.Arn}/invocations
+                responses:
+                  default:
+                    statusCode: '200'
+                    contentHandling: CONVERT_TO_TEXT
+                passthroughBehavior: when_no_match
+                httpMethod: POST
+                contentHandling: CONVERT_TO_TEXT
+                type: aws_proxy
+          /{proxy+}:
+            x-amazon-apigateway-any-method:
+              parameters:
+              - name: proxy
+                in: path
+                required: true
+                schema:
+                  type: string
+              x-amazon-apigateway-integration:
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetIndex.Arn}/invocations
+                responses:
+                  default:
+                    statusCode: '200'
+                passthroughBehavior: when_no_match
+                httpMethod: POST
+                cacheNamespace: xlr8r
+                cacheKeyParameters:
+                - method.request.path.proxy
+                contentHandling: CONVERT_TO_TEXT
+                type: aws_proxy
+      EndpointConfiguration: REGIONAL
+      BinaryMediaTypes:
+      - '*~1*'
+      MinimumCompressionSize: 0
+  GetIndex:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      CodeUri: s3://cf-sam-deployments-east/53280a91f6fa5972dede6fd875ac2cac
+      Runtime: nodejs10.x
+      MemorySize: 1152
+      Timeout: 5
+      Environment:
+        Variables:
+          ARC_CLOUDFORMATION: Testapp
+          ARC_APP_NAME: testapp
+          NODE_ENV: production
+          SESSION_TABLE_NAME: jwe
+          PYTHONPATH: /var/task/vendor:/var/runtime:/opt/python
+      Role:
+        Fn::Sub:
+        - arn:aws:iam::${AWS::AccountId}:role/${roleName}
+        - roleName:
+            Ref: Role
+      Events:
+        GetIndexEvent:
+          Type: Api
+          Properties:
+            Path: /
+            Method: GET
+            RestApiId:
+              Ref: Testapp
+  InvokeProxyPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName:
+        Ref: GetIndex
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn:
+        Fn::Sub:
+        - arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${restApiId}/*/*
+        - restApiId:
+            Ref: Testapp
+  Sneeze:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      CodeUri: s3://cf-sam-deployments-east/583a3132dbbc63614d1176ea8d7aa308
+      Runtime: nodejs10.x
+      MemorySize: 1152
+      Timeout: 5
+      Environment:
+        Variables:
+          ARC_CLOUDFORMATION: Testapp
+          ARC_APP_NAME: testapp
+          NODE_ENV: production
+          SESSION_TABLE_NAME: jwe
+          PYTHONPATH: /var/task/vendor:/var/runtime:/opt/python
+      Role:
+        Fn::Sub:
+        - arn:aws:iam::${AWS::AccountId}:role/${roleName}
+        - roleName:
+            Ref: Role
+      Events:
+        SneezeEvent:
+          Type: SNS
+          Properties:
+            Topic:
+              Ref: SneezeTopic
+  SneezeTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      DisplayName: Sneeze
+      Subscription: []
+  Cueball:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      CodeUri: s3://cf-sam-deployments-east/88b0880d715a7a9226f800dead7f831d
+      Runtime: nodejs10.x
+      MemorySize: 1152
+      Timeout: 5
+      Environment:
+        Variables:
+          ARC_CLOUDFORMATION: Testapp
+          ARC_APP_NAME: testapp
+          NODE_ENV: production
+          SESSION_TABLE_NAME: jwe
+          PYTHONPATH: /var/task/vendor:/var/runtime:/opt/python
+      Role:
+        Fn::Sub:
+        - arn:aws:iam::${AWS::AccountId}:role/${roleName}
+        - roleName:
+            Ref: Role
+      Events:
+        CueballQueueEvent:
+          Type: SQS
+          Properties:
+            Queue:
+              Fn::GetAtt:
+              - CueballQueue
+              - Arn
+  CueballQueue:
+    Type: AWS::SQS::Queue
+    Properties: {}
+  Daily:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      CodeUri: s3://cf-sam-deployments-east/dd24db81011b6eb6f02d1d5c3f824f95
+      Runtime: nodejs10.x
+      MemorySize: 1152
+      Timeout: 5
+      Environment:
+        Variables:
+          ARC_CLOUDFORMATION: Testapp
+          ARC_APP_NAME: testapp
+          NODE_ENV: production
+          SESSION_TABLE_NAME: jwe
+          PYTHONPATH: /var/task/vendor:/var/runtime:/opt/python
+      Role:
+        Fn::Sub:
+        - arn:aws:iam::${AWS::AccountId}:role/${roleName}
+        - roleName:
+            Ref: Role
+      Events:
+        DailyEvent:
+          Type: Schedule
+          Properties:
+            Schedule: rate(1 day)
   AccountsTable:
     Type: AWS::DynamoDB::Table
     Properties:
@@ -14,6 +191,8 @@ Resources:
       - AttributeName: email
         AttributeType: S
       BillingMode: PAY_PER_REQUEST
+      StreamSpecification:
+        StreamViewType: NEW_AND_OLD_IMAGES
       GlobalSecondaryIndexes:
       - IndexName: email-index
         KeySchema:
@@ -21,6 +200,40 @@ Resources:
           KeyType: HASH
         Projection:
           ProjectionType: ALL
+  AccountsStream:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.handler
+      CodeUri: s3://cf-sam-deployments-east/87c6ed8635b240e3b94f29c912bffdd4
+      Runtime: nodejs10.x
+      MemorySize: 1152
+      Timeout: 5
+      Environment:
+        Variables:
+          ARC_CLOUDFORMATION: Testapp
+          ARC_APP_NAME: testapp
+          NODE_ENV: production
+          SESSION_TABLE_NAME: jwe
+          PYTHONPATH: /var/task/vendor:/var/runtime:/opt/python
+      Role:
+        Fn::Sub:
+        - arn:aws:iam::${AWS::AccountId}:role/${roleName}
+        - roleName:
+            Ref: Role
+    Events: {}
+  AccountsStreamEvent:
+    Type: AWS::Lambda::EventSourceMapping
+    Properties:
+      BatchSize: 10
+      EventSourceArn:
+        Fn::GetAtt:
+        - AccountsTable
+        - StreamArn
+      FunctionName:
+        Fn::GetAtt:
+        - AccountsStream
+        - Arn
+      StartingPosition: TRIM_HORIZON
   Role:
     Type: AWS::IAM::Role
     Properties:
@@ -67,6 +280,28 @@ Resources:
               - arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tablename}/stream/*
               - tablename:
                   Ref: AccountsTable
+      - PolicyName: ArcSimpleNotificationServicePolicy
+        PolicyDocument:
+          Statement:
+          - Effect: Allow
+            Action:
+            - sns:Publish
+            Resource:
+            - Fn::Sub:
+              - arn:aws:sns:${AWS::Region}:${AWS::AccountId}:${topic}
+              - topic:
+                  Ref: SneezeTopic
+      - PolicyName: ArcSimpleQueueServicePolicy
+        PolicyDocument:
+          Statement:
+          - Effect: Allow
+            Action:
+            - sqs:SendMessageBatch
+            - sqs:SendMessage
+            - sqs:ReceiveMessage
+            - sqs:DeleteMessage
+            - sqs:GetQueueAttributes
+            Resource: '*'
   RoleReflectionPolicy:
     Type: AWS::IAM::Policy
     DependsOn: Role
@@ -83,4 +318,37 @@ Resources:
                 Ref: Role
       Roles:
       - Ref: Role
-Outputs: {}
+Outputs:
+  API:
+    Description: API Gateway
+    Value:
+      Fn::Sub:
+      - https://${restApiId}.execute-api.${AWS::Region}.amazonaws.com/production/
+      - restApiId:
+          Ref: Testapp
+  restApiId:
+    Description: HTTP restApiId
+    Value:
+      Ref: Testapp
+  SneezeSnsTopic:
+    Description: An SNS Topic
+    Value:
+      Ref: SneezeTopic
+    Export:
+      Name:
+        Fn::Join:
+        - ':'
+        - - Testapp
+          - Ref: AWS::StackName
+          - SneezeTopic
+  CueballSqsQueue:
+    Description: An SQS Queue
+    Value:
+      Ref: CueballQueue
+    Export:
+      Name:
+        Fn::Join:
+        - ':'
+        - - Testapp
+          - Ref: AWS::StackName
+          - CueballQueue

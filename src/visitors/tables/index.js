@@ -98,12 +98,13 @@ module.exports = function tables(arc, template) {
         template.Resources[name].Properties.Layers = layers
       }
 
-      // construct the event source so SAM can wire the permissions
       let eventName = `${name}Event`
-      template.Resources[name].Events[eventName] = {
-        Type: 'DynamoDB',
+      template.Resources[eventName] = {
+        Type: 'AWS::Lambda::EventSourceMapping',
         Properties: {
-          Stream: {'Fn::GetAtt': [`${TableName}Table`, 'StreamArn']},
+          BatchSize: 10,
+          EventSourceArn: {'Fn::GetAtt': [`${TableName}Table`, 'StreamArn']},
+          FunctionName: {'Fn::GetAtt': [name, 'Arn']},
           StartingPosition: 'TRIM_HORIZON'
         }
       }

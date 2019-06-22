@@ -79,26 +79,17 @@ module.exports = function nestScheduled(arc) {
         template.Resources[name].Properties.Layers = layers
       }
 
-      // construct the event source so SAM can wire the permissions
       let eventName = `${name}Event`
-      template.Resources[name].Events[eventName] = {
-        Type: 'DynamoDB',
+      template.Resources[eventName] = {
+        Type: 'AWS::Lambda::EventSourceMapping',
         Properties: {
-          Stream: {Ref: `${TableName}Table`},
+          BatchSize: 10,
+          EventSourceArn: {'Fn::GetAtt': [`${TableName}Table`, 'StreamArn']},
+          FunctionName: {'Fn::GetAtt': [name, 'Arn']},
           StartingPosition: 'TRIM_HORIZON'
         }
       }
 
-      /*let lambdaName = `${toLogicalID(name)}Stream`
-      let eventName = `${toLogicalID(name)}StreamEvent`
-
-      template.Resources[lambdaName].Events[eventName] = {
-        Type: 'DynamoDB',
-        Properties: {
-          Stream: {Ref: `${toLogicalID(name)}Table`},
-          StartingPosition: 'TRIM_HORIZON'
-        }
-      }*/
     }
   })
 
