@@ -1,8 +1,23 @@
-// learn more about http functions here: https://arc.codes/guides/http
+let aws = require('aws-sdk')
+let querystring = require('querystring')
+let iam = new aws.IAM
+
 exports.handler = async function http(req) {
-  console.log(req)
+  let data
+  let statusCode = 200
+  try {
+    data = await iam.getRolePolicy({
+      PolicyName: 'ArcDynamoPolicy',
+      RoleName: process.env.ARC_ROLE
+    }).promise()
+    data = JSON.parse(querystring.unescape(data.PolicyDocument))
+  }
+  catch(e) {
+    statusCode = 500
+    data = {msg: e.message, stack: e.stack}
+  }
   return {
     headers: {'content-type': 'text/html; charset=utf8'},
-    body: '<b>hello world</b> from nodejs'
+    body: `<pre>${JSON.stringify(data, null, 2)}</pre>`
   }
 }

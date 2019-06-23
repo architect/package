@@ -5,6 +5,7 @@ let path = require('path')
 
 module.exports = function getEnv(arc) {
   let env = {
+    ARC_ROLE: {Ref: 'Role'},
     ARC_CLOUDFORMATION: toLogicalID(arc.app[0]),
     ARC_APP_NAME: arc.app[0],
     NODE_ENV: 'production',
