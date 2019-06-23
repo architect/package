@@ -2,7 +2,7 @@ let aws = require('aws-sdk')
 let querystring = require('querystring')
 let iam = new aws.IAM
 
-exports.handler = async function http(req) {
+exports.handler = async function http() {
   let data
   let statusCode = 200
   try {
@@ -17,6 +17,7 @@ exports.handler = async function http(req) {
     data = {msg: e.message, stack: e.stack}
   }
   return {
+    statusCode,
     headers: {'content-type': 'text/html; charset=utf8'},
     body: `<pre>${JSON.stringify(data, null, 2)}</pre>`
   }

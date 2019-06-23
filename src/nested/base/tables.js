@@ -33,7 +33,7 @@ module.exports = function tables(arc, template) {
       let name = `${toLogicalID(table)}Table`
       return [{
         'Fn::Sub': [
-          'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tablename}',
+          'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tablename}/*',
           {tablename: {'Ref': name}}
         ]
       },
