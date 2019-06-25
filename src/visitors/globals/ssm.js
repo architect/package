@@ -119,7 +119,7 @@ module.exports = function ssm(arc, template) {
             Action: 'ssm:GetParametersByPath',
             Resource: {
               'Fn::Sub': [
-                'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AWS::StackName}/*',
+                'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AWS::StackName}',
                 {}
               ]
             }
