@@ -4,6 +4,7 @@ let policy = require('./policy')
 let queues = require('./queues')
 let statics = require('./static')
 let tables = require('./tables')
+let ssm = require('../../visitors/globals/ssm')
 let {version} = require('../../../package.json')
 
 /**
@@ -58,6 +59,9 @@ module.exports = function globals(arc) {
       }
     }
   }
+
+  // mix in params
+  template = ssm(arc, template)
 
   // mix in global assets that we need to secure w the IAM Role
   if (arc.static)

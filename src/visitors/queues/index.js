@@ -14,7 +14,7 @@ module.exports = function visitQueues(arc, template) {
   if (!template.Outputs)
     template.Outputs = {}
 
-  let appname = toLogicalID(arc.app[0])
+  //let appname = toLogicalID(arc.app[0])
 
   arc.queues.forEach(event=> {
 
@@ -71,11 +71,12 @@ module.exports = function visitQueues(arc, template) {
     template.Outputs[`${name}SqsQueue`] = {
       Description: 'An SQS Queue',
       Value: {Ref: `${name}Queue`},
+      /*
       Export: {
         Name: {
           'Fn::Join': [":", [appname, {Ref:'AWS::StackName'}, `${name}Queue`]]
         }
-      }
+      }*/
     }
   })
 

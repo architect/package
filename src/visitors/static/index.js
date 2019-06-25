@@ -1,4 +1,4 @@
-let toLogicalID = require('@architect/utils/to-logical-id')
+//let toLogicalID = require('@architect/utils/to-logical-id')
 let addStatic = require('./add-static-proxy')
 let addMocks = require('./add-static-mocks')
 
@@ -14,7 +14,7 @@ module.exports = function statics(arc, template) {
   if (!template.Outputs)
     template.Outputs = {}
 
-  let appname = toLogicalID(arc.app[0])
+  //let appname = toLogicalID(arc.app[0])
 
   // we leave the bucket name generation up to cloudfront
   template.Resources.StaticBucket = {
@@ -38,11 +38,12 @@ module.exports = function statics(arc, template) {
         {bukkit: {'Ref': 'StaticBucket'}}
       ]
     },
+    /*
     Export: {
       Name: {
         'Fn::Join': [":", [appname, {Ref:'AWS::StackName'}, 'Bucket']]
       }
-    }
+    }*/
   }
 
   // if an api is defined then add _static proxy and attempt to serialize ./public

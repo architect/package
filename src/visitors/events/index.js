@@ -14,7 +14,7 @@ module.exports = function statics(arc, template) {
   if (!template.Outputs)
     template.Outputs = {}
 
-  let appname = toLogicalID(arc.app[0])
+  // let appname = toLogicalID(arc.app[0])
 
   arc.events.forEach(event=> {
 
@@ -74,11 +74,12 @@ module.exports = function statics(arc, template) {
     template.Outputs[`${name}SnsTopic`] = {
       Description: 'An SNS Topic',
       Value: {Ref: `${name}Topic`},
+      /*
       Export: {
         Name: {
           'Fn::Join': [":", [appname, {Ref:'AWS::StackName'}, `${name}Topic`]]
         }
-      }
+      }*/
     }
   })
 
