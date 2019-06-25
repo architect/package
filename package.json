@@ -1,6 +1,6 @@
 {
   "name": "@architect/package",
-  "version": "1.0.24",
+  "version": "1.0.25",
   "description": "Package .arc for deployment with Cloudformation",
   "main": "src/index.js",
   "scripts": {
