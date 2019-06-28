@@ -126,5 +126,15 @@ module.exports = function visitWS(arc, template) {
     }
   })
 
+  template.Outputs.WSS = {
+    Description: 'Websocket Endpoint',
+    Value: {
+      'Fn::Sub': [
+        'wss://${WS}.execute-api.${AWS::Region}.amazonaws.com/${stage}',
+        {stage: 'production'}
+      ]
+    }
+  }
+
   return template
 }
