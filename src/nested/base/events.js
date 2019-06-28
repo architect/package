@@ -17,20 +17,18 @@ module.exports = function events(arc, template) {
       Statement: [{
         Effect: 'Allow',
         Action: 'sns:Publish',
-        Resource: getTopicArns(arc.events),
+        Resource: getTopicArn(),
       }]
     }
   })
-  function getTopicArns(topics) {
-    return topics.map(topic=> {
-      let name = `${toLogicalID(topic)}Topic`
+
+    function getTopicArn() {
       return {
         'Fn::Sub': [
-          'arn:aws:sns:${AWS::Region}:${AWS::AccountId}:${topic}',
-          {topic: {'Ref': name}}
+          'arn:aws:sns:${AWS::Region}:${AWS::AccountId}:${AWS::StackName}*',
+          {}
         ]
       }
-    })
-  }
+    }
   return template
 }
