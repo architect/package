@@ -99,13 +99,13 @@ module.exports = function globals(arc, template) {
         Statement: [{
           Effect: 'Allow',
           Action: [
-            // no scan!
             'dynamodb:BatchGetItem',
             'dynamodb:BatchWriteItem',
             'dynamodb:PutItem',
             'dynamodb:DeleteItem',
             'dynamodb:GetItem',
             'dynamodb:Query',
+            'dynamodb:Scan',
             'dynamodb:UpdateItem',
             'dynamodb:GetRecords',
             'dynamodb:GetShardIterator',

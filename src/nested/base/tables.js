@@ -10,7 +10,7 @@ module.exports = function tables(arc, template) {
       Statement: [{
         Effect: 'Allow',
         Action: [
-          // no scan!
+          'dynamodb:Scan',
           'dynamodb:BatchGetItem',
           'dynamodb:BatchWriteItem',
           'dynamodb:PutItem',
