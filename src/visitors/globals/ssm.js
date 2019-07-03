@@ -139,7 +139,7 @@ module.exports = function ssm(arc, template) {
         },
         Value: {
           'Fn::Sub': [
-            'wss://${WS}.execute-api.${AWS::Region}.amazonaws.com/${stage}',
+            'https://${WS}.execute-api.${AWS::Region}.amazonaws.com/${stage}/@connections',
             {stage: 'production'}
           ]
         }
