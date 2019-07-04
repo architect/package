@@ -48,10 +48,11 @@ module.exports = function visitWS(arc, template) {
   }
 
   // add websocket functions
-  ;['default', 'connect', 'disconnect'].forEach(lambda=> {
+  let defaults = ['default', 'connect', 'disconnect']
+  Array.from(new Set([...defaults, ...arc.ws])).forEach(lambda=> {
 
     let name = toLogicalID(`websocket-${lambda}`)
-    let code = `./src/ws/ws-${lambda}`
+    let code = `./src/ws/${lambda}`
     let prop = getPropertyHelper(arc, code) // helper function for getting props
     let env = getEnv(arc)
 
@@ -92,9 +93,8 @@ module.exports = function visitWS(arc, template) {
       Type: 'AWS::ApiGatewayV2::Route',
       Properties: {
         ApiId: {Ref: 'WS'},
-        RouteKey: `$${lambda}`,
+        RouteKey: defaults.includes(lambda)? `$${lambda}` : lambda,
         OperationName: Route,
-        //AutorizationType: 'NONE',
         Target: {
           'Fn::Join': ['/', ['integrations', {Ref: Integration}]]
         }
