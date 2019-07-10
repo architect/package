@@ -5,7 +5,8 @@
   "main": "src/index.js",
   "scripts": {
     "lint": "eslint . --fix",
-    "test": "tape test/*-test.js | tap-spec"
+    "test:unit": "tape test/*-test.js | tap-spec",
+    "test": "npm run lint && npm run test:unit"
   },
   "author": "Brian LeRoux <b@brian.io>",
   "license": "Apache-2.0",
@@ -16,10 +17,8 @@
     "mime-types": "^2.1.24"
   },
   "devDependencies": {
-    "aws-sdk": "^2.477.0",
     "eslint": "^5.16.0",
-    "run-parallel": "^1.1.9",
-    "run-series": "^1.1.8",
+    "sinon": "^7.3.2",
     "tap-spec": "^5.0.0",
     "tape": "^4.10.2"
   }
