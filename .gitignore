@@ -8,3 +8,4 @@ sam.json
 out.yaml
 cheeky-cfn*
 test/mock/sam.yaml
+coverage/

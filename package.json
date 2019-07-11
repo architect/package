@@ -6,6 +6,7 @@
   "scripts": {
     "lint": "eslint . --fix",
     "test:unit": "tape test/*-test.js | tap-spec",
+    "coverage": "istanbul cover tape test/*-test.js",
     "test": "npm run lint && npm run test:unit"
   },
   "author": "Brian LeRoux <b@brian.io>",
@@ -18,6 +19,7 @@
   },
   "devDependencies": {
     "eslint": "^5.16.0",
+    "istanbul": "^0.4.5",
     "sinon": "^7.3.2",
     "tap-spec": "^5.0.0",
     "tape": "^4.10.2"
