@@ -1,4 +1,4 @@
-# `@architect/package` [![Travis Build Status](https://travis-ci.com/architect/package.svg?branch=master)](https://travis-ci.com/architect/package) [![Appveyor Build Status](https://ci.appveyor.com/api/projects/status/a7ycjsuku26adj4n/branch/master?svg=true)](https://ci.appveyor.com/project/ArchitectCI/package/branch/master)
+# `@architect/package` [![Travis Build Status](https://travis-ci.com/architect/package.svg?branch=master)](https://travis-ci.com/architect/package) [![Appveyor Build Status](https://ci.appveyor.com/api/projects/status/a7ycjsuku26adj4n/branch/master?svg=true)](https://ci.appveyor.com/project/ArchitectCI/package/branch/master) [![codecov](https://codecov.io/gh/architect/package/branch/master/graph/badge.svg)](https://codecov.io/gh/architect/package)
 
 [@architect/package][npm] packages @architect projects as [`AWS::Serverless`][sam]
 -compatible JSON. Converts project `.arc` files into a [AWS Serverless Application
