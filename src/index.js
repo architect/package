@@ -6,22 +6,20 @@ let count = require('./resource-count')
 /**
  * returns AWS::Serverless JSON for a given (parsed) .arc file
  */
-module.exports = toServerlessCloudFormation
-
-// if its greater than 100 resources
-// create template files for nested stacks
-// otherwise just create a single sam template
-function toServerlessCloudFormation(arc) {
-  let exec = count(arc) > 100? toCFN : toSAM
+module.exports = function toServerlessCloudFormation(arc) {
+  // if its greater than 100 resources
+  // create template files for nested stacks
+  // otherwise just create a single sam template
+  let exec = count(arc) > 100? module.exports.toCFN : module.exports.toSAM
   return exec(arc)
 }
 
 // alias out direct methods
-toServerlessCloudFormation.toCFN = toCFN
-toServerlessCloudFormation.toSAM = toSAM
+module.exports.toCFN = toCFN
+module.exports.toSAM = toSAM
 
 /**
- * @param {Object} arc - parsed arfile
+ * @param {Object} arc - parsed arcfile
  * @returns {Object} templates - nested template files for packaging/deployment
  */
 function toCFN(arc) {
@@ -51,7 +49,7 @@ function toCFN(arc) {
 }
 
 /**
- * @param {Object} arc - parsed arfile
+ * @param {Object} arc - parsed arcfile
  * @returns {CloudFormation::Serverless} template
  */
 function toSAM(arc) {
@@ -66,7 +64,7 @@ function toSAM(arc) {
   let httpFirst = (x, y)=> x == 'http'? -1 : y == 'http'? 1 : 0
   let pragmas = Object.keys(arc).filter(supported).sort(httpFirst)
 
-  // walk the template invoking the vistor for the given pragma
+  // walk the template invoking the visitor for the given pragma
   let visit = (template, pragma)=> visitors[pragma](arc, template)
 
   // force globals first

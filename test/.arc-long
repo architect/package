@@ -1,0 +1,54 @@
+@app
+packagelong
+
+@http
+get     /
+get     /memories
+get     /busy
+get     /dat/monay
+get     /on/with/it/will/ya
+post    /up/tents
+post    /up/points
+post    /no/bills
+put     /on_your_boots
+put     /on_your_sunglasses
+put     /your/shorts/on/like/a/big/boy
+delete  /badness-in-life
+
+@views
+get /
+post /up/tents
+
+@events
+just-being-in-nature
+concerts
+meetups
+conferences
+vacations
+summer-solstice
+yalda
+noruz
+new-years-eve
+semana-santa
+surf-competitions
+jam-with-friends
+apocalypse
+sheet-and-utter-terror
+full-moon
+eclipse
+haleys-comet
+the-big-bang
+
+@scheduled
+hikes-with-friends rate(7 days)
+daily-yoga rate(1 day)
+daily-surf rate(1 day)
+
+@queues
+parks-to-visit
+get-tickets
+
+@tables
+trails
+  trail *String
+  insert Lambda

@@ -1,7 +1,12 @@
 sam.json
 out.yaml
 .eslintrc.js
+.eslintignore
 src/events
 src/http
 scripts
 test
+.travis.yml
+appveyor.yml
+codecov.yaml
+coverage/
