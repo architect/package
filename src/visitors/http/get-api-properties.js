@@ -1,13 +1,10 @@
 let toLogicalID = require('@architect/utils/to-logical-id')
-//let path = require('path')
-//let fs = require('fs')
 
 let getLambdaName = require('../get-lambda-name')
 let unexpress = require('./un-express-route')
 
 module.exports = function getApiProperties(arc) {
   return {
-    //Name: toLogicalID(arc.app[0]),
     StageName: 'production',
     DefinitionBody: getOpenApi(arc),
     EndpointConfiguration: 'REGIONAL',
@@ -20,7 +17,8 @@ function getOpenApi(arc) {
   return {
     openapi: '3.0.1',
     info: {
-      title: arc.app[0],
+      title: {Ref:'AWS::StackName'}
+      //arc.app[0],
     },
     paths: getPaths(arc.http)
   }
@@ -28,11 +26,6 @@ function getOpenApi(arc) {
 
 function getPaths(routes) {
 
-  //let dir = path.join(__dirname, 'vtl')
-  //let vtl = fs.readFileSync(path.join(dir, 'request.vtl')).toString()
-  //let vtlForm = fs.readFileSync(path.join(dir, 'request-form-post.vtl')).toString()
-  //let vtlBinary = fs.readFileSync(path.join(dir, 'request-binary.vtl')).toString()
-  //let resVtl = fs.readFileSync(path.join(dir, 'response.vtl')).toString()
   let result = {}
 
   routes.forEach(route=> {
@@ -51,32 +44,15 @@ function getPaths(routes) {
           }
         },
         'x-amazon-apigateway-integration': {
-          uri: getURI({path, method}),
+          uri: getURI({path: route[1], method}),
           responses: {
             default: {
               statusCode: '200', // lol
               contentHandling: 'CONVERT_TO_TEXT',
-              /*
-              responseTemplates: {
-                'text/html': resVtl
-              }*/
             }
           },
           passthroughBehavior: 'when_no_match',
           httpMethod: 'POST',
-          /*
-          requestTemplates: {
-            'application/json': vtl,
-            'application/octet-stream': vtlBinary,
-            'application/vnd.api+json': vtl,
-            'application/x-www-form-urlencoded': vtlForm,
-            'application/xml': vtl,
-            'multipart/form-data': vtlBinary,
-            'text/css': vtl,
-            'text/html': vtl,
-            'text/javascript': vtl,
-            'text/plain': vtl,
-          },*/
           contentHandling: 'CONVERT_TO_TEXT',
           type: 'aws_proxy' //'aws'
         }
@@ -87,7 +63,9 @@ function getPaths(routes) {
 }
 
 function getURI({path, method}) {
-  let name = toLogicalID(getLambdaName(`${method.toLowerCase()}${path}`))
+  let m = method.toLowerCase()
+  let name = toLogicalID(`${m}${getLambdaName(path).replace(/000/g, '')}`) // GetIndex
+  //let name = toLogicalID(getLambdaName(`${method.toLowerCase()}${path}`))
   let arn = `arn:aws:apigateway:\${AWS::Region}:lambda:path/2015-03-31/functions/\${${name}.Arn}/invocations`
   return {'Fn::Sub': arn}
 }
