@@ -5,6 +5,7 @@ src/http
 src/scheduled
 .arc
 sam.json
+sam.yaml
 out.yaml
 cheeky-cfn*
 test/mock/sam.yaml
