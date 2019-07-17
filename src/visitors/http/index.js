@@ -1,3 +1,5 @@
+let {join} = require('path')
+
 let toLogicalID = require('@architect/utils/to-logical-id')
 
 let getApiProps = require('./get-api-properties')
@@ -11,6 +13,14 @@ let getPropertyHelper = require('../get-lambda-config')
  * visit arc.http and merge in AWS::Serverless resources
  */
 module.exports = function http(arc, template) {
+
+  let findGetIndex = tuple=> tuple[0].toLowerCase() === 'get' && tuple[1] === '/'
+  let hasGetIndex = arc.http.some(findGetIndex) // we reuse this below for default proxy code
+
+  // force add GetIndex
+  if (!hasGetIndex) {
+    arc.http.push(['get', '/'])
+  }
 
   // base props
   let Type = 'AWS::Serverless::Api'
@@ -81,20 +91,25 @@ module.exports = function http(arc, template) {
     }
   })
 
+  // if we added get index we need to fix the code path
+  if (!hasGetIndex && arc.static) {
+    // inline the default proxy
+    let tmpl = join(__dirname, '..', '..', '..', 'vendor', 'arc-proxy-3.2.2', 'index.js')
+    template.Resources.GetIndex.Properties.CodeUri = tmpl
+  }
+
   // add permissions for proxy+ resource aiming at GetIndex
-  if (template.Resources.GetIndex) {
-    template.Resources.InvokeProxyPermission = {
-      Type: 'AWS::Lambda::Permission',
-      Properties: {
-        FunctionName: {Ref: 'GetIndex'},
-        Action: 'lambda:InvokeFunction',
-        Principal: 'apigateway.amazonaws.com',
-        SourceArn: {
-          'Fn::Sub': [
-            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${restApiId}/*/*',
-            {restApiId: {'Ref': appname}}
-          ]
-        }
+  template.Resources.InvokeProxyPermission = {
+    Type: 'AWS::Lambda::Permission',
+    Properties: {
+      FunctionName: {Ref: 'GetIndex'},
+      Action: 'lambda:InvokeFunction',
+      Principal: 'apigateway.amazonaws.com',
+      SourceArn: {
+        'Fn::Sub': [
+          'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${restApiId}/*/*',
+          {restApiId: {'Ref': appname}}
+        ]
       }
     }
   }
@@ -107,22 +122,17 @@ module.exports = function http(arc, template) {
         'https://${restApiId}.execute-api.${AWS::Region}.amazonaws.com/production/',
         {restApiId: {Ref: appname}}
       ]
-    }/*,
-    Export: {
-      Name: {
-        'Fn::Join': [":", [appname, {Ref:'AWS::StackName'}, 'API']]
-      }
-    }*/
+    }
   }
+
   template.Outputs.restApiId = {
     Description: 'HTTP restApiId',
-    Value: {Ref: appname}
-      /*
+    Value: {
       'Fn::Sub': [
         'https://${restApiId}.execute-api.${AWS::Region}.amazonaws.com/production/',
         {restApiId: {Ref: appname}}
       ]
-    }*/
+    }
   }
 
   return template

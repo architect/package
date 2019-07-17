@@ -1,0 +1,2 @@
+vendor/arc-proxy-*
+test/slow/mock/src/http/get-index/index.js

@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 <head>
-<link rel=stylesheet type=text/css href=/index.css>
+<link rel=stylesheet type=text/css href=/production/index.css>
 </head>
 <body>
 
@@ -9,10 +9,10 @@
   <h1>hello from <code>public/index.html</code></h1>
 </center>
 
-<script type=module src=index.js></script>
+<script type=module src=/production/index.js></script>
 <script type=module>
 ;(async function() {
-  let result = await fetch('/api')
+  let result = await fetch('/production/api')
   let json = await result.json()
   console.log('got api response', json)
 })();

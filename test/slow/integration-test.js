@@ -13,6 +13,7 @@ test-pkg
 
 @static
 @http
+# get /
 get /api
 `
 
