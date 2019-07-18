@@ -34,16 +34,10 @@ module.exports = function statics(arc, template) {
     Description: 'Bucket URL',
     Value: {
       'Fn::Sub': [
-        'http://${bukkit}.s3.${AWS::Region}.amazonaws.com',
+        'http://${bukkit}.s3-website-${AWS::Region}.amazonaws.com',
         {bukkit: {'Ref': 'StaticBucket'}}
       ]
-    },
-    /*
-    Export: {
-      Name: {
-        'Fn::Join': [":", [appname, {Ref:'AWS::StackName'}, 'Bucket']]
-      }
-    }*/
+    }
   }
 
   // if an api is defined then add _static proxy and attempt to serialize ./public
