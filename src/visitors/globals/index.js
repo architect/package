@@ -1,4 +1,5 @@
 let ssm = require('./ssm')
+//let cf = require('./cf')
 let toLogicalID = require('@architect/utils/to-logical-id')
 /**
  * visit arc and merge in any global AWS::Serverless resources
@@ -198,7 +199,12 @@ module.exports = function globals(arc, template) {
       })
     }*/
   }
+
   // rip in some ssm params
   template = ssm(arc, template)
+
+  // add an edge mabye
+  //template = cf(arc, template)
+
   return template
 }

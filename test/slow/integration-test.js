@@ -11,10 +11,11 @@ let arcfile = `
 @app
 test-pkg
 
+@cdn
 @static
 @http
-# get /
 get /api
+get /foo
 `
 
 test('write sam.json', t=> {
