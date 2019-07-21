@@ -127,12 +127,7 @@ module.exports = function http(arc, template) {
 
   template.Outputs.restApiId = {
     Description: 'HTTP restApiId',
-    Value: {
-      'Fn::Sub': [
-        'https://${restApiId}.execute-api.${AWS::Region}.amazonaws.com/production/',
-        {restApiId: {Ref: appname}}
-      ]
-    }
+    Value: {Ref: appname}
   }
 
   return template
