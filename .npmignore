@@ -1,4 +1,6 @@
 sam.json
+.nyc_output
+.github
 out.yaml
 .eslintrc.js
 .eslintignore
