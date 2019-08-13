@@ -119,7 +119,7 @@ module.exports = function http(arc, template) {
     Description: 'API Gateway',
     Value: {
       'Fn::Sub': [
-        'https://${restApiId}.execute-api.${AWS::Region}.amazonaws.com/production/',
+        'https://${restApiId}.execute-api.${AWS::Region}.amazonaws.com/staging/',
         {restApiId: {Ref: appname}}
       ]
     }

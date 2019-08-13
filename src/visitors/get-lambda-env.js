@@ -8,7 +8,7 @@ module.exports = function getEnv(arc) {
     ARC_ROLE: {Ref: 'Role'},
     ARC_CLOUDFORMATION: {Ref: 'AWS::StackName'},//toLogicalID(arc.app[0]),
     ARC_APP_NAME: arc.app[0],
-    NODE_ENV: 'production',
+    NODE_ENV: 'staging',
     SESSION_TABLE_NAME: 'jwe',
     PYTHONPATH: '/var/task/vendor:/var/runtime:/opt/python'
   }
