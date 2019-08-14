@@ -5,7 +5,7 @@ let unexpress = require('./un-express-route')
 
 module.exports = function getApiProperties(arc) {
   return {
-    StageName: 'production',
+    StageName: 'staging',
     DefinitionBody: getOpenApi(arc),
     EndpointConfiguration: 'REGIONAL',
     BinaryMediaTypes: ['*~1*'], // wat

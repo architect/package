@@ -41,7 +41,7 @@ module.exports = function visitWS(arc, template) {
   template.Resources.WebsocketStage = {
     Type: 'AWS::ApiGatewayV2::Stage',
     Properties: {
-      StageName: 'production',
+      StageName: 'staging',
       DeploymentId: {Ref: 'WebsocketDeployment'},
       ApiId: {Ref: 'WS'},
     }

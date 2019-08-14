@@ -54,7 +54,7 @@ function origin({appname, http}) {
   }
 
   if (http) {
-    base.OriginPath = '/production'
+    base.OriginPath = '/staging'
   }
 
   return base
