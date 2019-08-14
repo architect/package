@@ -1,5 +1,8 @@
 let toLogicalID = require('@architect/utils/to-logical-id')
 
+/**
+ * Moved to deploy, managed via SDK calls for now
+ */
 module.exports = function cloudfront(arc, template) {
 
   if (!template.Resources)
