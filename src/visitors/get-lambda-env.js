@@ -1,12 +1,7 @@
-//let toLogicalID = require('@architect/utils/to-logical-id')
-let parse = require('@architect/parser')
-let fs = require('fs')
-let path = require('path')
-
 module.exports = function getEnv(arc) {
   let env = {
     ARC_ROLE: {Ref: 'Role'},
-    ARC_CLOUDFORMATION: {Ref: 'AWS::StackName'},//toLogicalID(arc.app[0]),
+    ARC_CLOUDFORMATION: {Ref: 'AWS::StackName'},
     ARC_APP_NAME: arc.app[0],
     NODE_ENV: 'staging',
     SESSION_TABLE_NAME: 'jwe',
@@ -14,19 +9,6 @@ module.exports = function getEnv(arc) {
   }
   if (arc.static) {
     env.ARC_STATIC_BUCKET = {Ref: 'StaticBucket'}
-  }
-  let arcFile = path.join('.', '.arc-env')
-  let exists = fs.existsSync(arcFile)
-  if (exists) {
-    let raw = fs.readFileSync(arcFile).toString().trim()
-    let config = parse(raw)
-    if (config.production) {
-      config = config.production.reduce(function invert(a, b) {
-        a[b[0]] = b[1]
-        return a
-      }, {})
-    }
-    env = Object.assign({}, env, config)
   }
   return env
 }
