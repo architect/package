@@ -1,5 +1,5 @@
 let test = require('tape')
-let index = require('../')
+let index = require('../../')
 let parser = require('@architect/parser')
 let sinon = require('sinon')
 let fs = require('fs')
@@ -7,7 +7,7 @@ let path = require('path')
 let shortArcFile = fs.readFileSync(path.join(__dirname, '.arc-short')).toString()
 let longArcFile = fs.readFileSync(path.join(__dirname, '.arc-long')).toString()
 
-test('short arc file should invoke toSAM', t => {
+test('main module method: short arc file should invoke toSAM', t => {
   t.plan(1)
   let fake = sinon.fake.returns()
   sinon.replace(index, 'toSAM', fake)
@@ -17,7 +17,7 @@ test('short arc file should invoke toSAM', t => {
   sinon.restore()
 })
 
-test('long arc file should invoke toCFN', t => {
+test('main module method: long arc file should invoke toCFN', t => {
   t.plan(1)
   let fake = sinon.fake.returns()
   sinon.replace(index, 'toCFN', fake)
