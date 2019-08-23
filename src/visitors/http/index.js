@@ -96,6 +96,7 @@ module.exports = function http(arc, template) {
     // inline the default proxy
     let tmpl = join(__dirname, '..', '..', '..', 'vendor', 'arc-proxy-3.2.2', 'index.js')
     template.Resources.GetIndex.Properties.CodeUri = tmpl
+    template.Resources.GetIndex.Properties.Runtime = 'nodejs10.x'
   }
 
   // add permissions for proxy+ resource aiming at GetIndex
