@@ -94,7 +94,7 @@ module.exports = function http(arc, template) {
   // if we added get index we need to fix the code path
   if (!hasGetIndex && arc.static) {
     // inline the default proxy
-    let tmpl = join(__dirname, '..', '..', '..', 'vendor', 'arc-proxy-3.2.2', 'index.js')
+    let tmpl = join(__dirname, '..', '..', '..', 'vendor', 'arc-proxy-3.3.6', 'index.js')
     template.Resources.GetIndex.Properties.CodeUri = tmpl
     template.Resources.GetIndex.Properties.Runtime = 'nodejs10.x'
   }
