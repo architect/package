@@ -8,7 +8,11 @@ let path = require('path')
  * @returns {Object} - {runtime: 'nodejs10.x}
  */
 function invert(a, b) {
-  a[b[0]] = b[1]
+  if (b.length > 2) {
+    a[b[0]] = b.slice(1)
+  } else {
+    a[b[0]] = b[1]
+  }
   return a
 }
 

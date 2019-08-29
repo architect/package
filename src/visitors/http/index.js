@@ -77,6 +77,8 @@ module.exports = function http(arc, template) {
     let layers = prop('layers')
     if (Array.isArray(layers) && layers.length > 0) {
       template.Resources[name].Properties.Layers = layers
+    } else if (typeof layers == 'string') {
+      template.Resources[name].Properties.Layers = [layers]
     }
 
     // construct the event source so SAM can wire the permissions
