@@ -15,11 +15,11 @@ module.exports = function visitScheduled(arc, template) {
     template.Outputs = {}
 
   // we leave the bucket name generation up to cloudfront
-  arc.scheduled.forEach(vector=> {
+  arc.scheduled.forEach(scheduled=> {
 
-    let name = toLogicalID(vector.shift())
-    let rule = vector.join(' ').trim()
-    let code = `./src/scheduled/${name}`
+    let name = toLogicalID(scheduled[0])
+    let rule = scheduled.join(' ').trim()
+    let code = `./src/scheduled/${scheduled[0]}`
     let prop = getPropertyHelper(arc, code) // helper function for getting props
     let env = getEnv(arc)
 
