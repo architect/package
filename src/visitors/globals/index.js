@@ -79,14 +79,21 @@ module.exports = function globals(arc, template) {
           Action: [
             's3:GetObject',
             's3:PutObject',
-            's3:DeleteObject'
+            's3:PutObjectAcl',
+            's3:DeleteObject',
           ],
-          Resource: {
+          Resource: [{
             'Fn::Sub': [
               'arn:aws:s3:::${bukkit}',
               {bukkit: {'Ref': 'StaticBucket'}}
             ]
-          }
+          },
+          {
+            'Fn::Sub': [
+              'arn:aws:s3:::${bukkit}/*',
+              {bukkit: {'Ref': 'StaticBucket'}}
+            ]
+          }]
         }]
       }
     })
