@@ -1,4 +1,9 @@
 let {join} = require('path')
+let fs = require('fs')
+let exists = fs.existsSync
+let cp = require('cpr')
+let mkdir = require('mkdirp').sync
+// TODO add arc/http-proxy
 
 let toLogicalID = require('@architect/utils/to-logical-id')
 
@@ -94,7 +99,24 @@ module.exports = function http(arc, template) {
   // if we added get index we need to fix the code path
   if (!hasGetIndex && arc.static) {
     // inline the default proxy
-    let tmpl = join(__dirname, '..', '..', '..', 'vendor', 'arc-proxy-3.3.7', 'index.js')
+    let tmplFolder = join(__dirname, '..', '..', '..', 'vendor', 'arc-proxy-3.3.7',)
+    let tmpl = join(tmplFolder, 'index.js')
+
+    // Get static folder
+    let static = arc.static
+    let folderSetting = tuple => tuple[0] === 'folder'
+    let staticFolder = static && static.some(folderSetting) ? static.find(folderSetting)[1] : 'public'
+    let folder = join(process.cwd(), staticFolder)
+    let staticManifest = join(folder, 'static.json')
+    if (exists(staticManifest)) {
+      // THIS WONT WORK ON NODE 8!!!
+      let nmDir = join(tmplFolder, 'node_modules', '@architect', 'shared')
+      mkdir(nmDir)
+      let static = fs.readFileSync(staticManifest)
+      fs.writeFileSync(join(nmDir, 'static.json'), static)
+      tmpl = tmplFolder
+    }
+
     template.Resources.GetIndex.Properties.CodeUri = tmpl
     template.Resources.GetIndex.Properties.Runtime = 'nodejs10.x'
   }
