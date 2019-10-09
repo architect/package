@@ -2,7 +2,6 @@ let {version} = require('../package.json')
 let visitors = require('./visitors')
 let nested = require('./nested')
 let count = require('./resource-count')
-let fingerprinter = require('@architect/utils').fingerprint
 
 /**
  * returns AWS::Serverless JSON for a given (parsed) .arc file
@@ -12,20 +11,7 @@ module.exports = function toServerlessCloudFormation(arc) {
   // create template files for nested stacks
   // otherwise just create a single sam template
   let exec = count(arc) > 100? module.exports.toCFN : module.exports.toSAM
-
-  // Fingerprint first to prep for servicing root proxy
-  let hasStatic = arc.static.length
-  if (hasStatic) {
-    fingerprinter({}, function done(err) {
-      if (err) throw Error('Fingerprint error', err)
-      else {
-        return exec(arc)
-      }
-    })
-  }
-  else {
-    return exec(arc)
-  }
+  return exec(arc)
 }
 
 // alias out direct methods

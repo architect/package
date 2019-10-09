@@ -1,11 +1,11 @@
-let {join} = require('path')
 let fs = require('fs')
 let exists = fs.existsSync
-let cp = require('cpr')
+let {join} = require('path')
 let mkdir = require('mkdirp').sync
-// TODO add arc/http-proxy
 
-let toLogicalID = require('@architect/utils/to-logical-id')
+let utils = require('@architect/utils')
+let toLogicalID = utils.toLogicalID
+let fingerprinter = utils.fingerprint
 
 let getApiProps = require('./get-api-properties')
 let unexpress = require('./un-express-route')
@@ -98,27 +98,36 @@ module.exports = function http(arc, template) {
 
   // if we added get index we need to fix the code path
   if (!hasGetIndex && arc.static) {
-    // inline the default proxy
-    let tmplFolder = join(__dirname, '..', '..', '..', 'vendor', 'arc-proxy-3.3.7',)
-    let tmpl = join(tmplFolder, 'index.js')
+    // Inline the default proxy
+    let arcProxy = join(process.cwd(), 'node_modules', '@architect', 'http-proxy', 'dist')
+    let local = join(__dirname, '..', '..', '..', 'node_modules', '@architect', 'http-proxy', 'dist')
+    // Check to see if package is being called from a local (symlink) context
+    if (exists(local)) arcProxy = local
 
-    // Get static folder
-    let static = arc.static
-    let folderSetting = tuple => tuple[0] === 'folder'
-    let staticFolder = static && static.some(folderSetting) ? static.find(folderSetting)[1] : 'public'
-    let folder = join(process.cwd(), staticFolder)
-    let staticManifest = join(folder, 'static.json')
-    if (exists(staticManifest)) {
-      // THIS WONT WORK ON NODE 8!!!
-      let nmDir = join(tmplFolder, 'node_modules', '@architect', 'shared')
-      mkdir(nmDir)
-      let static = fs.readFileSync(staticManifest)
-      fs.writeFileSync(join(nmDir, 'static.json'), static)
-      tmpl = tmplFolder
-    }
+    let {fingerprint} = fingerprinter.config({static: arc.static})
 
-    template.Resources.GetIndex.Properties.CodeUri = tmpl
     template.Resources.GetIndex.Properties.Runtime = 'nodejs10.x'
+
+    if (fingerprint) {
+      // Note: Arc's tmp dir will need to be cleaned up by a later process further down the line
+      let tmp = join(process.cwd(), '__ARC_TMP__')
+      let shared = join(tmp, 'node_modules', '@architect', 'shared')
+      mkdir(shared)
+      // Handle proxy
+      let proxy = fs.readFileSync(join(arcProxy, 'index.js'))
+      fs.writeFileSync(join(tmp, 'index.js'), proxy)
+      // Handle static.json
+      let folderSetting = tuple => tuple[0] === 'folder'
+      let staticFolder = arc.static && arc.static.some(folderSetting) ? arc.static.find(folderSetting)[1] : 'public'
+      staticFolder = join(process.cwd(), staticFolder)
+      let staticManifest = fs.readFileSync(join(staticFolder, 'static.json'))
+      fs.writeFileSync(join(shared, 'static.json'), staticManifest)
+      // Ok we done
+      template.Resources.GetIndex.Properties.CodeUri = tmp
+    }
+    else {
+      template.Resources.GetIndex.Properties.CodeUri = arcProxy
+    }
   }
 
   // add permissions for proxy+ resource aiming at GetIndex
