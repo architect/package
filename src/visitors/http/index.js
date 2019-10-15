@@ -97,11 +97,14 @@ module.exports = function http(arc, template) {
 
   // if we added get index we need to fix the code path
   if (!hasGetIndex) {
-    // Inline the default proxy
+    // Package running as a dependency (most common use case)
     let arcProxy = join(process.cwd(), 'node_modules', '@architect', 'http-proxy', 'dist')
+    // Package running as a global install
+    let global = join(__dirname, '..', '..', '..', '..', 'http-proxy', 'dist')
+    // Package running from a local (symlink) context (usually testing/dev)
     let local = join(__dirname, '..', '..', '..', 'node_modules', '@architect', 'http-proxy', 'dist')
-    // Check to see if package is being called from a local (symlink) context
-    if (exists(local)) arcProxy = local
+    if (exists(global)) arcProxy = global
+    else if (exists(local)) arcProxy = local
 
     let {fingerprint} = fingerprinter.config({static: arc.static})
 
