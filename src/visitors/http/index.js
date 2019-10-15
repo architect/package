@@ -19,10 +19,9 @@ let getPropertyHelper = require('../get-lambda-config')
  */
 module.exports = function http(arc, template) {
 
+  // force add GetIndex if not defined
   let findGetIndex = tuple=> tuple[0].toLowerCase() === 'get' && tuple[1] === '/'
   let hasGetIndex = arc.http.some(findGetIndex) // we reuse this below for default proxy code
-
-  // force add GetIndex
   if (!hasGetIndex) {
     arc.http.push(['get', '/'])
   }
@@ -97,7 +96,7 @@ module.exports = function http(arc, template) {
   })
 
   // if we added get index we need to fix the code path
-  if (!hasGetIndex && arc.static) {
+  if (!hasGetIndex) {
     // Inline the default proxy
     let arcProxy = join(process.cwd(), 'node_modules', '@architect', 'http-proxy', 'dist')
     let local = join(__dirname, '..', '..', '..', 'node_modules', '@architect', 'http-proxy', 'dist')
