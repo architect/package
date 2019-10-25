@@ -21,7 +21,7 @@ module.exports = function visitScheduled(arc, template) {
     let name = toLogicalID(scheduled.shift())
     let rule = scheduled.join(' ').trim()
     let prop = getPropertyHelper(arc, code) // helper function for getting props
-    let env = getEnv(arc)
+    let env = getEnv(arc, code)
 
     template.Resources[name] = {
       Type: 'AWS::Serverless::Function',
@@ -50,6 +50,11 @@ module.exports = function visitScheduled(arc, template) {
     let layers = prop('layers')
     if (Array.isArray(layers) && layers.length > 0) {
       template.Resources[name].Properties.Layers = layers
+    }
+
+    let policies = prop('policies')
+    if (Array.isArray(policies) && policies.length > 0) {
+      template.Resources[name].Properties.Policies = policies
     }
 
     // construct the event source so SAM can wire the permissions

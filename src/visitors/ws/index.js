@@ -47,6 +47,31 @@ module.exports = function visitWS(arc, template) {
     }
   }
 
+  // augment the lambdas role
+  template.Resources.WebSocketPolicy = {
+    Type: 'AWS::IAM::Policy',
+    DependsOn: 'Role',
+    Properties: {
+      PolicyName: 'ArcWebSocketPolicy',
+      PolicyDocument: {
+        Statement: [{
+          Effect: 'Allow',
+          Action: [
+            'execute-api:Invoke',
+            'execute-api:ManageConnections'
+          ],
+          Resource: [
+            {"Fn::Sub": [
+              'arn:aws:execute-api:${AWS::Region}:*:${api}/*',
+              {api: {Ref: 'WS'}}
+            ]}
+          ]
+        }]
+      },
+      Roles: [{Ref: 'Role'}]
+    }
+  }
+
   // add websocket functions
   let defaults = ['default', 'connect', 'disconnect']
   Array.from(new Set([...defaults, ...arc.ws])).forEach(lambda=> {
@@ -54,7 +79,7 @@ module.exports = function visitWS(arc, template) {
     let name = toLogicalID(`websocket-${lambda}`)
     let code = `./src/ws/${lambda}`
     let prop = getPropertyHelper(arc, code) // helper function for getting props
-    let env = getEnv(arc)
+    let env = getEnv(arc, code)
 
     template.Resources[name] = {
       Type: 'AWS::Serverless::Function',
@@ -83,6 +108,11 @@ module.exports = function visitWS(arc, template) {
     let layers = prop('layers')
     if (Array.isArray(layers) && layers.length > 0) {
       template.Resources[name].Properties.Layers = layers
+    }
+
+    let policies = prop('policies')
+    if (Array.isArray(policies) && policies.length > 0) {
+      template.Resources[name].Properties.Policies = policies
     }
 
     let Route = `${name}Route`
@@ -130,8 +160,8 @@ module.exports = function visitWS(arc, template) {
     Description: 'Websocket Endpoint',
     Value: {
       'Fn::Sub': [
-        'wss://${WS}.execute-api.${AWS::Region}.amazonaws.com/${stage}',
-        {stage: 'production'}
+        '${WS}.execute-api.${AWS::Region}.amazonaws.com',
+        {}
       ]
     }
   }

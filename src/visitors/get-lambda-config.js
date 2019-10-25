@@ -8,6 +8,24 @@ let path = require('path')
  * @returns {Object} - {runtime: 'nodejs10.x}
  */
 function invert(a, b) {
+  let isLayerOrPolicyArray = Array.isArray(b) && (b[0] === 'layers' || b[0] === 'policies')
+  let isLayerOrPolicyObject = typeof b === 'object' && (Object.keys(b)[0] === 'layers' || Object.keys(b)[0] === 'policies')
+  if (isLayerOrPolicyArray) {
+    let nom = b.shift()
+    if (!a[nom])
+      a[nom] = b
+    else
+      a[nom] = a[nom].concat(b)
+    return a
+  }
+  if (isLayerOrPolicyObject) {
+    let nom = Object.keys(b)[0]
+    if (!a[nom])
+      a[nom] = Object.keys(b[nom])
+    else
+      a[nom] = a[nom].concat(Object.keys(b[nom]))
+    return a
+  }
   a[b[0]] = b[1]
   return a
 }
@@ -19,9 +37,10 @@ module.exports = function getPropertyHelper(arc, pathToCode) {
     timeout: 5,
     memory: 1152,
     runtime: 'nodejs10.x',
-    layers: [],
     state: 'n/a',
     concurrency: 'unthrottled',
+    layers: [],
+    policies: [],
   }
 
   // .arc global override

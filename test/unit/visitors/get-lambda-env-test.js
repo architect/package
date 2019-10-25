@@ -9,7 +9,7 @@ const ARC = parser(shortArcFile)
 
 test('get-lambda-env: baseline template interpolation', t => {
   t.plan(1)
-  let result = getEnv(ARC)
+  let result = getEnv(ARC, './fake')
   t.equals(result.ARC_APP_NAME, ARC.app[0], 'ARC_APP_NAME set to app name from arc file')
 })
 
@@ -17,7 +17,7 @@ test('get-lambda-env: if static exists, sets ARC_STATIC_BUCKET', t => {
   t.plan(1)
   let arc = Object.assign({}, ARC)
   arc.static = [true]
-  let result = getEnv(arc)
+  let result = getEnv(arc, './fake')
   t.deepEquals(result.ARC_STATIC_BUCKET, {Ref: 'StaticBucket'}, 'ARC_STATIC_BUCKET set')
 })
 

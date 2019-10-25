@@ -32,7 +32,7 @@ module.exports = function nestQueues(arc) {
     let name = toLogicalID(event)
     let code = `./src/queues/${event}`
     let prop = getPropertyHelper(arc, code) // helper function for getting props
-    let env = getEnv(arc)
+    let env = getEnv(arc, code)
 
     template.Parameters[`${name}Queue`] = {
       Type: 'String',
@@ -61,6 +61,11 @@ module.exports = function nestQueues(arc) {
     let layers = prop('layers')
     if (Array.isArray(layers) && layers.length > 0) {
       template.Resources[name].Properties.Layers = layers
+    }
+
+    let policies = prop('policies')
+    if (Array.isArray(policies) && policies.length > 0) {
+      template.Resources[name].Properties.Policies = policies
     }
 
     // construct the event source so SAM can wire the permissions

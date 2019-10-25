@@ -107,46 +107,6 @@ module.exports = function ssm(arc, template) {
     })
   }
 
-  if (arc.ws) {
-    hasParams = true
-    template.Resources.WebsocketParam = {
-      Type: 'AWS::SSM::Parameter',
-      Properties : {
-        Type: 'String',
-        Name: {
-          'Fn::Sub': [
-            '/${AWS::StackName}/ws/${key}',
-            {key: 'wss'}
-          ]
-        },
-        Value: {
-          'Fn::Sub': [
-            'wss://${WS}.execute-api.${AWS::Region}.amazonaws.com/${stage}',
-            {stage: 'production'}
-          ]
-        }
-      }
-    }
-    template.Resources.WebsocketConnectionParam = {
-      Type: 'AWS::SSM::Parameter',
-      Properties : {
-        Type: 'String',
-        Name: {
-          'Fn::Sub': [
-            '/${AWS::StackName}/ws/${key}',
-            {key: 'https'}
-          ]
-        },
-        Value: {
-          'Fn::Sub': [
-            'https://${WS}.execute-api.${AWS::Region}.amazonaws.com/${stage}/@connections',
-            {stage: 'production'}
-          ]
-        }
-      }
-    }
-  }
-
   if (hasParams) {
     template.Resources.ParameterStorePolicy = {
       Type: 'AWS::IAM::Policy',

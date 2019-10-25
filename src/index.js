@@ -72,10 +72,11 @@ function toSAM(arc) {
 
   // default cloudformation template
   // visitors will interpolate: Parameters, Mappings, Conditions, Resources, and Outputs
+  let timestamp = new Date(Date.now()).toISOString()
   let template = {
     AWSTemplateFormatVersion: '2010-09-09',
     Transform: 'AWS::Serverless-2016-10-31',
-    Description: `Exported by architect/package@${version} on ${new Date(Date.now()).toISOString()}`,
+    Description: `Exported by architect/package@${version} on ${timestamp}`,
   }
 
   // walk pragmas to reduce final template contents
