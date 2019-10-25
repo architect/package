@@ -1,6 +1,6 @@
 let toLogicalID = require('@architect/utils/to-logical-id')
 
-module.exports = function ssm(arc, template) {
+module.exports = function ssm(arc, template, stage) {
 
   if (!template.Resources)
     template.Resources = {}
@@ -115,32 +115,14 @@ module.exports = function ssm(arc, template) {
         Type: 'String',
         Name: {
           'Fn::Sub': [
-            '/${AWS::StackName}/ws/${key}',
+            '/${AWS::StackName}/ws',
             {key: 'wss'}
           ]
         },
         Value: {
           'Fn::Sub': [
-            'wss://${WS}.execute-api.${AWS::Region}.amazonaws.com/${stage}',
-            {stage: 'production'}
-          ]
-        }
-      }
-    }
-    template.Resources.WebsocketConnectionParam = {
-      Type: 'AWS::SSM::Parameter',
-      Properties : {
-        Type: 'String',
-        Name: {
-          'Fn::Sub': [
-            '/${AWS::StackName}/ws/${key}',
-            {key: 'https'}
-          ]
-        },
-        Value: {
-          'Fn::Sub': [
-            'https://${WS}.execute-api.${AWS::Region}.amazonaws.com/${stage}/@connections',
-            {stage: 'production'}
+            '${WS}.execute-api.${AWS::Region}.amazonaws.com/${stage}',
+            {stage}
           ]
         }
       }

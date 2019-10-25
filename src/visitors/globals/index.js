@@ -1,12 +1,13 @@
 let ssm = require('./ssm')
 //let cf = require('./cf') // Moved to deploy, managed via SDK calls for now
 let toLogicalID = require('@architect/utils/to-logical-id')
+
 /**
  * visit arc and merge in any global AWS::Serverless resources
  *
  * - AWS::IAM::Role
  */
-module.exports = function globals(arc, template) {
+module.exports = function globals(arc, template, stage) {
 
   // interpolate required shape
   if (!template.Resources)
@@ -27,28 +28,6 @@ module.exports = function globals(arc, template) {
         }]
       },
       Policies: []
-    }
-  }
-
-  // allow runtime to reflect permissions
-  template.Resources.RoleReflectionPolicy = {
-    Type: 'AWS::IAM::Policy',
-    DependsOn: 'Role',
-    Properties: {
-      PolicyName: `ArcRoleReflectionPolicy`,
-      PolicyDocument: {
-        Statement: [{
-          Effect: 'Allow',
-          Action: 'iam:GetRolePolicy',
-          Resource: {
-            'Fn::Sub': [
-              'arn:aws:iam::${AWS::AccountId}:role/${role}',
-              {role: {'Ref': 'Role'}}
-            ]
-          }
-        }]
-      },
-      Roles: [{'Ref': 'Role'}],
     }
   }
 
@@ -208,7 +187,7 @@ module.exports = function globals(arc, template) {
   }
 
   // rip in some ssm params
-  template = ssm(arc, template)
+  template = ssm(arc, template, stage)
 
   // add an edge mabye
   // Moved to deploy, managed via SDK calls for now

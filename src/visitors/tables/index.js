@@ -98,6 +98,11 @@ module.exports = function tables(arc, template) {
         template.Resources[name].Properties.Layers = layers
       }
 
+      let policies = prop('policies')
+      if (Array.isArray(policies) && policies.length > 0) {
+        template.Resources[name].Properties.Policies = policies
+      }
+
       let eventName = `${name}Event`
       template.Resources[eventName] = {
         Type: 'AWS::Lambda::EventSourceMapping',

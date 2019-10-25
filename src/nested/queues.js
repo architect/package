@@ -63,6 +63,11 @@ module.exports = function nestQueues(arc) {
       template.Resources[name].Properties.Layers = layers
     }
 
+    let policies = prop('policies')
+    if (Array.isArray(policies) && policies.length > 0) {
+      template.Resources[name].Properties.Policies = policies
+    }
+
     // construct the event source so SAM can wire the permissions
     let eventName = `${name}QueueEvent`
     template.Resources[name].Properties.Events[eventName] = {
