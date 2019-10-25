@@ -32,7 +32,7 @@ module.exports = function nestQueues(arc) {
     let name = toLogicalID(event)
     let code = `./src/queues/${event}`
     let prop = getPropertyHelper(arc, code) // helper function for getting props
-    let env = getEnv(arc)
+    let env = getEnv(arc, code)
 
     template.Parameters[`${name}Queue`] = {
       Type: 'String',

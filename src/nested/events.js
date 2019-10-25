@@ -32,7 +32,7 @@ module.exports = function nestEvents(arc) {
     let name = toLogicalID(event)
     let code = `./src/events/${event}`
     let prop = getPropertyHelper(arc, code) // helper function for getting props
-    let env = getEnv(arc)
+    let env = getEnv(arc, code)
 
     template.Parameters[`${name}Topic`] = {
       Type: 'String',

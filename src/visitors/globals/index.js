@@ -7,7 +7,7 @@ let toLogicalID = require('@architect/utils/to-logical-id')
  *
  * - AWS::IAM::Role
  */
-module.exports = function globals(arc, template, stage) {
+module.exports = function globals(arc, template) {
 
   // interpolate required shape
   if (!template.Resources)
@@ -187,11 +187,10 @@ module.exports = function globals(arc, template, stage) {
   }
 
   // rip in some ssm params
-  template = ssm(arc, template, stage)
+  template = ssm(arc, template)
 
   // add an edge mabye
   // Moved to deploy, managed via SDK calls for now
   //template = cf(arc, template)
-
   return template
 }

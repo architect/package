@@ -79,7 +79,7 @@ module.exports = function visitWS(arc, template) {
     let name = toLogicalID(`websocket-${lambda}`)
     let code = `./src/ws/${lambda}`
     let prop = getPropertyHelper(arc, code) // helper function for getting props
-    let env = getEnv(arc)
+    let env = getEnv(arc, code)
 
     template.Resources[name] = {
       Type: 'AWS::Serverless::Function',
@@ -160,8 +160,8 @@ module.exports = function visitWS(arc, template) {
     Description: 'Websocket Endpoint',
     Value: {
       'Fn::Sub': [
-        '${WS}.execute-api.${AWS::Region}.amazonaws.com/${stage}',
-        {stage: 'production'}
+        '${WS}.execute-api.${AWS::Region}.amazonaws.com',
+        {}
       ]
     }
   }

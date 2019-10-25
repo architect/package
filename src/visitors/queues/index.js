@@ -22,7 +22,7 @@ module.exports = function visitQueues(arc, template) {
     let name = toLogicalID(event)
     let code = `./src/queues/${event}`
     let prop = getPropertyHelper(arc, code) // helper function for getting props
-    let env = getEnv(arc)
+    let env = getEnv(arc, code)
 
     template.Resources[name] = {
       Type: 'AWS::Serverless::Function',

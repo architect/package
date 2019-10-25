@@ -31,9 +31,6 @@ module.exports = function http(arc, template) {
   let Properties = getApiProps(arc)
   let appname = toLogicalID(arc.app[0])
 
-  // construct the runtime env
-  let env = getEnv(arc)
-
   // ensure cf standard sections exist
   if (!template.Resources)
     template.Resources = {}
@@ -52,6 +49,7 @@ module.exports = function http(arc, template) {
     let name = toLogicalID(`${method}${getLambdaName(route[1]).replace(/000/g, '')}`) // GetIndex
     let code = `./src/http/${method}${getLambdaName(route[1])}` // ./src/http/get-index
     let prop = getPropertyHelper(arc, code) // returns a helper function for getting props
+    let env = getEnv(arc, code) // construct the runtime env
 
     // adding lambda resources
     template.Resources[name] = {

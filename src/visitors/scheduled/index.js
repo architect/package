@@ -21,7 +21,7 @@ module.exports = function visitScheduled(arc, template) {
     let name = toLogicalID(scheduled.shift())
     let rule = scheduled.join(' ').trim()
     let prop = getPropertyHelper(arc, code) // helper function for getting props
-    let env = getEnv(arc)
+    let env = getEnv(arc, code)
 
     template.Resources[name] = {
       Type: 'AWS::Serverless::Function',

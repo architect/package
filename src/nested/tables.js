@@ -53,7 +53,7 @@ module.exports = function nestScheduled(arc) {
       let name = `${TableName}Stream`
       let code = `./src/tables/${tbl}`
       let prop = getPropertyHelper(arc, code) // helper function for getting props
-      let env = getEnv(arc)
+      let env = getEnv(arc, code)
 
       template.Resources[name] = {
         Type: 'AWS::Serverless::Function',
