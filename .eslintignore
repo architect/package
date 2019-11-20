@@ -1,4 +1,4 @@
-vendor/arc-proxy-*
-test/slow/mock/src/http/get-index/index.js
-coverage/
 .nyc_output/
+coverage/
+test/slow/mock/src/http/get-index/index.js
+vendor/arc-proxy-*
