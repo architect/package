@@ -2,6 +2,22 @@
 
 ---
 
+## [1.0.52] 2019-11-19
+
+### Changed
+
+- Updated dependencies
+
+---
+
+## [1.0.51] 2019-11-01
+
+### Changed
+
+- Updated dependencies
+
+---
+
 ## [1.0.50] 2019-10-24
 
 ### Fix
@@ -11,7 +27,7 @@
 - Fix `.arc-config` properties: `layers` and `policies`
   - adding one layer or policy per line: `layers my:arn:here` or `policies my:arn:here`
   - adding arns as a list (two spaces indented below `layers` or `policies`)
-  - eg: 
+  - eg:
 
 ```arc
 @aws
