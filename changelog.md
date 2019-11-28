@@ -2,10 +2,11 @@
 
 ---
 
-## [1.0.52] 2019-11-19
+## [1.0.52 - 1.0.53] 2019-11-19
 
 ### Changed
 
+- Bump max resources to 200 per CloudFormation limit (was 100)
 - Updated dependencies
 
 ---
