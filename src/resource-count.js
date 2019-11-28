@@ -6,8 +6,7 @@ module.exports = function resourceCount(arc) {
     count += 1 //restapi
     count += 1 //deployment
     count += 1 //stage
-    count += 1 //invokeproxypermission
-    count += (arc.http.length*3) // lambda + permission + testpermission
+    count += (arc.http.length*2) // lambda + permission 
   }
 
   if (arc.events)

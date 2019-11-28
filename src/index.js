@@ -10,7 +10,7 @@ module.exports = function toServerlessCloudFormation(arc) {
   // if its greater than 100 resources
   // create template files for nested stacks
   // otherwise just create a single sam template
-  let exec = count(arc) > 100? module.exports.toCFN : module.exports.toSAM
+  let exec = count(arc) > 200? module.exports.toCFN : module.exports.toSAM
   return exec(arc)
 }
 
