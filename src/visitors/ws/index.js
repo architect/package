@@ -161,7 +161,7 @@ module.exports = function visitWS(arc, template) {
     Value: {
       'Fn::Sub': [
         // Always default to staging; mutate to production via macro where necessary
-        'https://${WS}.execute-api.${AWS::Region}.amazonaws.com/staging',
+        'wss://${WS}.execute-api.${AWS::Region}.amazonaws.com/staging',
         {}
       ]
     }

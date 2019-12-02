@@ -29,7 +29,7 @@ module.exports = function getEnv(arc, pathToCode) {
     env.ARC_WSS_URL = {
       'Fn::Sub': [
         // Always default to staging; mutate to production via macro where necessary
-        'https://${WS}.execute-api.${AWS::Region}.amazonaws.com/staging',
+        'wss://${WS}.execute-api.${AWS::Region}.amazonaws.com/staging',
         {}
       ]
     }

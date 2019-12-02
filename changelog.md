@@ -6,7 +6,7 @@
 
 ### Added
 
-- Adds staging path to WSS URL for printing and env vars
+- Adds `/staging` path part to WSS URL for printing and env vars
 
 ---
 
