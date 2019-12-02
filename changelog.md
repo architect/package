@@ -2,6 +2,14 @@
 
 ---
 
+## [1.0.54] 2019-12-01
+
+### Added
+
+- Adds staging path to WSS URL for printing and env vars
+
+---
+
 ## [1.0.52 - 1.0.53] 2019-11-19
 
 ### Changed
