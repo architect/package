@@ -156,6 +156,7 @@ module.exports = function http(arc, template) {
     Description: 'API Gateway',
     Value: {
       'Fn::Sub': [
+        // Always default to staging; mutate to production via macro where necessary
         'https://${restApiId}.execute-api.${AWS::Region}.amazonaws.com/staging',
         {restApiId: {Ref: appname}}
       ]

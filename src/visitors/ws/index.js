@@ -160,7 +160,8 @@ module.exports = function visitWS(arc, template) {
     Description: 'Websocket Endpoint',
     Value: {
       'Fn::Sub': [
-        '${WS}.execute-api.${AWS::Region}.amazonaws.com',
+        // Always default to staging; mutate to production via macro where necessary
+        'wss://${WS}.execute-api.${AWS::Region}.amazonaws.com/staging',
         {}
       ]
     }

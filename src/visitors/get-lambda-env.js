@@ -27,7 +27,11 @@ module.exports = function getEnv(arc, pathToCode) {
   // add the ARC_WSS_URL if defined
   if (arc.ws) {
     env.ARC_WSS_URL = {
-      'Fn::Sub': ['${WS}.execute-api.${AWS::Region}.amazonaws.com', {}]
+      'Fn::Sub': [
+        // Always default to staging; mutate to production via macro where necessary
+        'wss://${WS}.execute-api.${AWS::Region}.amazonaws.com/staging',
+        {}
+      ]
     }
   }
 
