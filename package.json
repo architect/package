@@ -28,7 +28,7 @@
   "devDependencies": {
     "codecov": "^3.6.1",
     "cross-env": "^6.0.3",
-    "eslint": "^6.6.0",
+    "eslint": "^6.7.2",
     "nyc": "^14.1.1",
     "sinon": "^7.5.0",
     "tap-spec": "^5.0.0",

@@ -8,6 +8,11 @@
 
 - Adds `/staging` path part to WSS URL for printing and env vars
 
+
+### Changed
+
+- Updated dependencies
+
 ---
 
 ## [1.0.52 - 1.0.53] 2019-11-19
