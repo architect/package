@@ -1,3 +1,4 @@
+let deno = require('./deno')
 let events = require('./events')
 let globals = require('./globals')
 let http = require('./http')
@@ -9,6 +10,7 @@ let tables = require('./tables')
 let ws = require('./ws')
 
 module.exports = {
+  deno,
   events,
   globals,
   http,

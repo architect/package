@@ -11,6 +11,9 @@ let arcfile = `
 @app
 test-pkg
 
+@aws
+runtime deno
+
 @cdn
 @static
 @http
@@ -69,7 +72,7 @@ test('deploy', t=> {
     '--s3-bucket',
     'cf-sam-deployments-east',
     '--capabilities',
-    'CAPABILITY_IAM'
+    'CAPABILITY_IAM CAPABILITY_AUTO_EXPAND'
   ],
   function done(err) {
     if (err) t.fail(err)

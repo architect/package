@@ -67,8 +67,9 @@ function toSAM(arc) {
   // walk the template invoking the visitor for the given pragma
   let visit = (template, pragma)=> visitors[pragma](arc, template)
 
-  // force globals first
+  // force globals first (last?)
   pragmas.push('globals')
+  pragmas.push('deno')
 
   // default cloudformation template
   // visitors will interpolate: Parameters, Mappings, Conditions, Resources, and Outputs
