@@ -3,8 +3,8 @@
  */
 module.exports = function deno(arc, template) {
 
-  // walk the functions and add custom runtim if 'deno' specified 
-  let hasDeno = false 
+  // walk the functions and add custom runtime if 'deno' specified
+  let hasDeno = false
   let resources = Object.keys(template.Resources)
   for (let resource of resources) {
     let isFunction = template.Resources[resource].Type === 'AWS::Serverless::Function'
@@ -16,7 +16,7 @@ module.exports = function deno(arc, template) {
       if (!template.Resources[resource].Properties.Layers)
         template.Resources[resource].Properties.Layers = []
       template.Resources[resource].Properties.Layers.push({'Fn::GetAtt': ['Deno', 'Outputs.DenoRuntimeArn']})
-      template.Resources[resource].Properties.Handler = 'handler'
+      template.Resources[resource].Properties.Handler = 'index.handler'
       template.Resources[resource].Properties.Runtime = 'provided'
     }
   }
