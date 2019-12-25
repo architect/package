@@ -2,6 +2,24 @@
 
 ---
 
+## [1.0.56] 2019-12-25
+
+### Changed
+
+- Updated dependencies
+- Updated calls to various `utils` methods
+
+---
+
+
+## [1.0.55] 2019-12-18
+
+### Added
+
+- Deno support!
+
+---
+
 ## [1.0.54] 2019-12-01
 
 ### Added
