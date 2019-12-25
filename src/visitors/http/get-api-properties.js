@@ -1,4 +1,4 @@
-let toLogicalID = require('@architect/utils/to-logical-id')
+let {toLogicalID} = require('@architect/utils')
 
 let getLambdaName = require('../get-lambda-name')
 let unexpress = require('./un-express-route')
