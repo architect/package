@@ -20,9 +20,9 @@
   "dependencies": {
     "@architect/http-proxy": "^3.4.7",
     "@architect/parser": "1.2.2",
-    "@architect/utils": "^1.4.1",
+    "@architect/utils": "^1.4.4",
     "glob": "^7.1.6",
-    "mime-types": "^2.1.25",
+    "mime-types": "^2.1.26",
     "mkdirp": "^0.5.1"
   },
   "devDependencies": {
@@ -30,7 +30,7 @@
     "cross-env": "^6.0.3",
     "eslint": "^6.8.0",
     "nyc": "^15.0.0",
-    "sinon": "^8.0.1",
+    "sinon": "^8.0.4",
     "tap-spec": "^5.0.0",
     "tape": "^4.12.1"
   }
