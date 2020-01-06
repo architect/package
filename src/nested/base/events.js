@@ -1,4 +1,4 @@
-let toLogicalID = require('@architect/utils/to-logical-id')
+let {toLogicalID} = require('@architect/utils')
 
 module.exports = function events(arc, template) {
   arc.events.forEach(event=> {

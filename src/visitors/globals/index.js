@@ -1,6 +1,6 @@
 let ssm = require('./ssm')
 //let cf = require('./cf') // Moved to deploy, managed via SDK calls for now
-let toLogicalID = require('@architect/utils/to-logical-id')
+let {toLogicalID} = require('@architect/utils')
 
 /**
  * visit arc and merge in any global AWS::Serverless resources

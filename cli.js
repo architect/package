@@ -1,11 +1,11 @@
-let readArcFile = require('@architect/utils/read-arc')
+let {readArc} = require('@architect/utils')
 let config = require('.')
 let chalk = require('chalk')
 let fs = require('fs')
 
 module.exports = function pack(/*opts*/) {
 
-  let {arc} = readArcFile()
+  let {arc} = readArc()
   fs.writeFileSync('sam.json', JSON.stringify(config(arc), null, 2))
 
   // draw the deploy instructions

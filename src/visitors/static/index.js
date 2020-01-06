@@ -1,4 +1,4 @@
-//let toLogicalID = require('@architect/utils/to-logical-id')
+//let {toLogicalID} = require('@architect/utils')
 let addStatic = require('./add-static-proxy')
 let addMocks = require('./add-static-mocks')
 
@@ -48,4 +48,3 @@ module.exports = function statics(arc, template) {
 
   return template
 }
-

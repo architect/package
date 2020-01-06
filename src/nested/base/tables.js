@@ -1,5 +1,5 @@
 let visitTables = require('../../visitors/tables')
-let toLogicalID = require('@architect/utils/to-logical-id')
+let {toLogicalID} = require('@architect/utils')
 
 module.exports = function tables(arc, template) {
   template = visitTables(arc, template)
