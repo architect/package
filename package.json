@@ -19,7 +19,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@architect/http-proxy": "^3.4.7",
-    "@architect/parser": "1.2.2",
+    "@architect/parser": "2.0.1",
     "@architect/utils": "^1.4.4",
     "glob": "^7.1.6",
     "mime-types": "^2.1.26",
