@@ -2,11 +2,11 @@
 
 ---
 
-## [1.1] TBD
+## [1.1.0] 2020-01-18
 
 ### Added
 
-- Support for DynamoDB Encryption using customer or AWS managed keys
+- Adds `encrypt` attribute to tables defined in `.arc` for DynamoDB Encryption using customer or AWS managed keys
 
 ---
 
