@@ -2,6 +2,14 @@
 
 ---
 
+## [1.1] TBD
+
+### Added
+
+- Support for DynamoDB Encryption using customer or AWS managed keys
+
+---
+
 ## [1.0.56] 2020-01-06
 
 ### Changed

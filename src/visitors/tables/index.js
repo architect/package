@@ -5,6 +5,7 @@ let getTTL = require('./get-ttl')
 let getHasLambda = require('./get-has-lambda')
 let getKeySchema = require('./get-key-schema')
 let getAttributes = require('./get-attribute-definitions')
+let getHasEncrypt = require('./get-encrypt')
 
 let getEnv = require('../get-lambda-env')
 let getPropertyHelper = require('../get-lambda-config')
@@ -29,6 +30,7 @@ module.exports = function tables(arc, template) {
     let KeySchema = getKeySchema(attr, keys)
     let hasTTL = getTTL(attr)
     let hasLambda = getHasLambda(attr)
+    let hasEncrypt = getHasEncrypt(attr)
     let TableName = toLogicalID(tbl)
     let AttributeDefinitions = getAttributes(clean(attr))
 
@@ -40,6 +42,15 @@ module.exports = function tables(arc, template) {
         AttributeDefinitions,
         BillingMode: 'PAY_PER_REQUEST',
       }
+    }
+
+    if (hasEncrypt) {
+      let encryptSpec = { SSEEnabled: true }
+      if (typeof hasEncrypt !== 'boolean') {
+        encryptSpec.KMSMasterKeyId = hasEncrypt
+        encryptSpec.SSEType = 'KMS'
+      }
+      template.Resources[`${TableName}Table`].Properties.SSESpecification = encryptSpec
     }
 
     if (hasTTL) {
