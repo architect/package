@@ -7,7 +7,7 @@
  * @table
  * mytablename2
  *   myid *String
- *   encrypt 'mycmkarn'
+ *   encrypt mycmkarn
  */
 
 module.exports = function getEncrypt(attr) {
