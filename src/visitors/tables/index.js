@@ -6,6 +6,7 @@ let getHasLambda = require('./get-has-lambda')
 let getKeySchema = require('./get-key-schema')
 let getAttributes = require('./get-attribute-definitions')
 let getHasEncrypt = require('./get-encrypt')
+let getHasRecovery = require('./get-has-recovery')
 
 let getEnv = require('../get-lambda-env')
 let getPropertyHelper = require('../get-lambda-config')
@@ -31,6 +32,7 @@ module.exports = function tables(arc, template) {
     let hasTTL = getTTL(attr)
     let hasLambda = getHasLambda(attr)
     let hasEncrypt = getHasEncrypt(attr)
+    let hasRecovery = getHasRecovery(attr)
     let TableName = toLogicalID(tbl)
     let AttributeDefinitions = getAttributes(clean(attr))
 
@@ -51,6 +53,12 @@ module.exports = function tables(arc, template) {
         encryptSpec.SSEType = 'KMS'
       }
       template.Resources[`${TableName}Table`].Properties.SSESpecification = encryptSpec
+    }
+
+    if (hasRecovery) {
+      template.Resources[`${TableName}Table`].Properties.PointInTimeRecoverySpecification = {
+        PointInTimeRecoveryEnabled: true
+      }
     }
 
     if (hasTTL) {
