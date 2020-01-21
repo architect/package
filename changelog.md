@@ -2,6 +2,14 @@
 
 ---
 
+## [1.2.0] 2020-01-20
+
+### Added
+
+- Adds `PointInTimeRecovery` attribute to tables defined in `.arc` for DynamoDB Point In Time Recovery support.
+
+---
+
 ## [1.1.0] 2020-01-18
 
 ### Added
