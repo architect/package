@@ -111,7 +111,7 @@ module.exports = function http(arc, template) {
 
     let {fingerprint} = fingerprinter.config({static: arc.static})
 
-    template.Resources.GetIndex.Properties.Runtime = 'nodejs10.x'
+    template.Resources.GetIndex.Properties.Runtime = 'nodejs12.x'
 
     if (fingerprint) {
       // Note: Arc's tmp dir will need to be cleaned up by a later process further down the line
