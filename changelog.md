@@ -2,6 +2,15 @@
 
 ---
 
+## [1.2.1] 2020-01-22
+
+### Changed
+
+- Updated default Lambda runtime to `nodejs12.x` (formerly `nodejs10.x`)
+- Updated dependencies
+
+---
+
 ## [1.2.0] 2020-01-20
 
 ### Added
