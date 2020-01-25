@@ -39,6 +39,7 @@ module.exports = function getPropertyHelper(arc, pathToCode) {
     runtime: 'nodejs12.x',
     state: 'n/a',
     concurrency: 'unthrottled',
+    fifo: true,
     layers: [],
     policies: [],
   }

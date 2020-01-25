@@ -14,8 +14,6 @@ module.exports = function visitQueues(arc, template) {
   if (!template.Outputs)
     template.Outputs = {}
 
-  //let appname = toLogicalID(arc.app[0])
-
   arc.queues.forEach(event=> {
 
     // create the lambda
@@ -70,18 +68,15 @@ module.exports = function visitQueues(arc, template) {
     // create the sqs queue
     template.Resources[`${name}Queue`] = {
       Type: 'AWS::SQS::Queue',
-      Properties: {}
+      Properties: {
+        FifoQueue: prop('fifo'),
+        VisibilityTimeout: prop('timeout')
+      }
     }
 
     template.Outputs[`${name}SqsQueue`] = {
       Description: 'An SQS Queue',
       Value: {Ref: `${name}Queue`},
-      /*
-      Export: {
-        Name: {
-          'Fn::Join': [":", [appname, {Ref:'AWS::StackName'}, `${name}Queue`]]
-        }
-      }*/
     }
   })
 

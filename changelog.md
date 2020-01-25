@@ -2,6 +2,15 @@
 
 ---
 
+## [1.2.2] 2020-01-24
+
+### Added 
+- `FifoQueue: true` default for `@queues` (override with `fifo false` in `.arc-config`)
+
+### Fix
+
+- `VisibilityTimeout` will now match the coresponding `@queue` `timeout` value in `.arc-config`
+
 ## [1.2.1] 2020-01-22
 
 ### Changed
