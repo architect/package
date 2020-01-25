@@ -66,10 +66,12 @@ module.exports = function visitQueues(arc, template) {
     }
 
     // create the sqs queue
+    let fifo = prop('fifo')
     template.Resources[`${name}Queue`] = {
       Type: 'AWS::SQS::Queue',
       Properties: {
-        FifoQueue: prop('fifo'),
+        FifoQueue: fifo,
+        ContentBasedDeduplication: fifo,
         VisibilityTimeout: prop('timeout')
       }
     }
