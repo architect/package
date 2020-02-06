@@ -2,14 +2,33 @@
 
 ---
 
+## [1.2.5] 2020-02-05
+
+### Changed
+
+- Updated dependencies
+
+---
+
+## [1.2.3 - 1.2.4] 2020-02-05
+
+### Fixed
+
+- Issue with adding `FifoQueue` to CloudFormation
+
+---
+
 ## [1.2.2] 2020-01-24
 
-### Added 
+### Added
 - `FifoQueue: true` default for `@queues` (override with `fifo false` in `.arc-config`)
 
-### Fix
+
+### Fixed
 
 - `VisibilityTimeout` will now match the coresponding `@queue` `timeout` value in `.arc-config`
+
+---
 
 ## [1.2.1] 2020-01-22
 
