@@ -75,8 +75,7 @@ module.exports = function visitQueues(arc, template) {
     // only add fifo when true; false will cause cfn to fail =/
     let fifo = prop('fifo')
     if (fifo) {
-      template.Resources[`${name}Queue`].Properties = fifo
-      template.Resources[`${name}Queue`].Properties = fifo
+      template.Resources[`${name}Queue`].Properties.FifoQueue = fifo
     }
 
     template.Outputs[`${name}SqsQueue`] = {
