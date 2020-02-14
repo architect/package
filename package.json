@@ -23,7 +23,7 @@
     "@architect/utils": "^1.4.7",
     "glob": "^7.1.6",
     "mime-types": "^2.1.26",
-    "mkdirp": "^0.5.1"
+    "mkdirp": "^1.0.3"
   },
   "devDependencies": {
     "codecov": "^3.6.4",
