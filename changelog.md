@@ -2,13 +2,30 @@
 
 ---
 
-## [1.2.6] 2020-03-19
+## [1.2.8 - 1.2.9] 2020-03-19
 
 ### Changed
 
 - Updated dependencies
 
 ---
+
+## [1.2.7] 2020-03-19
+
+### Changed
+
+- Updated npm config
+
+---
+
+## [1.2.6] 2020-03-19
+
+### Fixed
+
+- Fixes issue deploying FIFO queues
+
+---
+
 
 ## [1.2.5] 2020-02-05
 
