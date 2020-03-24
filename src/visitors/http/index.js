@@ -13,6 +13,7 @@ let unexpress = require('./un-express-route')
 let getEnv = require('../get-lambda-env')
 let getLambdaName = require('../get-lambda-name')
 let getPropertyHelper = require('../get-lambda-config')
+let forceStatic = require('../static')
 
 /**
  * visit arc.http and merge in AWS::Serverless resources
@@ -167,6 +168,9 @@ module.exports = function http(arc, template) {
     Description: 'HTTP restApiId',
     Value: {Ref: appname}
   }
+
+  if (!arc.static)
+    template = forceStatic(arc, template)
 
   return template
 }

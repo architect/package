@@ -7,6 +7,8 @@
 ### Changed
 
 - Updated dependencies
+- If `@http` is defined a static bucket will be created (`@static` is now implicit)
+- Updated `http-proxy` to support API Gateway HTTP APIs (say that three times fast)
 
 ---
 
