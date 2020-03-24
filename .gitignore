@@ -4,6 +4,7 @@ cheeky-cfn*
 coverage/
 node_modules/
 out.yaml
+package-lock.json
 sam.json
 sam.yaml
 src/events/
