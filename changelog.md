@@ -2,13 +2,14 @@
 
 ---
 
-## [1.2.10 - 1.3.1] 2020-03-22
+## [1.2.10 - 1.3.2] 2020-03-22
 
 ### Changed
 
 - Updated dependencies
 - If `@http` is defined a static bucket will be created (`@static` is now implicit)
 - Updated `http-proxy` to support API Gateway HTTP APIs (say that three times fast)
+- Fix missing `arc.static` bug in adding mocks
 
 ---
 
