@@ -20,7 +20,7 @@ module.exports = function addStaticMocks(arc, template) {
   let staticAssets = path.join(publicDir, '/**/*+(.html|.svg|.css|.js|.mjs)')
   let assets = glob.sync(staticAssets, {nodir:true})
 
-  let serialize = arc.static.some(t=> t[0] === 'serialize')
+  let serialize = arc.static && arc.static.some(t=> t[0] === 'serialize')
   if (serialize) {
     assets.forEach(asset=> {
 
