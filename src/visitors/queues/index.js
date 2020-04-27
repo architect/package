@@ -76,6 +76,7 @@ module.exports = function visitQueues(arc, template) {
     let fifo = prop('fifo')
     if (fifo) {
       template.Resources[`${name}Queue`].Properties.FifoQueue = fifo
+      template.Resources[`${name}Queue`].Properties.ContentBasedDeduplication = true
     }
 
     template.Outputs[`${name}SqsQueue`] = {
