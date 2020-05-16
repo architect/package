@@ -5,6 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "lint": "eslint . --fix",
+    "build": "rollup -c",
     "test:unit": "cross-env PORT=6666 tape test/unit/*-test.js test/unit/**/*-test.js  test/unit/**/**/*-test.js| tap-spec",
     "test:slow": "cross-env PORT=6666 tape test/slow/*-test.js | tap-spec",
     "coverage": "nyc --reporter=lcov --reporter=text-summary npm run test:unit",
@@ -18,18 +19,16 @@
   "author": "Brian LeRoux <b@brian.io>",
   "license": "Apache-2.0",
   "dependencies": {
-    "@architect/http-proxy": "~3.8.0",
-    "@architect/parser": "~2.1.1",
-    "@architect/utils": "~1.5.1",
-    "glob": "~7.1.6",
-    "mime-types": "~2.1.26",
-    "mkdirp": "~1.0.3"
+    "@architect/utils": "~1.5.1"
   },
   "devDependencies": {
+    "@rollup/plugin-commonjs": "~11.1.0",
+    "@rollup/plugin-json": "~4.0.3",
     "codecov": "^3.6.5",
     "cross-env": "^7.0.2",
     "eslint": "^6.8.0",
     "nyc": "^15.0.0",
+    "rollup": "~2.10.2",
     "sinon": "^9.0.1",
     "tap-spec": "^5.0.0",
     "tape": "^4.13.2"

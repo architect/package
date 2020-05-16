@@ -1,8 +1,8 @@
-let parse = require('@architect/parser')
-let fs = require('fs')
-let path = require('path')
+//let parse = require('@architect/parser')
+//let fs = require('fs')
+//let path = require('path')
 
-module.exports = function getEnv(arc, pathToCode) {
+module.exports = function getEnv(arc/*, pathToCode*/) {
 
   let env = {
     ARC_ROLE: {Ref: 'Role'},
@@ -35,7 +35,7 @@ module.exports = function getEnv(arc, pathToCode) {
     }
   }
 
-  // .arc-config local override
+  /* FIXME move to deploy macro .arc-config local override
   let arcFile = path.join(pathToCode, '.arc-config')
   let exists = fs.existsSync(arcFile)
   if (exists) {
@@ -45,7 +45,7 @@ module.exports = function getEnv(arc, pathToCode) {
       // local add PYTHONPATH if the runtime is python
       env.PYTHONPATH = '/var/task/vendor:/var/runtime:/opt/python'
     }
-  }
+  }*/
 
   return env
 }

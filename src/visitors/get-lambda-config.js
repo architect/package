@@ -1,6 +1,6 @@
-let parse = require('@architect/parser')
-let fs = require('fs')
-let path = require('path')
+//let parse = require('@architect/parser')
+//let fs = require('fs')
+//let path = require('path')
 
 /**
  * @param {Object} a - {}
@@ -30,7 +30,7 @@ function invert(a, b) {
   return a
 }
 
-module.exports = function getPropertyHelper(arc, pathToCode) {
+module.exports = function getPropertyHelper(arc/*, pathToCode*/) {
 
   // default props
   let props = {
@@ -50,7 +50,7 @@ module.exports = function getPropertyHelper(arc, pathToCode) {
     props = Object.assign({}, props, globals)
   }
 
-  // .arc-config local override
+  /* FIXME move to deploy macro .arc-config local override
   let arcFile = path.join(pathToCode, '.arc-config')
   let exists = fs.existsSync(arcFile)
   if (exists) {
@@ -60,7 +60,7 @@ module.exports = function getPropertyHelper(arc, pathToCode) {
       config = config.aws.reduce(invert, {})
     }
     props = Object.assign({}, props, config)
-  }
+  }*/
 
   return function getProp(name) {
     return props[name]
