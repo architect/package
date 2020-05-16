@@ -1,4 +1,4 @@
-let {toLogicalID} = require('@architect/utils')
+let toLogicalID = require('../to-logical-id')
 let {version} = require('../../package.json')
 let visit = require('../visitors/tables')
 let getEnv = require('../visitors/get-lambda-env')

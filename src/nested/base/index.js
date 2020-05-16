@@ -1,4 +1,4 @@
-let {toLogicalID} = require('@architect/utils')
+let toLogicalID = require('../../to-logical-id')
 let events = require('./events')
 let policy = require('./policy')
 let queues = require('./queues')

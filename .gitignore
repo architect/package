@@ -1,4 +1,5 @@
 .arc
+dist
 .nyc_output/
 cheeky-cfn*
 coverage/

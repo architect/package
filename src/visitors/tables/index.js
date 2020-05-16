@@ -1,4 +1,4 @@
-let {toLogicalID} = require('@architect/utils')
+let toLogicalID = require('../../to-logical-id')
 
 let clean = require('./clean')
 let getTTL = require('./get-ttl')

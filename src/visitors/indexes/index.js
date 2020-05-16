@@ -1,5 +1,5 @@
 let getAttributeDefinitions = require('../tables/get-attribute-definitions')
-let {toLogicalID} = require('@architect/utils')
+let toLogicalID = require('../../to-logical-id')
 let getGSI = require('./get-gsi-name')
 let getKeySchema = require('../tables/get-key-schema')
 let clean = require('../tables/clean')

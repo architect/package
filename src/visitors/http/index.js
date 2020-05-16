@@ -1,11 +1,4 @@
-let fs = require('fs')
-let exists = fs.existsSync
-let {join} = require('path')
-let mkdir = require('mkdirp').sync
-
-let utils = require('@architect/utils')
-let toLogicalID = utils.toLogicalID
-let fingerprinter = utils.fingerprint
+let toLogicalID = require('../../to-logical-id')
 
 let getApiProps = require('./get-api-properties')
 let unexpress = require('./un-express-route')
@@ -21,11 +14,12 @@ let forceStatic = require('../static')
 module.exports = function http(arc, template) {
 
   // force add GetIndex if not defined
+  /* FIXME add to deploy as macro
   let findGetIndex = tuple=> tuple[0].toLowerCase() === 'get' && tuple[1] === '/'
   let hasGetIndex = arc.http.some(findGetIndex) // we reuse this below for default proxy code
   if (!hasGetIndex) {
     arc.http.push(['get', '/'])
-  }
+  }*/
 
   // base props
   let Type = 'AWS::Serverless::Api'
@@ -43,7 +37,7 @@ module.exports = function http(arc, template) {
   template.Resources[appname] = {Type, Properties}
 
   // walk the arc file http routes
-  arc.http.forEach(route=> {
+  for (let route of arc.http) {
 
     let method = route[0].toLowerCase() // get, post, put, delete, patch
     let path = unexpress(route[1]) // from /foo/:bar to /foo/{bar}
@@ -97,8 +91,10 @@ module.exports = function http(arc, template) {
         RestApiId: {'Ref': appname}
       }
     }
-  })
+  // eol
+  }
 
+    /**FIXME move to deploy as a core plugin before merging this branch
   // if we added get index we need to fix the code path
   if (!hasGetIndex) {
     // Package running as a dependency (most common use case)
@@ -113,6 +109,7 @@ module.exports = function http(arc, template) {
     let {fingerprint} = fingerprinter.config({static: arc.static})
 
     template.Resources.GetIndex.Properties.Runtime = 'nodejs12.x'
+    template.Resources.GetIndex.Properties.CodeUri = arcProxy
 
     if (fingerprint) {
       // Note: Arc's tmp dir will need to be cleaned up by a later process further down the line
@@ -131,10 +128,8 @@ module.exports = function http(arc, template) {
       // Ok we done
       template.Resources.GetIndex.Properties.CodeUri = tmp
     }
-    else {
-      template.Resources.GetIndex.Properties.CodeUri = arcProxy
-    }
-  }
+  }*/
+
 
   // add permissions for proxy+ resource aiming at GetIndex
   template.Resources.InvokeProxyPermission = {

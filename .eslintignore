@@ -2,3 +2,4 @@
 coverage/
 test/slow/mock/src/http/get-index/index.js
 vendor/arc-proxy-*
+rollup.config.js

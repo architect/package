@@ -2,6 +2,17 @@
 
 ---
 
+## [1.4.0] ??
+
+- [x] remove experimental feature src/visitors/static/add-static-mocks.js
+- [x] add rollup for esm builds
+- [x] remove use of `fs` from src/visitors/http/index.js
+- [x] remove use of `fs` from src/visitors/get-lambda-config.js
+- [x] remove use of `fs` from src/visitors/get-lambda-env.js
+- [x] re-vendor toLogicalID for esm builds
+- [ ] add awareness for configurable code paths
+- [ ] update to Deno 1.0
+
 ## [1.2.10 - 1.3.2] 2020-03-22
 
 ### Changed

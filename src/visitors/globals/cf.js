@@ -1,4 +1,4 @@
-let {toLogicalID} = require('@architect/utils')
+let toLogicalID = require('../../to-logical-id')
 
 /**
  * Moved to deploy, managed via SDK calls for now
