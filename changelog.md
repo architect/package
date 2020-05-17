@@ -2,6 +2,15 @@
 
 ---
 
+## [1.3.3] 2020-05-17
+
+### Changed
+
+- Updates HTTP proxy lib to 3.10.0, which includes improved caching and pretty URL support
+- If creating a FIFO queue, set `ContentBasedDeduplication` to be enabled by default; thanks @filmaj!
+
+---
+
 ## [1.2.10 - 1.3.2] 2020-03-22
 
 ### Changed
