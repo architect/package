@@ -8,11 +8,10 @@ myapp
 @ws
 `
 
-test('web sockes have a policy doc', t => {
+test('WebSockets have a policy doc', t => {
   t.plan(2)
   let parsed = parse(arcfile)
   let cfn = pkg.toSAM(parsed)
   t.ok(pkg, 'pkg')
   t.ok(cfn.Resources.hasOwnProperty('WebSocketPolicy'), 'WebSocketPolicy')
-  //console.log(JSON.stringify(cfn, null, 2))
 })
