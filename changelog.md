@@ -2,6 +2,15 @@
 
 ---
 
+## [1.3.4] 2020-06-09
+
+### Changed
+
+- Removed `mkdirp` in favor of Node.js >= 10.x `mkdir` recursive
+- Updated dependencies
+
+---
+
 ## [1.3.3] 2020-05-17
 
 ### Changed
