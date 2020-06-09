@@ -9,6 +9,11 @@
 - Removed `mkdirp` in favor of Node.js >= 10.x `mkdir` recursive
 - Updated dependencies
 
+
+### Fixed
+
+- Fixed `@aws` configuration in root project manifest and `.arc-config`, especially pertaining to the use of `layer` or `layers`; fixes #852, ht @jessrosenfield!
+
 ---
 
 ## [1.3.3] 2020-05-17
