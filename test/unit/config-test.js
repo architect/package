@@ -146,8 +146,8 @@ policy
   t.equal(props['Policies'][0], 'fiz', `Policy matches: ${props['Layers'][0]}`)
 })
 
-test('Config - layers limits', t => {
-  t.plan(2)
+test('Config - layer validation', t => {
+  t.plan(4)
 
   let arcfile = arc(`@aws
 layers
@@ -174,6 +174,25 @@ layers
     let parsed = parse(arcfile)
     package.toSAM(parsed)
   }, 'Too many layers throws')
+
+  t.throws(() => {
+    let arcfile = arc(`@aws
+region us-west-1
+layers a:b:c:us-west-2:d
+`)
+    let parsed = parse(arcfile)
+    package.toSAM(parsed)
+  }, 'Incorrect (.arc) layer region throws')
+
+  process.env.AWS_REGION = 'us-west-1'
+  t.throws(() => {
+    let arcfile = arc(`@aws
+layers a:b:c:us-west-2:d
+`)
+    let parsed = parse(arcfile)
+    package.toSAM(parsed)
+  }, 'Incorrect (env) layer region throws')
+  delete process.env.AWS_REGION
 })
 
 test('.arc-config overrides root config', t => {

@@ -4,6 +4,11 @@
 
 ## [1.3.4] 2020-06-09
 
+### Added
+
+- Added layer region validation (instead of letting CloudFormation fail without a helpful error)
+
+
 ### Changed
 
 - Removed `mkdirp` in favor of Node.js >= 10.x `mkdir` recursive

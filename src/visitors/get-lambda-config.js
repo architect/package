@@ -59,8 +59,6 @@ function updateProps (props, config) {
     }
   }
 
-  if (props.layers.length > 5) throw Error('Lambda can only be configured with up to 5 layers')
-
   return props
 }
 
@@ -93,6 +91,22 @@ module.exports = function getPropertyHelper(arc, pathToCode) {
     let config = parse(raw)
     if (config.aws) {
       props = updateProps(props, config.aws)
+    }
+  }
+
+  // Layer validation
+  if (props.layers.length > 5) throw Error('Lambda can only be configured with up to 5 layers')
+  // CloudFormation fails without a helpful error if any layers aren't in the same region as the app because CloudFormation
+  if (props.layers.length) {
+    for (let layer of props.layers) {
+      let layerRegion = layer.split(':')[3]
+      let getRegion = s => s[0] === 'region' && s[1]
+      let arcRegion = arc.aws && arc.aws.some(getRegion) && arc.aws.find(getRegion)[1]
+      let region = process.env.AWS_REGION || arcRegion
+      if (region && region !== layerRegion) {
+        let msg = `Lambda layers must be in the same region as app\nApp region: ${region}\nLayer ARN: ${layer}`
+        throw Error(msg)
+      }
     }
   }
 
