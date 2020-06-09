@@ -116,7 +116,7 @@ module.exports = function http(arc, template) {
       // Note: Arc's tmp dir will need to be cleaned up by a later process further down the line
       let tmp = join(process.cwd(), '__ARC_TMP__')
       let shared = join(tmp, 'node_modules', '@architect', 'shared')
-      mkdirSync(shared, { recurisve: true })
+      mkdirSync(shared, { recursive: true })
       // Handle proxy
       let proxy = readFileSync(join(arcProxy, 'index.js'))
       writeFileSync(join(tmp, 'index.js'), proxy)
