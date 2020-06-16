@@ -21,9 +21,9 @@
   "author": "Brian LeRoux <b@brian.io>",
   "license": "Apache-2.0",
   "dependencies": {
-    "@architect/http-proxy": "~3.11.0",
-    "@architect/parser": "~2.1.4",
-    "@architect/utils": "~1.5.8",
+    "@architect/http-proxy": "~3.12.0",
+    "@architect/parser": "~2.1.5",
+    "@architect/utils": "~1.5.9",
     "glob": "~7.1.6",
     "mime-types": "~2.1.27"
   },
