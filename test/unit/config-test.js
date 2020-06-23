@@ -3,6 +3,9 @@ let test = require('tape')
 let package = require('../../')
 let mockFs = require('mock-fs')
 
+// dont let local env vars interfere with tests
+delete process.env.AWS_REGION
+
 let base =
 `@app
 app
