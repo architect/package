@@ -1,11 +1,11 @@
-let {readArc} = require('@architect/utils')
+let { readArc } = require('@architect/utils')
 let config = require('.')
 let chalk = require('chalk')
 let fs = require('fs')
 
-module.exports = function pack(/*opts*/) {
+module.exports = function pack (/* opts*/) {
 
-  let {arc} = readArc()
+  let { arc } = readArc()
   fs.writeFileSync('sam.json', JSON.stringify(config(arc), null, 2))
 
   // draw the deploy instructions
@@ -14,7 +14,7 @@ module.exports = function pack(/*opts*/) {
   let sam = chalk.bold.green(pkg)
   let cf = chalk.bold.green(dep)
 
-  let x = process.platform.startsWith('win')? ' √' :'✓'
+  let x = process.platform.startsWith('win') ? ' √' : '✓'
   let f = chalk.cyan.bold('sam.json')
 
   console.log(chalk.grey(`${x} Successfully created ${f}! Now deploy it by following these steps:

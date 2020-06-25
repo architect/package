@@ -1,11 +1,11 @@
-let {toLogicalID} = require('@architect/utils')
+let { toLogicalID } = require('@architect/utils')
 let events = require('./events')
 let policy = require('./policy')
 let queues = require('./queues')
 let statics = require('./static')
 let tables = require('./tables')
 let ssm = require('../../visitors/globals/ssm')
-let {version} = require('../../../package.json')
+let { version } = require('../../../package.json')
 
 /**
  * base is the root cfn template
@@ -13,7 +13,7 @@ let {version} = require('../../../package.json')
  * - this role allows read/write access to .arc defined dynamo tables, sns topics and sqs queues
  * - it contains resources we need to lock down with the app iam role
  */
-module.exports = function globals(arc) {
+module.exports = function globals (arc) {
 
   let template = {
     AWSTemplateFormatVersion: '2010-09-09',
@@ -26,15 +26,15 @@ module.exports = function globals(arc) {
         Properties: {
           AssumeRolePolicyDocument: {
             Version: '2012-10-17',
-            Statement: [{
+            Statement: [ {
               Effect: 'Allow',
               Principal: {
                 Service: 'lambda.amazonaws.com'
               },
               Action: 'sts:AssumeRole'
-            }]
+            } ]
           },
-          Policies: [policy]
+          Policies: [ policy ]
         }
       },
       RoleReflectionPolicy: {
@@ -43,18 +43,18 @@ module.exports = function globals(arc) {
         Properties: {
           PolicyName: `ArcRoleReflectionPolicy`,
           PolicyDocument: {
-            Statement: [{
+            Statement: [ {
               Effect: 'Allow',
               Action: 'iam:GetRolePolicy',
               Resource: {
                 'Fn::Sub': [
                   'arn:aws:iam::${AWS::AccountId}:role/${role}',
-                  {role: {'Ref': 'Role'}}
+                  { role: { 'Ref': 'Role' } }
                 ]
               }
-            }]
+            } ]
           },
-          Roles: [{'Ref': 'Role'}],
+          Roles: [ { 'Ref': 'Role' } ],
         }
       }
     }
@@ -78,7 +78,7 @@ module.exports = function globals(arc) {
 
   // start nesting templates for functions!
   let appname = arc.app[0]
-  let bucket = arc.aws.find(t=> t[0] === 'bucket')[1]
+  let bucket = arc.aws.find(t => t[0] === 'bucket')[1]
 
   // nest an http stack
   // passing in references to rol and static bucket if defined
@@ -89,26 +89,26 @@ module.exports = function globals(arc) {
         TemplateURL: {
           'Fn::Sub': [
             'http://${bucket}.s3.${AWS::Region}.amazonaws.com/${file}',
-            {bucket, file:`${appname}-cfn-http.yaml`}
+            { bucket, file: `${appname}-cfn-http.yaml` }
           ]
         },
         Parameters: {
-          Role: {'Fn::GetAtt': ['Role', 'Arn']},
+          Role: { 'Fn::GetAtt': [ 'Role', 'Arn' ] },
         }
       }
     }
     template.Outputs.API = {
-      Value: {'Fn::GetAtt': ['HTTP', 'Outputs.API']},
+      Value: { 'Fn::GetAtt': [ 'HTTP', 'Outputs.API' ] },
       Description: 'API Gateway'
     }
     template.Outputs.restApiId = {
-      Value: {'Fn::GetAtt': ['HTTP', 'Outputs.restApiId']},
+      Value: { 'Fn::GetAtt': [ 'HTTP', 'Outputs.restApiId' ] },
       Description: 'restApiId'
     }
     if (arc.static) {
-      template.Resources.HTTP.Properties.Parameters.StaticBucket = {Ref: 'StaticBucket'}
+      template.Resources.HTTP.Properties.Parameters.StaticBucket = { Ref: 'StaticBucket' }
       template.Outputs.Public = {
-        Value: {'Fn::GetAtt': ['StaticBucket', 'WebsiteURL']},
+        Value: { 'Fn::GetAtt': [ 'StaticBucket', 'WebsiteURL' ] },
         Description: 'S3 Bucket'
       }
     }
@@ -123,24 +123,24 @@ module.exports = function globals(arc) {
         TemplateURL: {
           'Fn::Sub': [
             'http://${bucket}.s3.${AWS::Region}.amazonaws.com/${file}',
-            {bucket, file: `${appname}-cfn-events.yaml`}
+            { bucket, file: `${appname}-cfn-events.yaml` }
           ]
         },
         Parameters: {
-          Role: {'Fn::GetAtt': ['Role', 'Arn']}
+          Role: { 'Fn::GetAtt': [ 'Role', 'Arn' ] }
         }
       }
     }
-    arc.events.forEach(event=> {
+    arc.events.forEach(event => {
       let name = `${toLogicalID(event)}Topic`
-      template.Resources.Events.Properties.Parameters[name] = {Ref: name}
+      template.Resources.Events.Properties.Parameters[name] = { Ref: name }
       template.Outputs[name] = {
-        Value: {'Fn::GetAtt': [name, 'TopicName']},
+        Value: { 'Fn::GetAtt': [ name, 'TopicName' ] },
         Description: 'SNS Topic'
       }
     })
     if (arc.static) {
-      template.Resources.Events.Properties.Parameters.StaticBucket = {Ref: 'StaticBucket'}
+      template.Resources.Events.Properties.Parameters.StaticBucket = { Ref: 'StaticBucket' }
     }
   }
 
@@ -152,16 +152,16 @@ module.exports = function globals(arc) {
         TemplateURL: {
           'Fn::Sub': [
             'http://${bucket}.s3.${AWS::Region}.amazonaws.com/${file}',
-            {bucket, file:`${appname}-cfn-scheduled.yaml`}
+            { bucket, file: `${appname}-cfn-scheduled.yaml` }
           ]
         },
         Parameters: {
-          Role: {'Fn::GetAtt': ['Role', 'Arn']},
+          Role: { 'Fn::GetAtt': [ 'Role', 'Arn' ] },
         }
       }
     }
     if (arc.static) {
-      template.Resources.Scheduled.Properties.Parameters.StaticBucket = {Ref: 'StaticBucket'}
+      template.Resources.Scheduled.Properties.Parameters.StaticBucket = { Ref: 'StaticBucket' }
     }
   }
 
@@ -174,25 +174,25 @@ module.exports = function globals(arc) {
         TemplateURL: {
           'Fn::Sub': [
             'http://${bucket}.s3.${AWS::Region}.amazonaws.com/${file}',
-            {bucket, file: `${appname}-cfn-queues.yaml`}
+            { bucket, file: `${appname}-cfn-queues.yaml` }
           ]
         },
         Parameters: {
-          Role: {'Fn::GetAtt': ['Role', 'Arn']}
+          Role: { 'Fn::GetAtt': [ 'Role', 'Arn' ] }
         }
       }
     }
-    arc.queues.forEach(event=> {
+    arc.queues.forEach(event => {
       let name = `${toLogicalID(event)}Queue`
-      template.Resources.Queues.Properties.Parameters[name] = {'Fn::GetAtt': [name, 'Arn']}
+      template.Resources.Queues.Properties.Parameters[name] = { 'Fn::GetAtt': [ name, 'Arn' ] }
     })
     if (arc.static) {
-      template.Resources.Queues.Properties.Parameters.StaticBucket = {Ref: 'StaticBucket'}
+      template.Resources.Queues.Properties.Parameters.StaticBucket = { Ref: 'StaticBucket' }
     }
   }
 
   // nest table streams stack
-  let hasStream = tbl=> tbl[Object.keys(tbl)[0]].hasOwnProperty('stream')
+  let hasStream = tbl => tbl[Object.keys(tbl)[0]].stream
   if (arc.tables && arc.tables.some(hasStream)) {
     template.Resources.Tables = {
       Type: 'AWS::CloudFormation::Stack',
@@ -200,21 +200,21 @@ module.exports = function globals(arc) {
         TemplateURL: {
           'Fn::Sub': [
             'http://${bucket}.s3.${AWS::Region}.amazonaws.com/${file}',
-            {bucket, file: `${appname}-cfn-tables.yaml`}
+            { bucket, file: `${appname}-cfn-tables.yaml` }
           ]
         },
         Parameters: {
-          Role: {'Fn::GetAtt': ['Role', 'Arn']}
+          Role: { 'Fn::GetAtt': [ 'Role', 'Arn' ] }
         }
       }
     }
-    arc.tables.forEach(table=> {
+    arc.tables.forEach(table => {
       let tbl = Object.keys(table)[0]
       let name = `${toLogicalID(tbl)}Table`
-      template.Resources.Tables.Properties.Parameters[name] = {'Fn::GetAtt': [name, 'StreamArn']}
+      template.Resources.Tables.Properties.Parameters[name] = { 'Fn::GetAtt': [ name, 'StreamArn' ] }
     })
     if (arc.static) {
-      template.Resources.Tables.Properties.Parameters.StaticBucket = {Ref: 'StaticBucket'}
+      template.Resources.Tables.Properties.Parameters.StaticBucket = { Ref: 'StaticBucket' }
     }
   }
 

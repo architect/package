@@ -1,7 +1,7 @@
 module.exports = {
   PolicyName: 'ArcGlobalPolicy',
   PolicyDocument: {
-    Statement: [{
+    Statement: [ {
       Effect: 'Allow',
       Action: [
         'logs:CreateLogGroup',
@@ -10,6 +10,6 @@ module.exports = {
         'logs:DescribeLogStreams'
       ],
       Resource: 'arn:aws:logs:*:*:*'
-    }]
+    } ]
   }
 }

@@ -64,7 +64,7 @@ function updateProps (props, config) {
 
 
 
-module.exports = function getPropertyHelper(arc, pathToCode) {
+module.exports = function getPropertyHelper (arc, pathToCode) {
 
   // Default props
   let props = {
@@ -110,7 +110,7 @@ module.exports = function getPropertyHelper(arc, pathToCode) {
     }
   }
 
-  return function getProp(name) {
+  return function getProp (name) {
     return props[name]
   }
 }

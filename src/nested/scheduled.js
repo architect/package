@@ -1,7 +1,7 @@
-let {version} = require('../../package.json')
+let { version } = require('../../package.json')
 let visit = require('../visitors/scheduled')
 
-module.exports = function nestScheduled(arc) {
+module.exports = function nestScheduled (arc) {
 
   let template = {
     AWSTemplateFormatVersion: '2010-09-09',

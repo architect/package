@@ -15,12 +15,12 @@
  * Also, order matters: slashes should be converted last, after there are no more dashes to convert
 */
 
-module.exports = function getLambdaName(fn) {
+module.exports = function getLambdaName (fn) {
   return fn === '/'
     ? '-index'
     : fn.replace(/-/g,  '_')
-        .replace(/\./g, '_')
-        .replace(/_/g,  '_')
-        .replace(/\//g, '-')
-        .replace(/:/g,  '000')
+      .replace(/\./g, '_')
+      .replace(/_/g,  '_')
+      .replace(/\//g, '-')
+      .replace(/:/g,  '000')
 }

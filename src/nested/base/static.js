@@ -1,4 +1,4 @@
-module.exports = function statics(arc, template) {
+module.exports = function statics (arc, template) {
   template.Resources.StaticBucket = {
     Type: 'AWS::S3::Bucket',
     Properties: {
@@ -12,7 +12,7 @@ module.exports = function statics(arc, template) {
   template.Resources.Role.Properties.Policies.push({
     PolicyName: 'ArcStaticBucketPolicy',
     PolicyDocument: {
-      Statement: [{
+      Statement: [ {
         Effect: 'Allow',
         Action: [
           's3:GetObject',
@@ -22,10 +22,10 @@ module.exports = function statics(arc, template) {
         Resource: {
           'Fn::Sub': [
             'arn:aws:s3:::${bukkit}',
-            {bukkit: {'Ref': 'StaticBucket'}}
+            { bukkit: { 'Ref': 'StaticBucket' } }
           ]
         }
-      }]
+      } ]
     }
   })
   return template

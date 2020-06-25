@@ -1,6 +1,6 @@
-let {toLogicalID} = require('@architect/utils')
+let { toLogicalID } = require('@architect/utils')
 
-module.exports = function ssm(arc, template) {
+module.exports = function ssm (arc, template) {
 
   if (!template.Resources)
     template.Resources = {}
@@ -9,22 +9,22 @@ module.exports = function ssm(arc, template) {
 
   if (arc.tables) {
     hasParams = true
-    arc.tables.forEach(table=> {
+    arc.tables.forEach(table => {
       let tablename = Object.keys(table)[0]
       let Table = toLogicalID(tablename)
       let TableName = `${Table}Table`
       let TableParam = `${Table}Param`
       template.Resources[TableParam] = {
         Type: 'AWS::SSM::Parameter',
-        Properties : {
+        Properties: {
           Type: 'String',
           Name: {
             'Fn::Sub': [
               '/${AWS::StackName}/tables/${tablename}',
-              {tablename}
+              { tablename }
             ]
           },
-          Value: {Ref: TableName}
+          Value: { Ref: TableName }
         }
       }
     })
@@ -32,20 +32,20 @@ module.exports = function ssm(arc, template) {
 
   if (arc.events) {
     hasParams = true
-    arc.events.forEach(event=> {
+    arc.events.forEach(event => {
       let Event = `${toLogicalID(event)}Topic`
       let EventParam = `${Event}Param`
       template.Resources[EventParam] = {
         Type: 'AWS::SSM::Parameter',
-        Properties : {
+        Properties: {
           Type: 'String',
           Name: {
             'Fn::Sub': [
               '/${AWS::StackName}/events/${event}',
-              {event}
+              { event }
             ]
           },
-          Value: {Ref: Event}
+          Value: { Ref: Event }
         }
       }
     })
@@ -53,20 +53,20 @@ module.exports = function ssm(arc, template) {
 
   if (arc.queues) {
     hasParams = true
-    arc.queues.forEach(q=> {
+    arc.queues.forEach(q => {
       let Queue = `${toLogicalID(q)}Queue`
       let QueueParam = `${Queue}Param`
       template.Resources[QueueParam] = {
         Type: 'AWS::SSM::Parameter',
-        Properties : {
+        Properties: {
           Type: 'String',
           Name: {
             'Fn::Sub': [
               '/${AWS::StackName}/queues/${q}',
-              {q}
+              { q }
             ]
           },
-          Value: {Ref: Queue}
+          Value: { Ref: Queue }
         }
       }
     })
@@ -76,29 +76,29 @@ module.exports = function ssm(arc, template) {
     hasParams = true
     template.Resources.StaticBucketParam = {
       Type: 'AWS::SSM::Parameter',
-      Properties : {
+      Properties: {
         Type: 'String',
         Name: {
           'Fn::Sub': [
             '/${AWS::StackName}/static/${key}',
-            {key: 'bucket'}
+            { key: 'bucket' }
           ]
         },
-        Value: {Ref: 'StaticBucket'}
+        Value: { Ref: 'StaticBucket' }
       }
     }
-    ;['fingerprint'].forEach(key=> {
-      let find = t=> t[0] === key
+    ;[ 'fingerprint' ].forEach(key => {
+      let find = t => t[0] === key
       let hasKey = arc.static.some(find)
-      let Value = hasKey? arc.static.find(find)[1]+'' : 'false'
+      let Value = hasKey ? arc.static.find(find)[1] + '' : 'false'
       template.Resources[`Static${toLogicalID(key)}Param`] = {
         Type: 'AWS::SSM::Parameter',
-        Properties : {
+        Properties: {
           Type: 'String',
           Name: {
             'Fn::Sub': [
               '/${AWS::StackName}/static/${key}',
-              {key}
+              { key }
             ]
           },
           Value
@@ -114,7 +114,7 @@ module.exports = function ssm(arc, template) {
       Properties: {
         PolicyName: `ArcParameterStorePolicy`,
         PolicyDocument: {
-          Statement: [{
+          Statement: [ {
             Effect: 'Allow',
             Action: 'ssm:GetParametersByPath',
             Resource: {
@@ -123,9 +123,9 @@ module.exports = function ssm(arc, template) {
                 {}
               ]
             }
-          }]
+          } ]
         },
-        Roles: [{'Ref': 'Role'}],
+        Roles: [ { 'Ref': 'Role' } ],
       }
     }
   }

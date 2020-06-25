@@ -1,22 +1,22 @@
-let {version} = require('../../package.json')
+let { version } = require('../../package.json')
 let http = require('../visitors/http')
 let addStatic = require('../visitors/static/add-static-proxy')
 let addMocks = require('../visitors/static/add-static-mocks')
 
-module.exports = function nestHTTP(arc) {
+module.exports = function nestHTTP (arc) {
   let template = {
     AWSTemplateFormatVersion: '2010-09-09',
     Transform: 'AWS::Serverless-2016-10-31',
     Description: `Exported by architect/package@${version} on ${new Date(Date.now()).toISOString()}`,
     Parameters: {
       Role: {
-        Type:'String',
+        Type: 'String',
         Description: 'IAM Role ARN'
       }
     }
   }
-  let visitor = (template, method)=> method(arc, template)
-  let tasks = [http, tidyRefToRole]
+  let visitor = (template, method) => method(arc, template)
+  let tasks = [ http, tidyRefToRole ]
   if (arc.static) {
     template.Parameters.StaticBucket = {
       Type: 'String',
@@ -29,10 +29,10 @@ module.exports = function nestHTTP(arc) {
 }
 
 // remaps refs from singularity template to passed in Parameters.Role
-function tidyRefToRole(arc, template) {
-  Object.keys(template.Resources).forEach(resource=> {
+function tidyRefToRole (arc, template) {
+  Object.keys(template.Resources).forEach(resource => {
     if (template.Resources[resource].Type === 'AWS::Serverless::Function') {
-      template.Resources[resource].Properties.Role = {Ref: 'Role'}
+      template.Resources[resource].Properties.Role = { Ref: 'Role' }
     }
   })
   return template

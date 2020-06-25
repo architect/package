@@ -1,11 +1,11 @@
-let {toLogicalID} = require('@architect/utils')
+let { toLogicalID } = require('@architect/utils')
 let getPropertyHelper = require('../get-lambda-config')
 let getEnv = require('../get-lambda-env')
 
 /**
  * visit arc.ws and merge in AWS::Serverless resources
  */
-module.exports = function visitWS(arc, template) {
+module.exports = function visitWS (arc, template) {
 
   // ensure cf standard sections exist
   if (!template.Resources)
@@ -34,7 +34,7 @@ module.exports = function visitWS(arc, template) {
       'WebsocketDisconnectRoute'
     ],
     Properties: {
-      ApiId: {Ref: 'WS'},
+      ApiId: { Ref: 'WS' },
     }
   }
 
@@ -42,8 +42,8 @@ module.exports = function visitWS(arc, template) {
     Type: 'AWS::ApiGatewayV2::Stage',
     Properties: {
       StageName: 'staging',
-      DeploymentId: {Ref: 'WebsocketDeployment'},
-      ApiId: {Ref: 'WS'},
+      DeploymentId: { Ref: 'WebsocketDeployment' },
+      ApiId: { Ref: 'WS' },
     }
   }
 
@@ -54,27 +54,27 @@ module.exports = function visitWS(arc, template) {
     Properties: {
       PolicyName: 'ArcWebSocketPolicy',
       PolicyDocument: {
-        Statement: [{
+        Statement: [ {
           Effect: 'Allow',
           Action: [
             'execute-api:Invoke',
             'execute-api:ManageConnections'
           ],
           Resource: [
-            {"Fn::Sub": [
+            { 'Fn::Sub': [
               'arn:aws:execute-api:${AWS::Region}:*:${api}/*',
-              {api: {Ref: 'WS'}}
-            ]}
+              { api: { Ref: 'WS' } }
+            ] }
           ]
-        }]
+        } ]
       },
-      Roles: [{Ref: 'Role'}]
+      Roles: [ { Ref: 'Role' } ]
     }
   }
 
   // add websocket functions
-  let defaults = ['default', 'connect', 'disconnect']
-  Array.from(new Set([...defaults, ...arc.ws])).forEach(lambda=> {
+  let defaults = [ 'default', 'connect', 'disconnect' ]
+  Array.from(new Set([ ...defaults, ...arc.ws ])).forEach(lambda => {
 
     let name = toLogicalID(`websocket-${lambda}`)
     let code = `./src/ws/${lambda}`
@@ -89,11 +89,11 @@ module.exports = function visitWS(arc, template) {
         Runtime: prop('runtime'),
         MemorySize: prop('memory'),
         Timeout: prop('timeout'),
-        Environment: {Variables: env},
+        Environment: { Variables: env },
         Role: {
           'Fn::Sub': [
             'arn:aws:iam::${AWS::AccountId}:role/${roleName}',
-            {roleName: {'Ref': `Role`}}
+            { roleName: { 'Ref': `Role` } }
           ]
         },
         Events: {}
@@ -122,11 +122,11 @@ module.exports = function visitWS(arc, template) {
     template.Resources[Route] = {
       Type: 'AWS::ApiGatewayV2::Route',
       Properties: {
-        ApiId: {Ref: 'WS'},
-        RouteKey: defaults.includes(lambda)? `$${lambda}` : lambda,
+        ApiId: { Ref: 'WS' },
+        RouteKey: defaults.includes(lambda) ? `$${lambda}` : lambda,
         OperationName: Route,
         Target: {
-          'Fn::Join': ['/', ['integrations', {Ref: Integration}]]
+          'Fn::Join': [ '/', [ 'integrations', { Ref: Integration } ] ]
         }
       }
     }
@@ -134,11 +134,11 @@ module.exports = function visitWS(arc, template) {
     template.Resources[Integration] = {
       Type: 'AWS::ApiGatewayV2::Integration',
       Properties: {
-        ApiId: {Ref: 'WS'},
+        ApiId: { Ref: 'WS' },
         IntegrationType: 'AWS_PROXY',
         IntegrationUri: {
           'Fn::Sub': [
-            'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${'+name+'.Arn}/invocations',
+            'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${' + name + '.Arn}/invocations',
             {}
           ]
         }
@@ -147,10 +147,10 @@ module.exports = function visitWS(arc, template) {
 
     template.Resources[Permission] = {
       Type: 'AWS::Lambda::Permission',
-      DependsOn: ['WS', name],
+      DependsOn: [ 'WS', name ],
       Properties: {
         Action: 'lambda:InvokeFunction',
-        FunctionName: {Ref: name},
+        FunctionName: { Ref: name },
         Principal: 'apigateway.amazonaws.com'
       }
     }

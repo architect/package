@@ -1,13 +1,13 @@
 let ssm = require('./ssm')
-//let cf = require('./cf') // Moved to deploy, managed via SDK calls for now
-let {toLogicalID} = require('@architect/utils')
+// let cf = require('./cf') // Moved to deploy, managed via SDK calls for now
+let { toLogicalID } = require('@architect/utils')
 
 /**
  * visit arc and merge in any global AWS::Serverless resources
  *
  * - AWS::IAM::Role
  */
-module.exports = function globals(arc, template) {
+module.exports = function globals (arc, template) {
 
   // interpolate required shape
   if (!template.Resources)
@@ -19,13 +19,13 @@ module.exports = function globals(arc, template) {
     Properties: {
       AssumeRolePolicyDocument: {
         Version: '2012-10-17',
-        Statement: [{
+        Statement: [ {
           Effect: 'Allow',
           Principal: {
             Service: 'lambda.amazonaws.com'
           },
           Action: 'sts:AssumeRole'
-        }]
+        } ]
       },
       Policies: []
     }
@@ -35,7 +35,7 @@ module.exports = function globals(arc, template) {
   template.Resources.Role.Properties.Policies.push({
     PolicyName: 'ArcGlobalPolicy',
     PolicyDocument: {
-      Statement: [{
+      Statement: [ {
         Effect: 'Allow',
         Action: [
           'logs:CreateLogGroup',
@@ -44,7 +44,7 @@ module.exports = function globals(arc, template) {
           'logs:DescribeLogStreams'
         ],
         Resource: 'arn:aws:logs:*:*:*'
-      }]
+      } ]
     }
   })
 
@@ -53,7 +53,7 @@ module.exports = function globals(arc, template) {
     template.Resources.Role.Properties.Policies.push({
       PolicyName: 'ArcStaticBucketPolicy',
       PolicyDocument: {
-        Statement: [{
+        Statement: [ {
           Effect: 'Allow',
           Action: [
             's3:GetObject',
@@ -61,19 +61,19 @@ module.exports = function globals(arc, template) {
             's3:PutObjectAcl',
             's3:DeleteObject',
           ],
-          Resource: [{
+          Resource: [ {
             'Fn::Sub': [
               'arn:aws:s3:::${bukkit}',
-              {bukkit: {'Ref': 'StaticBucket'}}
+              { bukkit: { 'Ref': 'StaticBucket' } }
             ]
           },
           {
             'Fn::Sub': [
               'arn:aws:s3:::${bukkit}/*',
-              {bukkit: {'Ref': 'StaticBucket'}}
+              { bukkit: { 'Ref': 'StaticBucket' } }
             ]
-          }]
-        }]
+          } ]
+        } ]
       }
     })
   }
@@ -83,7 +83,7 @@ module.exports = function globals(arc, template) {
     template.Resources.Role.Properties.Policies.push({
       PolicyName: 'ArcDynamoPolicy',
       PolicyDocument: {
-        Statement: [{
+        Statement: [ {
           Effect: 'Allow',
           Action: [
             'dynamodb:BatchGetItem',
@@ -100,32 +100,32 @@ module.exports = function globals(arc, template) {
             'dynamodb:ListStreams'
           ],
           Resource: getTableArns(arc.tables),
-        }]
+        } ]
       }
     })
-    function getTableArns(tbls) {
-      let flip = tbl=> Object.keys(tbl)[0]
-      return tbls.map(flip).map(table=> {
+    function getTableArns (tbls) {
+      let flip = tbl => Object.keys(tbl)[0]
+      return tbls.map(flip).map(table => {
         let name = `${toLogicalID(table)}Table`
-        return [{
+        return [ {
           'Fn::Sub': [
             'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tablename}',
-            {tablename: {'Ref': name}}
+            { tablename: { 'Ref': name } }
           ]
         },
         {
           'Fn::Sub': [
             'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tablename}/*',
-            {tablename: {'Ref': name}}
+            { tablename: { 'Ref': name } }
           ]
         },
         {
           'Fn::Sub': [
             'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tablename}/stream/*',
-            {tablename: {'Ref': name}}
+            { tablename: { 'Ref': name } }
           ]
-        }]
-      }).reduce((a, b)=> a.concat(b), [])
+        } ]
+      }).reduce((a, b) => a.concat(b), [])
     }
   }
 
@@ -134,17 +134,17 @@ module.exports = function globals(arc, template) {
     template.Resources.Role.Properties.Policies.push({
       PolicyName: 'ArcSimpleNotificationServicePolicy',
       PolicyDocument: {
-        Statement: [{
+        Statement: [ {
           Effect: 'Allow',
           Action: [
             'sns:Publish',
-            //'sns:ListTopics'
+            // 'sns:ListTopics'
           ],
           Resource: getTopicArn(),
-        }]
+        } ]
       }
     })
-    function getTopicArn() {
+    function getTopicArn () {
       return {
         'Fn::Sub': [
           'arn:aws:sns:${AWS::Region}:${AWS::AccountId}:${AWS::StackName}*',
@@ -159,7 +159,7 @@ module.exports = function globals(arc, template) {
     template.Resources.Role.Properties.Policies.push({
       PolicyName: 'ArcSimpleQueueServicePolicy',
       PolicyDocument: {
-        Statement: [{
+        Statement: [ {
           Effect: 'Allow',
           Action: [
             'sqs:SendMessageBatch',
@@ -168,8 +168,8 @@ module.exports = function globals(arc, template) {
             'sqs:DeleteMessage',
             'sqs:GetQueueAttributes',
           ],
-          Resource: '*'//getQueueArns(arc.queues),
-        }]
+          Resource: '*'// getQueueArns(arc.queues),
+        } ]
       }
     })
     /*
@@ -191,6 +191,6 @@ module.exports = function globals(arc, template) {
 
   // add an edge mabye
   // Moved to deploy, managed via SDK calls for now
-  //template = cf(arc, template)
+  // template = cf(arc, template)
   return template
 }

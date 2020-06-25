@@ -1,7 +1,7 @@
 /**
  * support for Deno custom runtime
  */
-module.exports = function deno(arc, template) {
+module.exports = function deno (arc, template) {
 
   // walk the functions and add custom runtime if 'deno' specified
   let hasDeno = false
@@ -15,7 +15,7 @@ module.exports = function deno(arc, template) {
       // if this does not exist create it
       if (!template.Resources[resource].Properties.Layers)
         template.Resources[resource].Properties.Layers = []
-      template.Resources[resource].Properties.Layers.push({'Fn::GetAtt': ['Deno', 'Outputs.DenoRuntimeArn']})
+      template.Resources[resource].Properties.Layers.push({ 'Fn::GetAtt': [ 'Deno', 'Outputs.DenoRuntimeArn' ] })
       template.Resources[resource].Properties.Handler = 'index.handler'
       template.Resources[resource].Properties.Runtime = 'provided'
     }

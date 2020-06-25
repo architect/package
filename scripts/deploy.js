@@ -1,7 +1,8 @@
+// eslint-disable-next-line
 let aws = require('aws-sdk')
 let series = require('run-series')
 let parallel = require('run-parallel')
-let {toCFN} = require('../')
+let { toCFN } = require('../')
 let utils = require('@architect/utils')
 let path = require('path')
 let fs = require('fs')
@@ -25,9 +26,9 @@ let spawn = require('./spawn')
  * @param {Function} callback - node style errback
  * @returns {Promise}
  */
-module.exports = function deploy(params={}, callback) {
+module.exports = function deploy (params = {}, callback) {
 
-/**
+  /**
  * the basic flow is this:
  *
  * 1.) reads the current .arc generates cfn templates:
@@ -54,8 +55,8 @@ module.exports = function deploy(params={}, callback) {
   // return a promise if no callback is supplied
   let promise
   if (!callback) {
-    promise = new Promise(function ugh(res, rej) {
-      callback = function errback(err, result) {
+    promise = new Promise(function ugh (res, rej) {
+      callback = function errback (err, result) {
         if (err) rej(err)
         else res(result)
       }
@@ -71,22 +72,22 @@ module.exports = function deploy(params={}, callback) {
 
   // derived
   let cfn = toCFN(arc)
-  let bucket = arc.aws.find(o=> o[0] === 'bucket')[1]
+  let bucket = arc.aws.find(o => o[0] === 'bucket')[1]
   let appname = arc.app[0]
-  let name = `${utils.toLogicalID(appname)}${production? 'Production' : 'Staging'}`
+  let name = `${utils.toLogicalID(appname)}${production ? 'Production' : 'Staging'}`
 
   series([
-    function toCFN(callback) {
-      parallel(Object.keys(cfn).map(k=> {
-        return function writes(callback) {
+    function toCFN (callback) {
+      parallel(Object.keys(cfn).map(k => {
+        return function writes (callback) {
           fs.writeFile(k, JSON.stringify(cfn[k], null, 2), callback)
         }
       }), callback)
     },
 
-    function samPackage(callback) {
-      series(Object.keys(cfn).map(k=> {
-        return function packages(callback) {
+    function samPackage (callback) {
+      series(Object.keys(cfn).map(k => {
+        return function packages (callback) {
           sam({
             filename: k,
             bucket,
@@ -97,10 +98,10 @@ module.exports = function deploy(params={}, callback) {
       }), callback)
     },
 
-    function uploadToS3(callback) {
+    function uploadToS3 (callback) {
       let s3 = new aws.S3
-      parallel(Object.keys(cfn).map(k=> {
-        return function uploads(callback) {
+      parallel(Object.keys(cfn).map(k => {
+        return function uploads (callback) {
           let Key = k.replace('json', 'yaml')
           let Body = fs.readFileSync(path.join(process.cwd(), Key))
           s3.putObject({
@@ -112,19 +113,19 @@ module.exports = function deploy(params={}, callback) {
       }), callback)
     },
 
-    function samDeploy(callback) {
-      spawn('sam', ['deploy',
-        '--template-file',`${appname}-cfn.yaml`,
+    function samDeploy (callback) {
+      spawn('sam', [ 'deploy',
+        '--template-file', `${appname}-cfn.yaml`,
         '--stack-name', name,
         '--s3-bucket', bucket,
-        '--capabilities','CAPABILITY_AUTO_EXPAND','CAPABILITY_IAM'
-      ], {log, verbose}, callback)
+        '--capabilities', 'CAPABILITY_AUTO_EXPAND', 'CAPABILITY_IAM'
+      ], { log, verbose }, callback)
     },
 
-    function cleanup(callback) {
+    function cleanup (callback) {
       if (clean) {
-        parallel(Object.keys(cfn).map(k=> {
-          return function writes(callback) {
+        parallel(Object.keys(cfn).map(k => {
+          return function writes (callback) {
             fs.unlink(path.join(process.cwd(), k), callback)
           }
         }), callback)

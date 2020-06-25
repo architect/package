@@ -1,11 +1,11 @@
 let getEnv = require('../get-lambda-env')
-let {toLogicalID} = require('@architect/utils')
+let { toLogicalID } = require('@architect/utils')
 let getPropertyHelper = require('../get-lambda-config')
 
 /**
  * visit arc.queues and merge in AWS::Serverless resources
  */
-module.exports = function visitQueues(arc, template) {
+module.exports = function visitQueues (arc, template) {
 
   // ensure cf standard sections exist
   if (!template.Resources)
@@ -14,7 +14,7 @@ module.exports = function visitQueues(arc, template) {
   if (!template.Outputs)
     template.Outputs = {}
 
-  arc.queues.forEach(event=> {
+  arc.queues.forEach(event => {
 
     // create the lambda
     let name = toLogicalID(event)
@@ -30,11 +30,11 @@ module.exports = function visitQueues(arc, template) {
         Runtime: prop('runtime'),
         MemorySize: prop('memory'),
         Timeout: prop('timeout'),
-        Environment: {Variables: env},
+        Environment: { Variables: env },
         Role: {
           'Fn::Sub': [
             'arn:aws:iam::${AWS::AccountId}:role/${roleName}',
-            {roleName: {'Ref': `Role`}}
+            { roleName: { 'Ref': `Role` } }
           ]
         },
         Events: {}
@@ -61,7 +61,7 @@ module.exports = function visitQueues(arc, template) {
     template.Resources[name].Properties.Events[eventName] = {
       Type: 'SQS',
       Properties: {
-        Queue: {'Fn::GetAtt': [`${name}Queue`, 'Arn']}
+        Queue: { 'Fn::GetAtt': [ `${name}Queue`, 'Arn' ] }
       }
     }
 
@@ -81,7 +81,7 @@ module.exports = function visitQueues(arc, template) {
 
     template.Outputs[`${name}SqsQueue`] = {
       Description: 'An SQS Queue',
-      Value: {Ref: `${name}Queue`},
+      Value: { Ref: `${name}Queue` },
     }
   })
 

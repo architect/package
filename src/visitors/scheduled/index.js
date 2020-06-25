@@ -1,11 +1,11 @@
-let {toLogicalID} = require('@architect/utils')
+let { toLogicalID } = require('@architect/utils')
 let getPropertyHelper = require('../get-lambda-config')
 let getEnv = require('../get-lambda-env')
 
 /**
  * visit arc.scheduled and merge in AWS::Serverless resources
  */
-module.exports = function visitScheduled(arc, template) {
+module.exports = function visitScheduled (arc, template) {
 
   // ensure cf standard sections exist
   if (!template.Resources)
@@ -15,7 +15,7 @@ module.exports = function visitScheduled(arc, template) {
     template.Outputs = {}
 
   // we leave the bucket name generation up to cloudfront
-  arc.scheduled.forEach(scheduled=> {
+  arc.scheduled.forEach(scheduled => {
 
     let code = `./src/scheduled/${scheduled[0]}`
     let name = toLogicalID(scheduled.shift())
@@ -31,11 +31,11 @@ module.exports = function visitScheduled(arc, template) {
         Runtime: prop('runtime'),
         MemorySize: prop('memory'),
         Timeout: prop('timeout'),
-        Environment: {Variables: env},
+        Environment: { Variables: env },
         Role: {
           'Fn::Sub': [
             'arn:aws:iam::${AWS::AccountId}:role/${roleName}',
-            {roleName: {'Ref': `Role`}}
+            { roleName: { 'Ref': `Role` } }
           ]
         },
         Events: {}

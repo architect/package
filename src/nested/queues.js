@@ -1,9 +1,9 @@
-let {toLogicalID} = require('@architect/utils')
-let {version} = require('../../package.json')
+let { toLogicalID } = require('@architect/utils')
+let { version } = require('../../package.json')
 let getEnv = require('../visitors/get-lambda-env')
 let getPropertyHelper = require('../visitors/get-lambda-config')
 
-module.exports = function nestQueues(arc) {
+module.exports = function nestQueues (arc) {
 
   let template = {
     AWSTemplateFormatVersion: '2010-09-09',
@@ -26,7 +26,7 @@ module.exports = function nestQueues(arc) {
     }
   }
 
-  arc.queues.forEach(event=> {
+  arc.queues.forEach(event => {
 
     // create the lambda
     let name = toLogicalID(event)
@@ -47,8 +47,8 @@ module.exports = function nestQueues(arc) {
         Runtime: prop('runtime'),
         MemorySize: prop('memory'),
         Timeout: prop('timeout'),
-        Environment: {Variables: env},
-        Role: {Ref: 'Role'},
+        Environment: { Variables: env },
+        Role: { Ref: 'Role' },
         Events: {}
       }
     }
@@ -73,7 +73,7 @@ module.exports = function nestQueues(arc) {
     template.Resources[name].Properties.Events[eventName] = {
       Type: 'SQS',
       Properties: {
-        Queue: {'Fn::GetAtt': [`${name}Queue`, 'Arn']}
+        Queue: { 'Fn::GetAtt': [ `${name}Queue`, 'Arn' ] }
       }
     }
   })

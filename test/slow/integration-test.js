@@ -21,7 +21,7 @@ get /api
 get /foo
 `
 
-test('write sam.json', t=> {
+test('write sam.json', t => {
   t.plan(1)
   let sam = pkg.toSAM(parse(arcfile))
   fs.writeFileSync(__dirname + '/mock/sam.json', JSON.stringify(sam, null, 2))
@@ -30,19 +30,19 @@ test('write sam.json', t=> {
 })
 
 // helper function for child.spawn
-function spawn(command, args, callback) {
+function spawn (command, args, callback) {
   let cwd = path.join(__dirname, 'mock')
-  let pkg = child.spawn(command, args, {cwd, shell: true})
-  pkg.stdout.on('data', b=> console.log(b.toString()))
-  pkg.stderr.on('data', function(b) {
+  let pkg = child.spawn(command, args, { cwd, shell: true })
+  pkg.stdout.on('data', b => console.log(b.toString()))
+  pkg.stderr.on('data', function (b) {
     console.log(b.toString())
     callback(Error('stderr'))
   })
-  pkg.on('close', ()=> callback())
+  pkg.on('close', () => callback())
   pkg.on('error', callback)
 }
 
-test('sam package', t=> {
+test('sam package', t => {
   t.plan(1)
   spawn('sam', [
     'package',
@@ -53,7 +53,7 @@ test('sam package', t=> {
     '--s3-bucket',
     'cf-sam-deployments-east',
   ],
-  function done(err) {
+  function done (err) {
     if (err) t.fail(err)
     else {
       t.ok(true, 'packaged')
@@ -61,7 +61,7 @@ test('sam package', t=> {
   })
 })
 
-test('deploy', t=> {
+test('deploy', t => {
   t.plan(1)
   spawn('sam', [
     'deploy',
@@ -74,7 +74,7 @@ test('deploy', t=> {
     '--capabilities',
     'CAPABILITY_IAM CAPABILITY_AUTO_EXPAND'
   ],
-  function done(err) {
+  function done (err) {
     if (err) t.fail(err)
     else {
       t.ok(true, 'deployed')

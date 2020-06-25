@@ -1,16 +1,16 @@
-module.exports = function resourceCount(arc) {
-  let count = 1 //role
+module.exports = function resourceCount (arc) {
+  let count = 1 // role
   count += 1 // policy
 
   if (arc.http) {
-    count += 1 //restapi
-    count += 1 //deployment
-    count += 1 //stage
-    count += (arc.http.length*2) // lambda + permission
+    count += 1 // restapi
+    count += 1 // deployment
+    count += 1 // stage
+    count += (arc.http.length * 2) // lambda + permission
   }
 
   if (arc.events)
-    count += (arc.events.length*3) // lambda + permissino + topicsubscription
+    count += (arc.events.length * 3) // lambda + permissino + topicsubscription
 
   if (arc.tables)
     count += arc.tables.length
