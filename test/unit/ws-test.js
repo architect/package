@@ -13,5 +13,5 @@ test('WebSockets have a policy doc', t => {
   let parsed = parse(arcfile)
   let cfn = pkg.toSAM(parsed)
   t.ok(pkg, 'pkg')
-  t.ok(cfn.Resources.hasOwnProperty('WebSocketPolicy'), 'WebSocketPolicy')
+  t.ok(cfn.Resources.WebSocketPolicy, 'WebSocketPolicy')
 })

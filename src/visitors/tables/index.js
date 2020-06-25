@@ -1,4 +1,4 @@
-let {toLogicalID} = require('@architect/utils')
+let { toLogicalID } = require('@architect/utils')
 
 let clean = require('./clean')
 let getTTL = require('./get-ttl')
@@ -14,7 +14,7 @@ let getPropertyHelper = require('../get-lambda-config')
 /**
  * visit arc.tables and merge in AWS::Serverless resources
  */
-module.exports = function tables(arc, template) {
+module.exports = function tables (arc, template) {
 
   if (!template.Resources)
     template.Resources = {}
@@ -22,7 +22,7 @@ module.exports = function tables(arc, template) {
   if (!template.Outputs)
     template.Outputs = {}
 
-  arc.tables.forEach(table=> {
+  arc.tables.forEach(table => {
 
     let tbl = Object.keys(table)[0]
     let attr = table[tbl]
@@ -38,7 +38,7 @@ module.exports = function tables(arc, template) {
 
     template.Resources[`${TableName}Table`] = {
       Type: 'AWS::DynamoDB::Table',
-      //DeletionPolicy: 'Retain',
+      // DeletionPolicy: 'Retain',
       Properties: {
         KeySchema,
         AttributeDefinitions,
@@ -63,7 +63,7 @@ module.exports = function tables(arc, template) {
 
     if (hasTTL) {
       template.Resources[`${TableName}Table`].Properties.TimeToLiveSpecification = {
-        AttributeName : hasTTL,
+        AttributeName: hasTTL,
         Enabled: true
       }
     }
@@ -96,11 +96,11 @@ module.exports = function tables(arc, template) {
           Runtime: prop('runtime'),
           MemorySize: prop('memory'),
           Timeout: prop('timeout'),
-          Environment: {Variables: env},
+          Environment: { Variables: env },
           Role: {
             'Fn::Sub': [
               'arn:aws:iam::${AWS::AccountId}:role/${roleName}',
-              {roleName: {'Ref': `Role`}}
+              { roleName: { 'Ref': `Role` } }
             ]
           }
         },
@@ -127,8 +127,8 @@ module.exports = function tables(arc, template) {
         Type: 'AWS::Lambda::EventSourceMapping',
         Properties: {
           BatchSize: 10,
-          EventSourceArn: {'Fn::GetAtt': [`${TableName}Table`, 'StreamArn']},
-          FunctionName: {'Fn::GetAtt': [name, 'Arn']},
+          EventSourceArn: { 'Fn::GetAtt': [ `${TableName}Table`, 'StreamArn' ] },
+          FunctionName: { 'Fn::GetAtt': [ name, 'Arn' ] },
           StartingPosition: 'TRIM_HORIZON'
         }
       }

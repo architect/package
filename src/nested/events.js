@@ -1,9 +1,9 @@
-let {toLogicalID} = require('@architect/utils')
-let {version} = require('../../package.json')
+let { toLogicalID } = require('@architect/utils')
+let { version } = require('../../package.json')
 let getEnv = require('../visitors/get-lambda-env')
 let getPropertyHelper = require('../visitors/get-lambda-config')
 
-module.exports = function nestEvents(arc) {
+module.exports = function nestEvents (arc) {
 
   let template = {
     AWSTemplateFormatVersion: '2010-09-09',
@@ -26,7 +26,7 @@ module.exports = function nestEvents(arc) {
     }
   }
 
-  arc.events.forEach(event=> {
+  arc.events.forEach(event => {
 
     // create the lambda
     let name = toLogicalID(event)
@@ -47,8 +47,8 @@ module.exports = function nestEvents(arc) {
         Runtime: prop('runtime'),
         MemorySize: prop('memory'),
         Timeout: prop('timeout'),
-        Environment: {Variables: env},
-        Role: {Ref: 'Role'},
+        Environment: { Variables: env },
+        Role: { Ref: 'Role' },
         Events: {}
       }
     }
@@ -68,7 +68,7 @@ module.exports = function nestEvents(arc) {
     template.Resources[name].Properties.Events[eventName] = {
       Type: 'SNS',
       Properties: {
-        Topic: {'Ref': `${name}Topic`}
+        Topic: { 'Ref': `${name}Topic` }
       }
     }
   })

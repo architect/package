@@ -1,4 +1,4 @@
-let {version} = require('../package.json')
+let { version } = require('../package.json')
 let visitors = require('./visitors')
 let nested = require('./nested')
 let count = require('./resource-count')
@@ -6,11 +6,11 @@ let count = require('./resource-count')
 /**
  * returns AWS::Serverless JSON for a given (parsed) .arc file
  */
-module.exports = function toServerlessCloudFormation(arc) {
+module.exports = function toServerlessCloudFormation (arc) {
   // if its greater than 100 resources
   // create template files for nested stacks
   // otherwise just create a single sam template
-  let exec = count(arc) > 200? module.exports.toCFN : module.exports.toSAM
+  let exec = count(arc) > 200 ? module.exports.toCFN : module.exports.toSAM
   return exec(arc)
 }
 
@@ -22,9 +22,9 @@ module.exports.toSAM = toSAM
  * @param {Object} arc - parsed arcfile
  * @returns {Object} templates - nested template files for packaging/deployment
  */
-function toCFN(arc) {
+function toCFN (arc) {
 
-  let hasStream = tbl=> tbl[Object.keys(tbl)[0]].hasOwnProperty('stream')
+  let hasStream = tbl => tbl[Object.keys(tbl)[0]].stream
   let appname = arc.app[0]
   let template = {}
 
@@ -52,20 +52,20 @@ function toCFN(arc) {
  * @param {Object} arc - parsed arcfile
  * @returns {CloudFormation::Serverless} template
  */
-function toSAM(arc) {
+function toSAM (arc) {
 
   // allowed list of pragmas ['http', 'globals'...etc]
   let supports = Object.keys(visitors)
 
   // helper to filter an array to only supported pragmas
-  let supported = pragma=> supports.includes(pragma)
+  let supported = pragma => supports.includes(pragma)
 
   // list of pragmas defined in the arc file
-  let httpFirst = (x, y)=> x == 'http'? -1 : y == 'http'? 1 : 0
+  let httpFirst = (x, y) => x == 'http' ? -1 : y == 'http' ? 1 : 0
   let pragmas = Object.keys(arc).filter(supported).sort(httpFirst)
 
   // walk the template invoking the visitor for the given pragma
-  let visit = (template, pragma)=> visitors[pragma](arc, template)
+  let visit = (template, pragma) => visitors[pragma](arc, template)
 
   // force globals first (last?)
   pragmas.push('globals')

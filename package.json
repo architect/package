@@ -27,7 +27,11 @@
     "glob": "~7.1.6",
     "mime-types": "~2.1.27"
   },
+  "peerDependencies": {
+    "aws-sdk": "~2.644.0"
+  },
   "devDependencies": {
+    "@architect/eslint-config": "0.0.1",
     "codecov": "^3.7.0",
     "cross-env": "^7.0.2",
     "eslint": "^7.2.0",
@@ -36,5 +40,8 @@
     "sinon": "^9.0.2",
     "tap-spec": "^5.0.0",
     "tape": "^5.0.1"
+  },
+  "eslintConfig": {
+    "extends": "@architect/eslint-config"
   }
 }

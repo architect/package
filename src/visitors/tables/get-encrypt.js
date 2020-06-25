@@ -10,7 +10,7 @@
  *   encrypt mycmkarn
  */
 
-module.exports = function getEncrypt(attr) {
+module.exports = function getEncrypt (attr) {
   var found = false
   Object.keys(attr).forEach(k => {
     if (k === 'encrypt') {

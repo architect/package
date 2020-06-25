@@ -1,11 +1,11 @@
 let getEnv = require('../get-lambda-env')
-let {toLogicalID} = require('@architect/utils')
+let { toLogicalID } = require('@architect/utils')
 let getPropertyHelper = require('../get-lambda-config')
 
 /**
  * visit arc.events and merge in AWS::Serverless resources
  */
-module.exports = function statics(arc, template) {
+module.exports = function statics (arc, template) {
 
   // ensure cf standard sections exist
   if (!template.Resources)
@@ -16,7 +16,7 @@ module.exports = function statics(arc, template) {
 
   // let appname = toLogicalID(arc.app[0])
 
-  arc.events.forEach(event=> {
+  arc.events.forEach(event => {
 
     // create the lambda
     let name = toLogicalID(event)
@@ -32,11 +32,11 @@ module.exports = function statics(arc, template) {
         Runtime: prop('runtime'),
         MemorySize: prop('memory'),
         Timeout: prop('timeout'),
-        Environment: {Variables: env},
+        Environment: { Variables: env },
         Role: {
           'Fn::Sub': [
             'arn:aws:iam::${AWS::AccountId}:role/${roleName}',
-            {roleName: {'Ref': `Role`}}
+            { roleName: { 'Ref': `Role` } }
           ]
         },
         Events: {}
@@ -63,7 +63,7 @@ module.exports = function statics(arc, template) {
     template.Resources[name].Properties.Events[eventName] = {
       Type: 'SNS',
       Properties: {
-        Topic: {'Ref': `${name}Topic`}
+        Topic: { 'Ref': `${name}Topic` }
       }
     }
 
@@ -78,7 +78,7 @@ module.exports = function statics(arc, template) {
 
     template.Outputs[`${name}SnsTopic`] = {
       Description: 'An SNS Topic',
-      Value: {Ref: `${name}Topic`},
+      Value: { Ref: `${name}Topic` },
       /*
       Export: {
         Name: {

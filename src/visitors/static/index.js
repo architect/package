@@ -1,11 +1,11 @@
-//let {toLogicalID} = require('@architect/utils')
+// let {toLogicalID} = require('@architect/utils')
 let addStatic = require('./add-static-proxy')
 let addMocks = require('./add-static-mocks')
 
 /**
  * visit arc.static and merge in AWS::Serverless resources
  */
-module.exports = function statics(arc, template) {
+module.exports = function statics (arc, template) {
 
   // ensure cf standard sections exist
   if (!template.Resources)
@@ -14,12 +14,12 @@ module.exports = function statics(arc, template) {
   if (!template.Outputs)
     template.Outputs = {}
 
-  //let appname = toLogicalID(arc.app[0])
+  // let appname = toLogicalID(arc.app[0])
 
   // we leave the bucket name generation up to cloudfront
   template.Resources.StaticBucket = {
     Type: 'AWS::S3::Bucket',
-    //DeletionPolicy: 'Retain',
+    // DeletionPolicy: 'Retain',
     Properties: {
       AccessControl: 'PublicRead',
       WebsiteConfiguration: {
@@ -35,7 +35,7 @@ module.exports = function statics(arc, template) {
     Value: {
       'Fn::Sub': [
         'http://${bukkit}.s3-website-${AWS::Region}.amazonaws.com',
-        {bukkit: {'Ref': 'StaticBucket'}}
+        { bukkit: { 'Ref': 'StaticBucket' } }
       ]
     }
   }

@@ -1,7 +1,7 @@
-let {toLogicalID} = require('@architect/utils')
+let { toLogicalID } = require('@architect/utils')
 
-module.exports = function events(arc, template) {
-  arc.events.forEach(event=> {
+module.exports = function events (arc, template) {
+  arc.events.forEach(event => {
     let name = toLogicalID(event)
     template.Resources[`${name}Topic`] = {
       Type: 'AWS::SNS::Topic',
@@ -14,21 +14,21 @@ module.exports = function events(arc, template) {
   template.Resources.Role.Properties.Policies.push({
     PolicyName: 'ArcSimpleNotificationServicePolicy',
     PolicyDocument: {
-      Statement: [{
+      Statement: [ {
         Effect: 'Allow',
         Action: 'sns:Publish',
         Resource: getTopicArn(),
-      }]
+      } ]
     }
   })
 
-    function getTopicArn() {
-      return {
-        'Fn::Sub': [
-          'arn:aws:sns:${AWS::Region}:${AWS::AccountId}:${AWS::StackName}*',
-          {}
-        ]
-      }
+  function getTopicArn () {
+    return {
+      'Fn::Sub': [
+        'arn:aws:sns:${AWS::Region}:${AWS::AccountId}:${AWS::StackName}*',
+        {}
+      ]
     }
+  }
   return template
 }

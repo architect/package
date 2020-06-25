@@ -4,6 +4,6 @@
  *   myid *String
  *   stream true
  */
-module.exports = function getHasLambda(attr) {
-  return attr.hasOwnProperty('stream')
+module.exports = function getHasLambda (attr) {
+  return attr.stream
 }

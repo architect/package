@@ -1,9 +1,7 @@
 let { existsSync, mkdirSync, readFileSync, writeFileSync } = require('fs')
-let {join} = require('path')
+let { join } = require('path')
 
-let utils = require('@architect/utils')
-let toLogicalID = utils.toLogicalID
-let fingerprinter = utils.fingerprint
+let { toLogicalID, fingerprint: fingerprinter } = require('@architect/utils')
 
 let getApiProps = require('./get-api-properties')
 let unexpress = require('./un-express-route')
@@ -16,13 +14,13 @@ let forceStatic = require('../static')
 /**
  * visit arc.http and merge in AWS::Serverless resources
  */
-module.exports = function http(arc, template) {
+module.exports = function http (arc, template) {
 
   // force add GetIndex if not defined
-  let findGetIndex = tuple=> tuple[0].toLowerCase() === 'get' && tuple[1] === '/'
+  let findGetIndex = tuple => tuple[0].toLowerCase() === 'get' && tuple[1] === '/'
   let hasGetIndex = arc.http.some(findGetIndex) // we reuse this below for default proxy code
   if (!hasGetIndex) {
-    arc.http.push(['get', '/'])
+    arc.http.push([ 'get', '/' ])
   }
 
   // base props
@@ -38,10 +36,10 @@ module.exports = function http(arc, template) {
     template.Outputs = {}
 
   // construct the api resource
-  template.Resources[appname] = {Type, Properties}
+  template.Resources[appname] = { Type, Properties }
 
   // walk the arc file http routes
-  arc.http.forEach(route=> {
+  arc.http.forEach(route => {
 
     let method = route[0].toLowerCase() // get, post, put, delete, patch
     let path = unexpress(route[1]) // from /foo/:bar to /foo/{bar}
@@ -59,11 +57,11 @@ module.exports = function http(arc, template) {
         Runtime: prop('runtime'),
         MemorySize: prop('memory'),
         Timeout: prop('timeout'),
-        Environment: {Variables: env},
+        Environment: { Variables: env },
         Role: {
           'Fn::Sub': [
             'arn:aws:iam::${AWS::AccountId}:role/${roleName}',
-            {roleName: {'Ref': `Role`}}
+            { roleName: { 'Ref': `Role` } }
           ]
         },
         Events: {}
@@ -92,7 +90,7 @@ module.exports = function http(arc, template) {
       Properties: {
         Path: path,
         Method: route[0].toUpperCase(),
-        RestApiId: {'Ref': appname}
+        RestApiId: { 'Ref': appname }
       }
     }
   })
@@ -108,7 +106,7 @@ module.exports = function http(arc, template) {
     if (existsSync(global)) arcProxy = global
     else if (existsSync(local)) arcProxy = local
 
-    let {fingerprint} = fingerprinter.config({static: arc.static})
+    let { fingerprint } = fingerprinter.config({ static: arc.static })
 
     template.Resources.GetIndex.Properties.Runtime = 'nodejs12.x'
 
@@ -138,13 +136,13 @@ module.exports = function http(arc, template) {
   template.Resources.InvokeProxyPermission = {
     Type: 'AWS::Lambda::Permission',
     Properties: {
-      FunctionName: {Ref: 'GetIndex'},
+      FunctionName: { Ref: 'GetIndex' },
       Action: 'lambda:InvokeFunction',
       Principal: 'apigateway.amazonaws.com',
       SourceArn: {
         'Fn::Sub': [
           'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${restApiId}/*/*',
-          {restApiId: {'Ref': appname}}
+          { restApiId: { 'Ref': appname } }
         ]
       }
     }
@@ -157,14 +155,14 @@ module.exports = function http(arc, template) {
       'Fn::Sub': [
         // Always default to staging; mutate to production via macro where necessary
         'https://${restApiId}.execute-api.${AWS::Region}.amazonaws.com/staging',
-        {restApiId: {Ref: appname}}
+        { restApiId: { Ref: appname } }
       ]
     }
   }
 
   template.Outputs.restApiId = {
     Description: 'HTTP restApiId',
-    Value: {Ref: appname}
+    Value: { Ref: appname }
   }
 
   if (!arc.static)

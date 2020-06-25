@@ -1,10 +1,10 @@
-let {toLogicalID} = require('@architect/utils')
-let {version} = require('../../package.json')
+let { toLogicalID } = require('@architect/utils')
+let { version } = require('../../package.json')
 let visit = require('../visitors/tables')
 let getEnv = require('../visitors/get-lambda-env')
 let getPropertyHelper = require('../visitors/get-lambda-config')
 
-module.exports = function nestScheduled(arc) {
+module.exports = function nestScheduled (arc) {
 
   let template = visit(arc, {
     AWSTemplateFormatVersion: '2010-09-09',
@@ -21,7 +21,7 @@ module.exports = function nestScheduled(arc) {
   })
 
   // remove AWS::DynamoDB::Table refs
-  Object.keys(template.Resources).forEach(k=> {
+  Object.keys(template.Resources).forEach(k => {
     if (template.Resources[k].Type === 'AWS::DynamoDB::Table') {
       delete template.Resources[k]
     }
@@ -34,11 +34,11 @@ module.exports = function nestScheduled(arc) {
     }
   }
 
-  arc.tables.forEach(table=> {
+  arc.tables.forEach(table => {
 
     let tbl  = Object.keys(table)[0]
     let attr = table[tbl]
-    let hasStream = attr.hasOwnProperty('stream')
+    let hasStream = attr.stream
     let TableName = toLogicalID(tbl)
 
     if (hasStream) {
@@ -63,8 +63,8 @@ module.exports = function nestScheduled(arc) {
           Runtime: prop('runtime'),
           MemorySize: prop('memory'),
           Timeout: prop('timeout'),
-          Environment: {Variables: env},
-          Role: {Ref: `Role`}
+          Environment: { Variables: env },
+          Role: { Ref: `Role` }
         },
         Events: {}
       }
@@ -89,8 +89,8 @@ module.exports = function nestScheduled(arc) {
         Type: 'AWS::Lambda::EventSourceMapping',
         Properties: {
           BatchSize: 10,
-          EventSourceArn: {'Fn::GetAtt': [`${TableName}Table`, 'StreamArn']},
-          FunctionName: {'Fn::GetAtt': [name, 'Arn']},
+          EventSourceArn: { 'Fn::GetAtt': [ `${TableName}Table`, 'StreamArn' ] },
+          FunctionName: { 'Fn::GetAtt': [ name, 'Arn' ] },
           StartingPosition: 'TRIM_HORIZON'
         }
       }

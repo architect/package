@@ -5,4 +5,4 @@ let scheduled = require('./scheduled')
 let queues = require('./queues')
 let tables = require('./tables')
 
-module.exports = {base, events, http, scheduled, queues, tables}
+module.exports = { base, events, http, scheduled, queues, tables }

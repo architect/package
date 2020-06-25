@@ -1,24 +1,24 @@
-let {toLogicalID} = require('@architect/utils')
+let { toLogicalID } = require('@architect/utils')
 
-module.exports = function addStatic(arc, template) {
+module.exports = function addStatic (arc, template) {
 
   let appname = toLogicalID(arc.app[0])
 
   template.Resources[appname].Properties.DefinitionBody.paths['/_static/{proxy+}'] = {
     'x-amazon-apigateway-any-method': {
-      parameters: [{
+      parameters: [ {
         name: 'proxy',
         in: 'path',
         required: true,
         schema: {
           type: 'string'
         }
-      }],
+      } ],
       'x-amazon-apigateway-integration': {
         uri: {
           'Fn::Sub': [
             'http://${bukkit}.s3.${AWS::Region}.amazonaws.com/{proxy}',
-            {bukkit: {'Ref': 'StaticBucket'}}
+            { bukkit: { 'Ref': 'StaticBucket' } }
           ]
         },
         responses: {

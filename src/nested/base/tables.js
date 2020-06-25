@@ -1,13 +1,13 @@
 let visitTables = require('../../visitors/tables')
-let {toLogicalID} = require('@architect/utils')
+let { toLogicalID } = require('@architect/utils')
 
-module.exports = function tables(arc, template) {
+module.exports = function tables (arc, template) {
   template = visitTables(arc, template)
   template = stripFunctions(arc, template)
   template.Resources.Role.Properties.Policies.push({
     PolicyName: 'ArcDynamoPolicy',
     PolicyDocument: {
-      Statement: [{
+      Statement: [ {
         Effect: 'Allow',
         Action: [
           'dynamodb:Scan',
@@ -24,43 +24,43 @@ module.exports = function tables(arc, template) {
           'dynamodb:ListStreams'
         ],
         Resource: getTableArns(arc.tables),
-      }]
+      } ]
     }
   })
-  function getTableArns(tbls) {
-    let flip = tbl=> Object.keys(tbl)[0]
-    return tbls.map(flip).map(table=> {
+  function getTableArns (tbls) {
+    let flip = tbl => Object.keys(tbl)[0]
+    return tbls.map(flip).map(table => {
       let name = `${toLogicalID(table)}Table`
-      return [{
+      return [ {
         'Fn::Sub': [
           'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tablename}',
-          {tablename: {'Ref': name}}
+          { tablename: { 'Ref': name } }
         ]
       },
       {
         'Fn::Sub': [
           'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tablename}/*',
-          {tablename: {'Ref': name}}
+          { tablename: { 'Ref': name } }
         ]
       },
       {
         'Fn::Sub': [
           'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tablename}/stream/*',
-          {tablename: {'Ref': name}}
+          { tablename: { 'Ref': name } }
         ]
-      }]
-    }).reduce((a, b)=> a.concat(b), [])
+      } ]
+    }).reduce((a, b) => a.concat(b), [])
   }
   return template
 }
 
 // remove stream functions
-function stripFunctions(arc, template) {
-  arc.tables.forEach(table=> {
+function stripFunctions (arc, template) {
+  arc.tables.forEach(table => {
 
     let tbl = Object.keys(table)[0]
     let attr = table[tbl]
-    let hasLambda = attr.hasOwnProperty('stream')
+    let hasLambda = attr.stream
     let TableName = toLogicalID(tbl)
 
     if (hasLambda) {
@@ -68,6 +68,6 @@ function stripFunctions(arc, template) {
       delete template.Resources[name]
     }
   })
-  //console.log('nested/base/tables', template.Resources)
+  // console.log('nested/base/tables', template.Resources)
   return template
 }

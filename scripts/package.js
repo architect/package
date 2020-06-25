@@ -1,6 +1,6 @@
 let spawn = require('./spawn')
 
-module.exports = function samPackage({filename, bucket, log, verbose}, callback) {
+module.exports = function samPackage ({ filename, bucket, log, verbose }, callback) {
   spawn('sam', [
     'package',
     '--template-file',
@@ -9,5 +9,5 @@ module.exports = function samPackage({filename, bucket, log, verbose}, callback)
     filename.replace('json', 'yaml'),
     '--s3-bucket',
     bucket
-  ], {log, verbose}, callback)
+  ], { log, verbose }, callback)
 }

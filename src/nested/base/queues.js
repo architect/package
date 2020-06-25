@@ -1,7 +1,7 @@
-let {toLogicalID} = require('@architect/utils')
+let { toLogicalID } = require('@architect/utils')
 
-module.exports = function events(arc, template) {
-  arc.queues.forEach(event=> {
+module.exports = function events (arc, template) {
+  arc.queues.forEach(event => {
     let name = toLogicalID(event)
     template.Resources[`${name}Queue`] = {
       Type: 'AWS::SQS::Queue',
@@ -11,7 +11,7 @@ module.exports = function events(arc, template) {
   template.Resources.Role.Properties.Policies.push({
     PolicyName: 'ArcSimpleQueueServicePolicy',
     PolicyDocument: {
-      Statement: [{
+      Statement: [ {
         Effect: 'Allow',
         Action: [
           'sqs:SendMessageBatch',
@@ -20,8 +20,8 @@ module.exports = function events(arc, template) {
           'sqs:DeleteMessage',
           'sqs:GetQueueAttributes',
         ],
-        Resource: '*'//getQueueArns(arc.queues),
-      }]
+        Resource: '*'// getQueueArns(arc.queues),
+      } ]
     }
   })
   /*
