@@ -3,9 +3,6 @@ let test = require('tape')
 let package = require('../../')
 let mockFs = require('mock-fs')
 
-// dont let local env vars interfere with tests
-delete process.env.AWS_REGION
-
 let base =
 `@app
 app
@@ -14,6 +11,15 @@ app
 an-event
 `
 let arc = config => `${base}\n${config ? config : ''}`
+
+let origRegion
+test('Config test setup', t => {
+  t.plan(1)
+  // dont let local env vars interfere with tests
+  origRegion = process.env.AWS_REGION
+  delete process.env.AWS_REGION
+  t.pass('Test env prepared')
+})
 
 test('Module is present', t => {
   t.plan(1)
@@ -277,4 +283,10 @@ fifo false
   props = package.toSAM(parsed).Resources.AQueueQueue.Properties
   t.notOk(props['FifoQueue'], `FifoQueue disabled by setting`)
   t.notOk(props['ContentBasedDeduplication'], `ContentBasedDeduplication disabled by setting`)
+})
+
+test('Config test teardown', t => {
+  t.plan(1)
+  process.env.AWS_REGION = origRegion
+  t.pass('Test env torn down')
 })
