@@ -1,25 +1,17 @@
-// let {toLogicalID} = require('@architect/utils')
 let addStatic = require('./add-static-proxy')
-let addMocks = require('./add-static-mocks')
 
 /**
  * visit arc.static and merge in AWS::Serverless resources
  */
 module.exports = function visitStatic (arc, template) {
 
-  // ensure cf standard sections exist
-  if (!template.Resources)
-    template.Resources = {}
+  // Ensure standard CF sections exist
+  if (!template.Resources) template.Resources = {}
+  if (!template.Outputs) template.Outputs = {}
 
-  if (!template.Outputs)
-    template.Outputs = {}
-
-  // let appname = toLogicalID(arc.app[0])
-
-  // we leave the bucket name generation up to cloudfront
+  // Leave the bucket name generation up to CloudFormation
   template.Resources.StaticBucket = {
     Type: 'AWS::S3::Bucket',
-    // DeletionPolicy: 'Retain',
     Properties: {
       AccessControl: 'PublicRead',
       WebsiteConfiguration: {
@@ -43,7 +35,6 @@ module.exports = function visitStatic (arc, template) {
   // if an api is defined then add _static proxy and attempt to serialize ./public
   if (arc.http) {
     template = addStatic(arc, template)
-    template = addMocks(arc, template)
   }
 
   return template
