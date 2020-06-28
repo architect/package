@@ -29,13 +29,13 @@ module.exports = function visitStatic (arc, template) {
     }
   }
 
-  // which means we need to share it here
+  // Which means we need to share it here
   template.Outputs.BucketURL = {
     Description: 'Bucket URL',
     Value: {
       'Fn::Sub': [
         'http://${bukkit}.s3-website-${AWS::Region}.amazonaws.com',
-        { bukkit: { 'Ref': 'StaticBucket' } }
+        { bukkit: { Ref: 'StaticBucket' } }
       ]
     }
   }

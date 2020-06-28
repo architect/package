@@ -35,7 +35,7 @@ module.exports = function visitScheduled (arc, template) {
         Role: {
           'Fn::Sub': [
             'arn:aws:iam::${AWS::AccountId}:role/${roleName}',
-            { roleName: { 'Ref': `Role` } }
+            { roleName: { Ref: 'Role' } }
           ]
         },
         Events: {}

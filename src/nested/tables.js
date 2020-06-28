@@ -64,7 +64,7 @@ module.exports = function nestScheduled (arc) {
           MemorySize: prop('memory'),
           Timeout: prop('timeout'),
           Environment: { Variables: env },
-          Role: { Ref: `Role` }
+          Role: { Ref: 'Role' }
         },
         Events: {}
       }

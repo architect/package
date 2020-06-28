@@ -36,7 +36,7 @@ module.exports = function visitEvents (arc, template) {
         Role: {
           'Fn::Sub': [
             'arn:aws:iam::${AWS::AccountId}:role/${roleName}',
-            { roleName: { 'Ref': `Role` } }
+            { roleName: { Ref: 'Role' } }
           ]
         },
         Events: {}
@@ -63,7 +63,7 @@ module.exports = function visitEvents (arc, template) {
     template.Resources[name].Properties.Events[eventName] = {
       Type: 'SNS',
       Properties: {
-        Topic: { 'Ref': `${name}Topic` }
+        Topic: { Ref: `${name}Topic` }
       }
     }
 

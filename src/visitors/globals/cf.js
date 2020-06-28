@@ -39,7 +39,7 @@ function origin ({ appname, http }) {
   let staticOrigin = {
     'Fn::Sub': [
       '${bukkit}.s3-website-${AWS::Region}.amazonaws.com',
-      { bukkit: { 'Ref': 'StaticBucket' } }
+      { bukkit: { Ref: 'StaticBucket' } }
     ]
   }
 

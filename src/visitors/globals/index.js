@@ -64,13 +64,13 @@ module.exports = function visitGlobals (arc, template) {
           Resource: [ {
             'Fn::Sub': [
               'arn:aws:s3:::${bukkit}',
-              { bukkit: { 'Ref': 'StaticBucket' } }
+              { bukkit: { Ref: 'StaticBucket' } }
             ]
           },
           {
             'Fn::Sub': [
               'arn:aws:s3:::${bukkit}/*',
-              { bukkit: { 'Ref': 'StaticBucket' } }
+              { bukkit: { Ref: 'StaticBucket' } }
             ]
           } ]
         } ]
@@ -110,19 +110,19 @@ module.exports = function visitGlobals (arc, template) {
         return [ {
           'Fn::Sub': [
             'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tablename}',
-            { tablename: { 'Ref': name } }
+            { tablename: { Ref: name } }
           ]
         },
         {
           'Fn::Sub': [
             'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tablename}/*',
-            { tablename: { 'Ref': name } }
+            { tablename: { Ref: name } }
           ]
         },
         {
           'Fn::Sub': [
             'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tablename}/stream/*',
-            { tablename: { 'Ref': name } }
+            { tablename: { Ref: name } }
           ]
         } ]
       }).reduce((a, b) => a.concat(b), [])
