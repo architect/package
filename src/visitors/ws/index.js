@@ -5,7 +5,7 @@ let getEnv = require('../get-lambda-env')
 /**
  * visit arc.ws and merge in AWS::Serverless resources
  */
-module.exports = function visitWS (arc, template) {
+module.exports = function visitWebSockets (arc, template) {
 
   // ensure cf standard sections exist
   if (!template.Resources)

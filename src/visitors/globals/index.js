@@ -7,7 +7,7 @@ let { toLogicalID } = require('@architect/utils')
  *
  * - AWS::IAM::Role
  */
-module.exports = function globals (arc, template) {
+module.exports = function visitGlobals (arc, template) {
 
   // interpolate required shape
   if (!template.Resources)

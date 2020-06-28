@@ -5,7 +5,7 @@ let getPropertyHelper = require('../get-lambda-config')
 /**
  * visit arc.events and merge in AWS::Serverless resources
  */
-module.exports = function statics (arc, template) {
+module.exports = function visitEvents (arc, template) {
 
   // ensure cf standard sections exist
   if (!template.Resources)

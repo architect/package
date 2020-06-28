@@ -1,7 +1,7 @@
 /**
  * support for Deno custom runtime
  */
-module.exports = function deno (arc, template) {
+module.exports = function visitDeno (arc, template) {
 
   // walk the functions and add custom runtime if 'deno' specified
   let hasDeno = false
