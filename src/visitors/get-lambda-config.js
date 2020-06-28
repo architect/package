@@ -104,7 +104,7 @@ module.exports = function getPropertyHelper (arc, pathToCode) {
       let arcRegion = arc.aws && arc.aws.some(getRegion) && arc.aws.find(getRegion)[1]
       let region = process.env.AWS_REGION || arcRegion
       if (region && region !== layerRegion) {
-        let msg = `Lambda layers must be in the same region as app\nApp region: ${region}\nLayer ARN: ${layer}`
+        let msg = `Lambda layers must be in the same region as app\nApp region: ${region}\nLayer ARN: ${layer}\nLayer region:${layerRegion}`
         throw Error(msg)
       }
     }
