@@ -1,41 +1,26 @@
-let { toLogicalID } = require('@architect/utils')
-
 module.exports = function addStatic (arc, template) {
-
-  let appname = toLogicalID(arc.app[0])
-
-  template.Resources[appname].Properties.DefinitionBody.paths['/_static/{proxy+}'] = {
-    'x-amazon-apigateway-any-method': {
-      parameters: [ {
-        name: 'proxy',
-        in: 'path',
-        required: true,
-        schema: {
-          type: 'string'
-        }
-      } ],
+  template.Resources.HTTP.Properties.DefinitionBody.paths['/_static/{proxy+}'] = {
+    get: {
       'x-amazon-apigateway-integration': {
+        payloadFormatVersion: '1.0',
+        type: 'http_proxy',
+        httpMethod: 'GET',
         uri: {
           'Fn::Sub': [
             'http://${bukkit}.s3.${AWS::Region}.amazonaws.com/{proxy}',
-            { bukkit: { 'Ref': 'StaticBucket' } }
+            { bukkit: { Ref: 'StaticBucket' } }
           ]
         },
-        responses: {
-          default: {
-            statusCode: '200'
-          }
-        },
+        connectionType: 'INTERNET',
+        timeoutInMillis: 30000,
         requestParameters: {
           'integration.request.path.proxy': 'method.request.path.proxy'
         },
-        passthroughBehavior: 'when_no_match',
-        httpMethod: 'ANY',
-        cacheNamespace: 'xlr8r2',
-        cacheKeyParameters: [
-          'method.request.path.proxy'
-        ],
-        type: 'http_proxy'
+        // TODO currently ignored, reimplement when respected by HTTP APIs
+        // cacheNamespace: xlr8r2,
+        // cacheKeyParameters: [
+        //   'method.request.path.proxy'
+        // ]
       }
     }
   }

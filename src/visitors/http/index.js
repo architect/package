@@ -1,54 +1,52 @@
 let { existsSync, mkdirSync, readFileSync, writeFileSync } = require('fs')
 let { join } = require('path')
 
-let { toLogicalID, fingerprint: fingerprinter } = require('@architect/utils')
+let { getLambdaName, toLogicalID, fingerprint: fingerprinter } = require('@architect/utils')
 
 let getApiProps = require('./get-api-properties')
 let unexpress = require('./un-express-route')
 
 let getEnv = require('../get-lambda-env')
-let getLambdaName = require('../get-lambda-name')
 let getPropertyHelper = require('../get-lambda-config')
 let forceStatic = require('../static')
 
 /**
- * visit arc.http and merge in AWS::Serverless resources
+ * Visit arc.http and generate an HTTP API
  */
-module.exports = function http (arc, template) {
+module.exports = function visitHttp (arc, template) {
 
-  // force add GetIndex if not defined
+  // Copy arc.http to avoid get index mutation
+  let http = JSON.parse(JSON.stringify(arc.http))
+
+  // Force add GetIndex if not defined
   let findGetIndex = tuple => tuple[0].toLowerCase() === 'get' && tuple[1] === '/'
-  let hasGetIndex = arc.http.some(findGetIndex) // we reuse this below for default proxy code
+  let hasGetIndex = http.some(findGetIndex) // we reuse this below for default proxy code
   if (!hasGetIndex) {
-    arc.http.push([ 'get', '/' ])
+    http.push([ 'get', '/' ])
   }
 
-  // base props
-  let Type = 'AWS::Serverless::Api'
-  let Properties = getApiProps(arc)
-  let appname = toLogicalID(arc.app[0])
+  // Base props
+  let Type = 'AWS::Serverless::HttpApi'
+  let Properties = getApiProps(http)
 
-  // ensure cf standard sections exist
-  if (!template.Resources)
-    template.Resources = {}
+  // Ensure standard CF sections exist
+  if (!template.Resources) template.Resources = {}
+  if (!template.Outputs) template.Outputs = {}
 
-  if (!template.Outputs)
-    template.Outputs = {}
+  // Construct the API resource
+  template.Resources.HTTP = { Type, Properties }
 
-  // construct the api resource
-  template.Resources[appname] = { Type, Properties }
-
-  // walk the arc file http routes
-  arc.http.forEach(route => {
+  // Walk the HTTP routes
+  http.forEach(route => {
 
     let method = route[0].toLowerCase() // get, post, put, delete, patch
-    let path = unexpress(route[1]) // from /foo/:bar to /foo/{bar}
+    let path = unexpress(route[1]) // From `/foo/:bar` to `/foo/{bar}`
     let name = toLogicalID(`${method}${getLambdaName(route[1]).replace(/000/g, '')}`) // GetIndex
     let code = `./src/http/${method}${getLambdaName(route[1])}` // ./src/http/get-index
-    let prop = getPropertyHelper(arc, code) // returns a helper function for getting props
-    let env = getEnv(arc, code) // construct the runtime env
+    let prop = getPropertyHelper(http, code) // Returns a helper function for getting props
+    let env = getEnv(arc, code) // Construct the runtime env
 
-    // adding lambda resources
+    // Add Lambda resources
     template.Resources[name] = {
       Type: 'AWS::Serverless::Function',
       Properties: {
@@ -69,7 +67,7 @@ module.exports = function http (arc, template) {
     }
 
     let concurrency = prop('concurrency')
-    if (concurrency != 'unthrottled') {
+    if (concurrency !== 'unthrottled') {
       template.Resources[name].Properties.ReservedConcurrentExecutions = concurrency
     }
 
@@ -83,19 +81,19 @@ module.exports = function http (arc, template) {
       template.Resources[name].Properties.Policies = policies
     }
 
-    // construct the event source so SAM can wire the permissions
+    // Construct the API event source so SAM can wire the permissions
     let eventName = `${name}Event`
     template.Resources[name].Properties.Events[eventName] = {
-      Type: 'Api',
+      Type: 'HttpApi',
       Properties: {
         Path: path,
         Method: route[0].toUpperCase(),
-        RestApiId: { 'Ref': appname }
+        ApiId: { Ref: 'HTTP' }
       }
     }
   })
 
-  // if we added get index we need to fix the code path
+  // If we added get index, we need to fix the code path
   if (!hasGetIndex) {
     // Package running as a dependency (most common use case)
     let arcProxy = join(process.cwd(), 'node_modules', '@architect', 'http-proxy', 'dist')
@@ -106,10 +104,10 @@ module.exports = function http (arc, template) {
     if (existsSync(global)) arcProxy = global
     else if (existsSync(local)) arcProxy = local
 
-    let { fingerprint } = fingerprinter.config({ static: arc.static })
-
+    // Set the runtime
     template.Resources.GetIndex.Properties.Runtime = 'nodejs12.x'
 
+    let { fingerprint } = fingerprinter.config({ static: arc.static })
     if (fingerprint) {
       // Note: Arc's tmp dir will need to be cleaned up by a later process further down the line
       let tmp = join(process.cwd(), '__ARC_TMP__')
@@ -132,8 +130,8 @@ module.exports = function http (arc, template) {
     }
   }
 
-  // add permissions for proxy+ resource aiming at GetIndex
-  template.Resources.InvokeProxyPermission = {
+  // Add permissions for $default aiming at GetIndex
+  template.Resources.InvokeDefaultPermission = {
     Type: 'AWS::Lambda::Permission',
     Properties: {
       FunctionName: { Ref: 'GetIndex' },
@@ -141,8 +139,8 @@ module.exports = function http (arc, template) {
       Principal: 'apigateway.amazonaws.com',
       SourceArn: {
         'Fn::Sub': [
-          'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${restApiId}/*/*',
-          { restApiId: { 'Ref': appname } }
+          'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiId}/*/*',
+          { ApiId: { Ref: 'HTTP' } }
         ]
       }
     }
@@ -150,23 +148,24 @@ module.exports = function http (arc, template) {
 
   // add the deployment url to the output
   template.Outputs.API = {
-    Description: 'API Gateway',
+    Description: 'API Gateway (HTTP)',
     Value: {
       'Fn::Sub': [
         // Always default to staging; mutate to production via macro where necessary
-        'https://${restApiId}.execute-api.${AWS::Region}.amazonaws.com/staging',
-        { restApiId: { Ref: appname } }
+        'https://${ApiId}.execute-api.${AWS::Region}.amazonaws.com',
+        { ApiId: { Ref: 'HTTP' } }
       ]
     }
   }
 
-  template.Outputs.restApiId = {
-    Description: 'HTTP restApiId',
-    Value: { Ref: appname }
+  template.Outputs.ApiId = {
+    Description: 'API ID (ApiId)',
+    Value: { Ref: 'HTTP' }
   }
 
-  if (!arc.static)
+  if (!arc.static) {
     template = forceStatic(arc, template)
+  }
 
   return template
 }
