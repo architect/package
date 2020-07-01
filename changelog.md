@@ -8,6 +8,7 @@
 
 - Fixed issue API Gateway issue that adds a default `Stage` stage
 - Corrected internal configuration for static proxy
+- Now ensure least privilege HTTP methods on `/_static/*`, allowing only `GET`
 
 ---
 
