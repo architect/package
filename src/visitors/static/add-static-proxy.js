@@ -30,7 +30,7 @@ module.exports = function addStatic (arc, template) {
           'integration.request.path.proxy': 'method.request.path.proxy'
         },
         passthroughBehavior: 'when_no_match',
-        httpMethod: 'ANY',
+        httpMethod: 'POST',
         cacheNamespace: 'xlr8r2',
         cacheKeyParameters: [
           'method.request.path.proxy'

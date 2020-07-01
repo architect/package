@@ -2,6 +2,15 @@
 
 ---
 
+## [1.3.8] 2020-07-01
+
+### Fixed
+
+- Fixed issue API Gateway issue that adds a default `Stage` stage
+- Corrected internal configuration for static proxy
+
+---
+
 ## [1.3.7] 2020-06-15
 
 ### Changed
