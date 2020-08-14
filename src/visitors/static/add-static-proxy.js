@@ -13,9 +13,10 @@ module.exports = function addStatic (arc, template) {
         },
         connectionType: 'INTERNET',
         timeoutInMillis: 30000,
-        requestParameters: {
-          'integration.request.path.proxy': 'method.request.path.proxy'
-        },
+        // requestParameters was ignored, now it blows up HTTP API S3 integrations
+        // requestParameters: {
+        //   'integration.request.path.proxy': 'method.request.path.proxy'
+        // },
         // TODO currently ignored, reimplement when respected by HTTP APIs
         // cacheNamespace: xlr8r2,
         // cacheKeyParameters: [
