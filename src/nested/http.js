@@ -1,7 +1,6 @@
 let { version } = require('../../package.json')
 let http = require('../visitors/http')
 let addStatic = require('../visitors/static/add-static-proxy')
-let addMocks = require('../visitors/static/add-static-mocks')
 
 module.exports = function nestHTTP (arc) {
   let template = {
@@ -23,7 +22,6 @@ module.exports = function nestHTTP (arc) {
       Description: 'Static Bucket ARN'
     }
     tasks.push(addStatic)
-    tasks.push(addMocks)
   }
   return tasks.reduce(visitor, template)
 }

@@ -5,7 +5,7 @@ let getEnv = require('../get-lambda-env')
 /**
  * visit arc.ws and merge in AWS::Serverless resources
  */
-module.exports = function visitWS (arc, template) {
+module.exports = function visitWebSockets (arc, template) {
 
   // ensure cf standard sections exist
   if (!template.Resources)
@@ -93,7 +93,7 @@ module.exports = function visitWS (arc, template) {
         Role: {
           'Fn::Sub': [
             'arn:aws:iam::${AWS::AccountId}:role/${roleName}',
-            { roleName: { 'Ref': `Role` } }
+            { roleName: { Ref: 'Role' } }
           ]
         },
         Events: {}

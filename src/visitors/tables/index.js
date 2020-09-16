@@ -14,7 +14,7 @@ let getPropertyHelper = require('../get-lambda-config')
 /**
  * visit arc.tables and merge in AWS::Serverless resources
  */
-module.exports = function tables (arc, template) {
+module.exports = function visitTables (arc, template) {
 
   if (!template.Resources)
     template.Resources = {}
@@ -100,7 +100,7 @@ module.exports = function tables (arc, template) {
           Role: {
             'Fn::Sub': [
               'arn:aws:iam::${AWS::AccountId}:role/${roleName}',
-              { roleName: { 'Ref': `Role` } }
+              { roleName: { Ref: 'Role' } }
             ]
           }
         },

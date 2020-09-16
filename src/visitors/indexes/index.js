@@ -6,7 +6,7 @@ let clean = require('../tables/clean')
 /**
  * visit arc.indexes and merge in AWS::Serverless resources
  */
-module.exports = function indices (arc, template) {
+module.exports = function visitIndexes (arc, template) {
 
   // ensure cf standard sections exist
   if (!template.Resources)

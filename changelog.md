@@ -2,6 +2,29 @@
 
 ---
 
+## [2.0.0] 2020-06-25
+
+### Added
+
+- `HTTP` APIs are the new default when provisioning API Gateway resources
+  - This only impacts Architect `@http`, which was formerly provisioned as `REST` APIs
+  - `@architect/deploy` now provides backwards compatibility for `REST` APIs
+  - More info: https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api.html
+  - Fixes #838
+
+
+### Changed
+
+- Removed experimental support for static mocks
+- Internal change: implemented new code standard with `@architect/eslint-config`
+
+
+### Fixed
+
+- Fixed inadvertent mutation of `arc.http`
+
+---
+
 ## [1.3.8] 2020-07-01
 
 ### Changed

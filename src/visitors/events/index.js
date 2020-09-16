@@ -5,7 +5,7 @@ let getPropertyHelper = require('../get-lambda-config')
 /**
  * visit arc.events and merge in AWS::Serverless resources
  */
-module.exports = function statics (arc, template) {
+module.exports = function visitEvents (arc, template) {
 
   // ensure cf standard sections exist
   if (!template.Resources)
@@ -36,7 +36,7 @@ module.exports = function statics (arc, template) {
         Role: {
           'Fn::Sub': [
             'arn:aws:iam::${AWS::AccountId}:role/${roleName}',
-            { roleName: { 'Ref': `Role` } }
+            { roleName: { Ref: 'Role' } }
           ]
         },
         Events: {}
@@ -63,7 +63,7 @@ module.exports = function statics (arc, template) {
     template.Resources[name].Properties.Events[eventName] = {
       Type: 'SNS',
       Properties: {
-        Topic: { 'Ref': `${name}Topic` }
+        Topic: { Ref: `${name}Topic` }
       }
     }
 

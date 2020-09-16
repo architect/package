@@ -125,7 +125,7 @@ module.exports = function ssm (arc, template) {
             }
           } ]
         },
-        Roles: [ { 'Ref': 'Role' } ],
+        Roles: [ { Ref: 'Role' } ],
       }
     }
   }
