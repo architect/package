@@ -1,5 +1,5 @@
 let { getLambdaName, toLogicalID } = require('@architect/utils')
-let unexpress = require('./un-express-route')
+let renderRoute = require('./render-route')
 
 module.exports = function getHttpApiProperties (http) {
   return {
@@ -24,7 +24,7 @@ function getPaths (routes) {
   routes.forEach(route => {
 
     let method = route[0]
-    let path = unexpress(route[1])
+    let path = renderRoute(route[1])
     if (!result[path]) result[path] = {}
 
     if (!result[path][method]) {

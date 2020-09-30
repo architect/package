@@ -4,7 +4,7 @@ let { join } = require('path')
 let { getLambdaName, toLogicalID, fingerprint: fingerprinter } = require('@architect/utils')
 
 let getApiProps = require('./get-api-properties')
-let unexpress = require('./un-express-route')
+let renderRoute = require('./render-route')
 
 let getEnv = require('../get-lambda-env')
 let getPropertyHelper = require('../get-lambda-config')
@@ -40,9 +40,10 @@ module.exports = function visitHttp (arc, template) {
   http.forEach(route => {
 
     let method = route[0].toLowerCase() // get, post, put, delete, patch
-    let path = unexpress(route[1]) // From `/foo/:bar` to `/foo/{bar}`
-    let name = toLogicalID(`${method}${getLambdaName(route[1]).replace(/000/g, '')}`) // GetIndex
-    let code = `./src/http/${method}${getLambdaName(route[1])}` // ./src/http/get-index
+    let path = renderRoute(route[1]) // From `/foo/:bar` to `/foo/{bar}`
+    let lambdaName = getLambdaName(route[1])
+    let name = toLogicalID(`${method}${lambdaName.replace(/000/g, '')}`) // GetIndex
+    let code = `./src/http/${method}${lambdaName}` // ./src/http/get-index
     let prop = getPropertyHelper(http, code) // Returns a helper function for getting props
     let env = getEnv(arc, code) // Construct the runtime env
 
