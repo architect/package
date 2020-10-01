@@ -19,15 +19,21 @@ module.exports = function visitHttp (arc, template) {
   let http = JSON.parse(JSON.stringify(arc.http))
 
   // Force add GetIndex if not defined
-  let findGetIndex = tuple => tuple[0].toLowerCase() === 'get' && tuple[1] === '/'
-  let hasGetIndex = http.some(findGetIndex) // we reuse this below for default proxy code
-  if (!hasGetIndex) {
+  let findRoot = r => {
+    let method = r[0].toLowerCase()
+    let path = r[1]
+    let isRootMethod = method === 'get' || method === 'any'
+    let isRootPath = path === '/' || path === '/*'
+    return isRootMethod && isRootPath
+  }
+  let hasRoot = http.some(findRoot) // we reuse this below for default proxy code
+  if (!hasRoot) {
     http.push([ 'get', '/' ])
   }
 
   // Base props
   let Type = 'AWS::Serverless::HttpApi'
-  let Properties = getApiProps(http)
+  let { Properties, InvokeDefaultPermission } = getApiProps(http)
 
   // Ensure standard CF sections exist
   if (!template.Resources) template.Resources = {}
@@ -95,7 +101,7 @@ module.exports = function visitHttp (arc, template) {
   })
 
   // If we added get index, we need to fix the code path
-  if (!hasGetIndex) {
+  if (!hasRoot) {
     // Package running as a dependency (most common use case)
     let arcProxy = join(process.cwd(), 'node_modules', '@architect', 'http-proxy', 'dist')
     // Package running as a global install
@@ -129,23 +135,24 @@ module.exports = function visitHttp (arc, template) {
     else {
       template.Resources.GetIndex.Properties.CodeUri = arcProxy
     }
-  }
 
-  // Add permissions for $default aiming at GetIndex
-  template.Resources.InvokeDefaultPermission = {
-    Type: 'AWS::Lambda::Permission',
-    Properties: {
-      FunctionName: { Ref: 'GetIndex' },
-      Action: 'lambda:InvokeFunction',
-      Principal: 'apigateway.amazonaws.com',
-      SourceArn: {
-        'Fn::Sub': [
-          'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiId}/*/*',
-          { ApiId: { Ref: 'HTTP' } }
-        ]
+    // Add permissions for $default aiming at GetIndex
+    template.Resources.InvokeDefaultPermission = {
+      Type: 'AWS::Lambda::Permission',
+      Properties: {
+        FunctionName: { Ref: 'GetIndex' },
+        Action: 'lambda:InvokeFunction',
+        Principal: 'apigateway.amazonaws.com',
+        SourceArn: {
+          'Fn::Sub': [
+            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiId}/*/*',
+            { ApiId: { Ref: 'HTTP' } }
+          ]
+        }
       }
     }
   }
+  else template.Resources.InvokeDefaultPermission = InvokeDefaultPermission
 
   // add the deployment url to the output
   template.Outputs.API = {

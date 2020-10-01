@@ -2,38 +2,36 @@ let { getLambdaName, toLogicalID } = require('@architect/utils')
 let renderRoute = require('./render-route')
 
 module.exports = function getHttpApiProperties (http) {
-  return {
+  let { paths, InvokeDefaultPermission } = getPaths(http)
+  let Properties = {
     StageName: '$default', // Default, but specify for safety
-    DefinitionBody: getOpenApi(http)
+    DefinitionBody: {
+      openapi: '3.0.1',
+      info: { title: { Ref: 'AWS::StackName' } },
+      paths,
+    }
   }
-}
-
-function getOpenApi (http) {
-  return {
-    openapi: '3.0.1',
-    info: {
-      title: { Ref: 'AWS::StackName' }
-    },
-    paths: getPaths(http)
-  }
+  return { Properties, InvokeDefaultPermission }
 }
 
 function getPaths (routes) {
-  let result = {}
+  let paths = {}
+  let fallbackRoute = { method: 'get', path: '/' }
+  let foundFallbackRoute = false
 
-  routes.forEach(route => {
+  routes.forEach(r => {
+    let method = r[0].toLowerCase()
+    let path = r[1]
+    let cfPath = renderRoute(path)
+    if (!paths[cfPath]) paths[cfPath] = {}
 
-    let method = route[0]
-    let path = renderRoute(route[1])
-    if (!result[path]) result[path] = {}
-
-    if (!result[path][method]) {
-      result[path][method] = {
+    if (!paths[cfPath][method]) {
+      paths[cfPath][method] = {
         'x-amazon-apigateway-integration': {
           payloadFormatVersion: '2.0',
           type: 'aws_proxy',
           httpMethod: 'POST',
-          uri: getURI({ path: route[1], method }),
+          uri: getURI({ path, method }),
           connectionType: 'INTERNET',
           // TODO currently ignored, reimplement when respected by HTTP APIs
           // cacheNamespace: xlr8r,
@@ -43,26 +41,41 @@ function getPaths (routes) {
         }
       }
     }
+
+    let isRootMethod = method === 'get' || method === 'any'
+    let isRootPath = path === '/' || path === '/*'
+    if (isRootMethod && isRootPath && !foundFallbackRoute) {
+      fallbackRoute = { method, path }
+      foundFallbackRoute = true  // First match wins, don't keep overwriting the fallbackRoute
+    }
   })
-  return addFallback(result)
+
+  let { $default, InvokeDefaultPermission } = addFallback(fallbackRoute)
+
+  paths['/$default'] = $default
+
+  return { paths, InvokeDefaultPermission }
 }
 
-function getURI ({ path, method }) {
-  let m = method.toLowerCase()
-  let name = toLogicalID(`${m}${getLambdaName(path).replace(/000/g, '')}`) // GetIndex
+function getName ({ path, method }) {
+  return toLogicalID(`${method}${getLambdaName(path).replace(/000/g, '')}`) // example: GetIndex
+}
+
+function getURI (route) {
+  let name = getName(route)
   let arn = `arn:aws:apigateway:\${AWS::Region}:lambda:path/2015-03-31/functions/\${${name}.Arn}/invocations`
   return { 'Fn::Sub': arn }
 }
 
-function addFallback (cf) {
-  cf['/$default'] = {
+function addFallback (fallbackRoute) {
+  let $default = {
     'x-amazon-apigateway-any-method': {
       isDefaultRoute: true,
       'x-amazon-apigateway-integration': {
         payloadFormatVersion: '2.0',
         type: 'aws_proxy',
         httpMethod: 'POST',
-        uri: getURI({ path: '/', method: 'GET' }),
+        uri: getURI(fallbackRoute),
         connectionType: 'INTERNET',
         // TODO currently ignored, reimplement when respected by HTTP APIs
         // cacheNamespace: xlr8r,
@@ -72,5 +85,21 @@ function addFallback (cf) {
       }
     }
   }
-  return cf
+
+  let InvokeDefaultPermission = {
+    Type: 'AWS::Lambda::Permission',
+    Properties: {
+      FunctionName: { Ref: getName(fallbackRoute) },
+      Action: 'lambda:InvokeFunction',
+      Principal: 'apigateway.amazonaws.com',
+      SourceArn: {
+        'Fn::Sub': [
+          'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiId}/*/*',
+          { ApiId: { Ref: 'HTTP' } }
+        ]
+      }
+    }
+  }
+
+  return { $default, InvokeDefaultPermission }
 }
