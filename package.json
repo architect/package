@@ -34,10 +34,10 @@
     "@architect/eslint-config": "0.0.1",
     "codecov": "^3.7.2",
     "cross-env": "^7.0.2",
-    "eslint": "^7.9.0",
+    "eslint": "^7.10.0",
     "mock-fs": "~4.13.0",
     "nyc": "^15.1.0",
-    "sinon": "^9.0.3",
+    "sinon": "^9.1.0",
     "tap-spec": "^5.0.0",
     "tape": "^5.0.1"
   },
