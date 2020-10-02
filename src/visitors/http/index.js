@@ -9,6 +9,7 @@ let renderRoute = require('./render-route')
 let getEnv = require('../get-lambda-env')
 let getPropertyHelper = require('../get-lambda-config')
 let forceStatic = require('../static')
+let proxy = require('./proxy')
 
 /**
  * Visit arc.http and generate an HTTP API
@@ -173,6 +174,10 @@ module.exports = function visitHttp (arc, template) {
 
   if (!arc.static) {
     template = forceStatic(arc, template)
+  }
+
+  if (arc.proxy) {
+    template = proxy(arc, template)
   }
 
   return template
