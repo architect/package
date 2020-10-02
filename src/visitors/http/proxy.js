@@ -2,6 +2,10 @@ module.exports = function proxy (arc, template) {
 
   let staging = arc.proxy.find(e => e[0] === 'staging')
 
+  if (!staging) {
+    throw SyntaxError(`@proxy missing 'staging' setting`)
+  }
+
   // Clean up default root handler
   if (!arc.http || !arc.http.some(r => r[0] === 'get' && r[1] === '/')) {
     delete template.Resources.HTTP.Properties.DefinitionBody.paths['/']
