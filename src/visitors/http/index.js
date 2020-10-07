@@ -19,7 +19,7 @@ module.exports = function visitHttp (arc, template) {
   // Copy arc.http to avoid get index mutation
   let http = JSON.parse(JSON.stringify(arc.http))
 
-  // Force add GetIndex if not defined
+  // Set up Arc Static Asset Proxy (ASAP): force add GetIndex if not defined
   let findRoot = r => {
     let method = r[0].toLowerCase()
     let path = r[1]
@@ -27,8 +27,10 @@ module.exports = function visitHttp (arc, template) {
     let isRootPath = path === '/' || path === '/*'
     return isRootMethod && isRootPath
   }
-  let hasRoot = http.some(findRoot) // we reuse this below for default proxy code
-  if (!hasRoot) {
+  let hasRoot = http.some(findRoot) // We reuse this below for ASAP
+  // Only add ASAP if @proxy isn't defined
+  let addASAP = !hasRoot && !arc.proxy
+  if (addASAP) {
     http.push([ 'get', '/' ])
   }
 
@@ -102,7 +104,7 @@ module.exports = function visitHttp (arc, template) {
   })
 
   // If we added get index, we need to fix the code path
-  if (!hasRoot) {
+  if (addASAP) {
     // Package running as a dependency (most common use case)
     let arcProxy = join(process.cwd(), 'node_modules', '@architect', 'http-proxy', 'dist')
     // Package running as a global install
@@ -137,8 +139,8 @@ module.exports = function visitHttp (arc, template) {
       template.Resources.GetIndex.Properties.CodeUri = arcProxy
     }
 
-    // Add permissions for $default aiming at GetIndex
-    template.Resources.InvokeDefaultPermission = {
+    // Add permissions for Arc Static Asset Proxy (ASAP) at GetIndex
+    template.Resources.InvokeArcStaticAssetProxy = {
       Type: 'AWS::Lambda::Permission',
       Properties: {
         FunctionName: { Ref: 'GetIndex' },
@@ -171,10 +173,12 @@ module.exports = function visitHttp (arc, template) {
     Value: { Ref: 'HTTP' }
   }
 
+  // Backfill @static
   if (!arc.static) {
     template = forceStatic(arc, template)
   }
 
+  // Handle @proxy (not to be confused with ASAP)
   if (arc.proxy) {
     template = proxy(arc, template)
   }
