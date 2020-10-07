@@ -2,6 +2,14 @@
 
 ---
 
+## [6.1.0] 2021-01-22
+
+### Added
+
+- Added support for `name` property in `@indexes` pragma to allow explicit naming of GSIs
+
+---
+
 ## [6.0.4] 2021-01-07
 
 ### Added
