@@ -31,7 +31,7 @@ module.exports = function visitHttp (arc, template) {
   // Only add ASAP if @proxy isn't defined
   let addASAP = !hasRoot && !arc.proxy
   if (addASAP) {
-    http.push([ 'get', '/' ])
+    http.push([ 'get', '/*' ])
   }
 
   // Base props
@@ -115,7 +115,7 @@ module.exports = function visitHttp (arc, template) {
     else if (existsSync(local)) arcProxy = local
 
     // Set the runtime
-    template.Resources.GetIndex.Properties.Runtime = 'nodejs12.x'
+    template.Resources.GetCatchall.Properties.Runtime = 'nodejs12.x'
 
     let { fingerprint } = fingerprinter.config({ static: arc.static })
     if (fingerprint) {
@@ -133,17 +133,17 @@ module.exports = function visitHttp (arc, template) {
       let staticManifest = readFileSync(join(staticFolder, 'static.json'))
       writeFileSync(join(shared, 'static.json'), staticManifest)
       // Ok we done
-      template.Resources.GetIndex.Properties.CodeUri = tmp
+      template.Resources.GetCatchall.Properties.CodeUri = tmp
     }
     else {
-      template.Resources.GetIndex.Properties.CodeUri = arcProxy
+      template.Resources.GetCatchall.Properties.CodeUri = arcProxy
     }
 
-    // Add permissions for Arc Static Asset Proxy (ASAP) at GetIndex
+    // Add permissions for Arc Static Asset Proxy (ASAP) at GetCatchall
     template.Resources.InvokeArcStaticAssetProxy = {
       Type: 'AWS::Lambda::Permission',
       Properties: {
-        FunctionName: { Ref: 'GetIndex' },
+        FunctionName: { Ref: 'GetCatchall' },
         Action: 'lambda:InvokeFunction',
         Principal: 'apigateway.amazonaws.com',
         SourceArn: {
