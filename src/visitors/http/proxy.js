@@ -7,6 +7,7 @@ module.exports = function proxy (arc, template) {
   }
 
   // Clean up default root handler
+  // TODO rely on Inventory's 'get /'.explicit flag
   if (!arc.http || !arc.http.some(r => r[0] === 'get' && r[1] === '/')) {
     delete template.Resources.HTTP.Properties.DefinitionBody.paths['/']
     delete template.Resources.GetIndex

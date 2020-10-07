@@ -34,7 +34,7 @@ module.exports = function visitHttp (arc, template) {
 
   // Base props
   let Type = 'AWS::Serverless::HttpApi'
-  let { Properties, InvokeDefaultPermission } = getApiProps(http)
+  let Properties = getApiProps(http)
 
   // Ensure standard CF sections exist
   if (!template.Resources) template.Resources = {}
@@ -153,7 +153,6 @@ module.exports = function visitHttp (arc, template) {
       }
     }
   }
-  else template.Resources.InvokeDefaultPermission = InvokeDefaultPermission
 
   // add the deployment url to the output
   template.Outputs.API = {

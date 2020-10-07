@@ -2,7 +2,7 @@
 
 ---
 
-## [2.1.0] 2020-09-30
+## [3.0.0] 2020-09-30
 
 ### Added
 
@@ -14,6 +14,8 @@
 
 ### Changed
 
+- Breaking change: with the addition of `@http` `any` and `*`, we are deprecating `get /` as greedy catchall by default
+  - To get back the same behavior, either update your `get /` to `any /*`, or just define a new `any /*` route
 - Updated dependencies
 
 ---
