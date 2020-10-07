@@ -19,12 +19,13 @@ module.exports = function visitHttp (arc, template) {
   // Copy arc.http to avoid get index mutation
   let http = JSON.parse(JSON.stringify(arc.http))
 
-  // Set up Arc Static Asset Proxy (ASAP): force add GetIndex if not defined
+  // Set up Arc Static Asset Proxy (ASAP): force add GetCatchall if not defined
   let findRoot = r => {
     let method = r[0].toLowerCase()
     let path = r[1]
     let isRootMethod = method === 'get' || method === 'any'
-    let isRootPath = path === '/' || path === '/*'
+    // Literal root, root catchall, or root param should nullify ASAP
+    let isRootPath = path === '/' || path === '/*' || path.startsWith('/:')
     return isRootMethod && isRootPath
   }
   let hasRoot = http.some(findRoot) // We reuse this below for ASAP
