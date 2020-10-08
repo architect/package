@@ -22,8 +22,8 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@architect/http-proxy": "~3.12.3",
-    "@architect/parser": "~2.2.0",
-    "@architect/utils": "~1.5.12-RC.0",
+    "@architect/parser": "~2.3.0",
+    "@architect/utils": "~1.5.12",
     "glob": "~7.1.6",
     "mime-types": "~2.1.27"
   },
@@ -32,12 +32,12 @@
   },
   "devDependencies": {
     "@architect/eslint-config": "0.0.1",
-    "codecov": "^3.7.2",
+    "codecov": "^3.8.0",
     "cross-env": "^7.0.2",
     "eslint": "^7.10.0",
     "mock-fs": "~4.13.0",
     "nyc": "^15.1.0",
-    "sinon": "^9.1.0",
+    "sinon": "^9.2.0",
     "tap-spec": "^5.0.0",
     "tape": "^5.0.1"
   },
