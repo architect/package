@@ -14,8 +14,8 @@
 
 ### Changed
 
-- Breaking change: with the addition of `@http` `any` and `*`, we are deprecating `get /` as greedy catchall by default
-  - To get back the same behavior, either update your `get /` to `any /*`, or just define a new `any /*` route
+- Breaking change: with the addition of `@http` `any` and `*`, default `get /` greedy catchall is now deprecated
+  - To restore that behavior, either move your `get /` route to `any /*`, or just define a new `any /*` route
 - Updated dependencies
 
 ---

@@ -23,9 +23,10 @@ module.exports = function visitHttp (arc, template) {
   let findRoot = r => {
     let method = r[0].toLowerCase()
     let path = r[1]
+    let rootParam = path.startsWith('/:') && path.split('/:').length === 2
     let isRootMethod = method === 'get' || method === 'any'
     // Literal root, root catchall, or root param should nullify ASAP
-    let isRootPath = path === '/' || path === '/*' || path.startsWith('/:')
+    let isRootPath = path === '/' || path === '/*' || rootParam
     return isRootMethod && isRootPath
   }
   let hasRoot = http.some(findRoot) // We reuse this below for ASAP
