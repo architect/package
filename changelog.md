@@ -2,6 +2,24 @@
 
 ---
 
+## [3.0.0] 2020-09-30
+
+### Added
+
+- Added support for `@http` catchall syntax (e.g. `get /api/*`)
+- Added support for `@http` `head` + `options` methods
+- Added support for `@http` `any` method syntax (e.g. `any /path`)
+- Added support for `@proxy`
+
+
+### Changed
+
+- Breaking change: with the addition of `@http` `any` and `*`, we are deprecating `get /` as greedy catchall by default
+  - To get back the same behavior, either update your `get /` to `any /*`, or just define a new `any /*` route
+- Updated dependencies
+
+---
+
 ## [2.0.0] 2020-09-15
 
 ### Added

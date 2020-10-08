@@ -4,11 +4,12 @@ let { join } = require('path')
 let { getLambdaName, toLogicalID, fingerprint: fingerprinter } = require('@architect/utils')
 
 let getApiProps = require('./get-api-properties')
-let unexpress = require('./un-express-route')
+let renderRoute = require('./render-route')
 
 let getEnv = require('../get-lambda-env')
 let getPropertyHelper = require('../get-lambda-config')
 let forceStatic = require('../static')
+let proxy = require('./proxy')
 
 /**
  * Visit arc.http and generate an HTTP API
@@ -18,11 +19,20 @@ module.exports = function visitHttp (arc, template) {
   // Copy arc.http to avoid get index mutation
   let http = JSON.parse(JSON.stringify(arc.http))
 
-  // Force add GetIndex if not defined
-  let findGetIndex = tuple => tuple[0].toLowerCase() === 'get' && tuple[1] === '/'
-  let hasGetIndex = http.some(findGetIndex) // we reuse this below for default proxy code
-  if (!hasGetIndex) {
-    http.push([ 'get', '/' ])
+  // Set up Arc Static Asset Proxy (ASAP): force add GetCatchall if not defined
+  let findRoot = r => {
+    let method = r[0].toLowerCase()
+    let path = r[1]
+    let isRootMethod = method === 'get' || method === 'any'
+    // Literal root, root catchall, or root param should nullify ASAP
+    let isRootPath = path === '/' || path === '/*' || path.startsWith('/:')
+    return isRootMethod && isRootPath
+  }
+  let hasRoot = http.some(findRoot) // We reuse this below for ASAP
+  // Only add ASAP if @proxy isn't defined
+  let addASAP = !hasRoot && !arc.proxy
+  if (addASAP) {
+    http.push([ 'get', '/*' ])
   }
 
   // Base props
@@ -40,9 +50,10 @@ module.exports = function visitHttp (arc, template) {
   http.forEach(route => {
 
     let method = route[0].toLowerCase() // get, post, put, delete, patch
-    let path = unexpress(route[1]) // From `/foo/:bar` to `/foo/{bar}`
-    let name = toLogicalID(`${method}${getLambdaName(route[1]).replace(/000/g, '')}`) // GetIndex
-    let code = `./src/http/${method}${getLambdaName(route[1])}` // ./src/http/get-index
+    let path = renderRoute(route[1]) // From `/foo/:bar` to `/foo/{bar}`
+    let lambdaName = getLambdaName(route[1])
+    let name = toLogicalID(`${method}${lambdaName.replace(/000/g, '')}`) // GetIndex
+    let code = `./src/http/${method}${lambdaName}` // ./src/http/get-index
     let prop = getPropertyHelper(http, code) // Returns a helper function for getting props
     let env = getEnv(arc, code) // Construct the runtime env
 
@@ -94,7 +105,7 @@ module.exports = function visitHttp (arc, template) {
   })
 
   // If we added get index, we need to fix the code path
-  if (!hasGetIndex) {
+  if (addASAP) {
     // Package running as a dependency (most common use case)
     let arcProxy = join(process.cwd(), 'node_modules', '@architect', 'http-proxy', 'dist')
     // Package running as a global install
@@ -105,7 +116,7 @@ module.exports = function visitHttp (arc, template) {
     else if (existsSync(local)) arcProxy = local
 
     // Set the runtime
-    template.Resources.GetIndex.Properties.Runtime = 'nodejs12.x'
+    template.Resources.GetCatchall.Properties.Runtime = 'nodejs12.x'
 
     let { fingerprint } = fingerprinter.config({ static: arc.static })
     if (fingerprint) {
@@ -123,25 +134,25 @@ module.exports = function visitHttp (arc, template) {
       let staticManifest = readFileSync(join(staticFolder, 'static.json'))
       writeFileSync(join(shared, 'static.json'), staticManifest)
       // Ok we done
-      template.Resources.GetIndex.Properties.CodeUri = tmp
+      template.Resources.GetCatchall.Properties.CodeUri = tmp
     }
     else {
-      template.Resources.GetIndex.Properties.CodeUri = arcProxy
+      template.Resources.GetCatchall.Properties.CodeUri = arcProxy
     }
-  }
 
-  // Add permissions for $default aiming at GetIndex
-  template.Resources.InvokeDefaultPermission = {
-    Type: 'AWS::Lambda::Permission',
-    Properties: {
-      FunctionName: { Ref: 'GetIndex' },
-      Action: 'lambda:InvokeFunction',
-      Principal: 'apigateway.amazonaws.com',
-      SourceArn: {
-        'Fn::Sub': [
-          'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiId}/*/*',
-          { ApiId: { Ref: 'HTTP' } }
-        ]
+    // Add permissions for Arc Static Asset Proxy (ASAP) at GetCatchall
+    template.Resources.InvokeArcStaticAssetProxy = {
+      Type: 'AWS::Lambda::Permission',
+      Properties: {
+        FunctionName: { Ref: 'GetCatchall' },
+        Action: 'lambda:InvokeFunction',
+        Principal: 'apigateway.amazonaws.com',
+        SourceArn: {
+          'Fn::Sub': [
+            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiId}/*/*',
+            { ApiId: { Ref: 'HTTP' } }
+          ]
+        }
       }
     }
   }
@@ -163,8 +174,14 @@ module.exports = function visitHttp (arc, template) {
     Value: { Ref: 'HTTP' }
   }
 
+  // Backfill @static
   if (!arc.static) {
     template = forceStatic(arc, template)
+  }
+
+  // Handle @proxy (not to be confused with ASAP)
+  if (arc.proxy) {
+    template = proxy(arc, template)
   }
 
   return template

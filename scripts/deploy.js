@@ -20,7 +20,6 @@ let spawn = require('./spawn')
  * @param {Boolean} params.log - enable/disable logging (default false)
  * @param {Boolean} params.verbose - enable/disable verbose logging (default false)
  * @param {Boolean} params.production - deploy to production (default false)
- * @param {Boolean} params.production - deploy to production (default false)
  * @param {Boolean} params.clean - delete generated files (default true)
  * @param {Object} params.arc - parsed .arc file (if not passed in will read the .arc in cwd)
  * @param {Function} callback - node style errback

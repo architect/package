@@ -1,39 +1,34 @@
 let { getLambdaName, toLogicalID } = require('@architect/utils')
-let unexpress = require('./un-express-route')
+let renderRoute = require('./render-route')
 
 module.exports = function getHttpApiProperties (http) {
-  return {
+  let paths = getPaths(http)
+  let Properties = {
     StageName: '$default', // Default, but specify for safety
-    DefinitionBody: getOpenApi(http)
+    DefinitionBody: {
+      openapi: '3.0.1',
+      info: { title: { Ref: 'AWS::StackName' } },
+      paths,
+    }
   }
-}
-
-function getOpenApi (http) {
-  return {
-    openapi: '3.0.1',
-    info: {
-      title: { Ref: 'AWS::StackName' }
-    },
-    paths: getPaths(http)
-  }
+  return Properties
 }
 
 function getPaths (routes) {
-  let result = {}
+  let paths = {}
 
-  routes.forEach(route => {
-
-    let method = route[0]
-    let path = unexpress(route[1])
-    if (!result[path]) result[path] = {}
-
-    if (!result[path][method]) {
-      result[path][method] = {
+  routes.forEach(r => {
+    let method = r[0].toLowerCase()
+    let path = r[1]
+    let cfPath = renderRoute(path)
+    if (!paths[cfPath]) paths[cfPath] = {}
+    if (!paths[cfPath][method]) {
+      paths[cfPath][method] = {
         'x-amazon-apigateway-integration': {
           payloadFormatVersion: '2.0',
           type: 'aws_proxy',
           httpMethod: 'POST',
-          uri: getURI({ path: route[1], method }),
+          uri: getURI({ path, method }),
           connectionType: 'INTERNET',
           // TODO currently ignored, reimplement when respected by HTTP APIs
           // cacheNamespace: xlr8r,
@@ -44,33 +39,15 @@ function getPaths (routes) {
       }
     }
   })
-  return addFallback(result)
+
+  return paths
 }
 
-function getURI ({ path, method }) {
-  let m = method.toLowerCase()
-  let name = toLogicalID(`${m}${getLambdaName(path).replace(/000/g, '')}`) // GetIndex
+// Example: 'get' + '/' -> GetIndex
+let getName = ({ path, method }) => toLogicalID(`${method}${getLambdaName(path).replace(/000/g, '')}`)
+
+function getURI (route) {
+  let name = getName(route)
   let arn = `arn:aws:apigateway:\${AWS::Region}:lambda:path/2015-03-31/functions/\${${name}.Arn}/invocations`
   return { 'Fn::Sub': arn }
-}
-
-function addFallback (cf) {
-  cf['/$default'] = {
-    'x-amazon-apigateway-any-method': {
-      isDefaultRoute: true,
-      'x-amazon-apigateway-integration': {
-        payloadFormatVersion: '2.0',
-        type: 'aws_proxy',
-        httpMethod: 'POST',
-        uri: getURI({ path: '/', method: 'GET' }),
-        connectionType: 'INTERNET',
-        // TODO currently ignored, reimplement when respected by HTTP APIs
-        // cacheNamespace: xlr8r,
-        // cacheKeyParameters: [
-        //   'method.request.path.proxy'
-        // ]
-      }
-    }
-  }
-  return cf
 }
