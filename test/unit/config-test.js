@@ -249,6 +249,7 @@ policies weee
     'src/events/an-event/.arc-config': Buffer.from(arcConfig)
   })
   props = package.toSAM(parsed).Resources.AnEvent.Properties
+  mockFs.restore()
   t.equal(props['Timeout'], timeout, `Timeout: ${props['Timeout']}`)
   t.equal(props['MemorySize'], memory, `Memory: ${props['MemorySize']}`)
   t.equal(props['Runtime'], runtime, `Runtime: ${props['Runtime']}`)
