@@ -2,6 +2,20 @@
 
 ---
 
+## [3.0.2] 2020-10-26
+
+### Added
+
+- Added support for CloudFormation's new 500 resource limit! This makes us very happy!
+
+
+### Changed
+
+- Removed check for >200 CloudFormation resources, and related `nested` CloudFormation code path (which was not maintained and known to be broken)
+- Removed `.toSAM` and `.toCFN` methods
+
+---
+
 ## [3.0.1] 2020-10-12
 
 ### Fixed
