@@ -23,7 +23,7 @@ get /foo
 
 test('write sam.json', t => {
   t.plan(1)
-  let sam = pkg.toSAM(parse(arcfile))
+  let sam = pkg(parse(arcfile))
   fs.writeFileSync(__dirname + '/mock/sam.json', JSON.stringify(sam, null, 2))
   t.ok(true, 'ran')
   console.log(sam)

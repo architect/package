@@ -38,7 +38,7 @@ test('Basic config', t => {
   // Control
   let arcfile = arc()
   let parsed = parse(arcfile)
-  let props = package.toSAM(parsed).Resources.AnEvent.Properties
+  let props = package(parsed).Resources.AnEvent.Properties
   t.notEqual(props['Timeout'], timeout, `Timeout (control test): ${props['Timeout']}`)
   t.notEqual(props['MemorySize'], memory, `Memory (control test): ${props['MemorySize']}`)
   t.notEqual(props['Runtime'], runtime, `Runtime (control test): ${props['Runtime']}`)
@@ -56,7 +56,7 @@ layers foo
 policies fiz
 `)
   parsed = parse(arcfile)
-  props = package.toSAM(parsed).Resources.AnEvent.Properties
+  props = package(parsed).Resources.AnEvent.Properties
   t.equal(props['Timeout'], timeout, `Timeout (control test): ${props['Timeout']}`)
   t.equal(props['MemorySize'], memory, `Memory (control test): ${props['MemorySize']}`)
   t.equal(props['Runtime'], runtime, `Runtime (control test): ${props['Runtime']}`)
@@ -76,7 +76,7 @@ layers foo
 policies fiz
 `)
   let parsed = parse(arcfile)
-  let props = package.toSAM(parsed).Resources.AnEvent.Properties
+  let props = package(parsed).Resources.AnEvent.Properties
   t.equal(props['Layers'].length, 1, `Got a single layer back (using 'layers')`)
   t.equal(props['Layers'][0], 'foo', `Layer matches: ${props['Layers'][0]}`)
   t.equal(props['Policies'].length, 1, `Got a single policy back (using 'policies')`)
@@ -89,7 +89,7 @@ policies fiz
 policies buz
 `)
   parsed = parse(arcfile)
-  props = package.toSAM(parsed).Resources.AnEvent.Properties
+  props = package(parsed).Resources.AnEvent.Properties
   t.equal(props['Layers'].length, 2, `Got a multiple layers back (repeating 'layers')`)
   t.equal(props['Layers'][0], 'foo', `Layer matches: ${props['Layers'][0]}`)
   t.equal(props['Layers'][1], 'bar', `Layer matches: ${props['Layers'][1]}`)
@@ -106,7 +106,7 @@ policies
   buz
 `)
   parsed = parse(arcfile)
-  props = package.toSAM(parsed).Resources.AnEvent.Properties
+  props = package(parsed).Resources.AnEvent.Properties
   t.equal(props['Layers'].length, 2, `Got a multiple layers back (using 'layers' as an array)`)
   t.equal(props['Layers'][0], 'foo', `Layer matches: ${props['Layers'][0]}`)
   t.equal(props['Policies'].length, 2, `Got a multiple policys back (using 'policies' as an array)`)
@@ -118,7 +118,7 @@ layer foo
 policy fiz
 `)
   parsed = parse(arcfile)
-  props = package.toSAM(parsed).Resources.AnEvent.Properties
+  props = package(parsed).Resources.AnEvent.Properties
   t.equal(props['Layers'].length, 1, `Got a single layer back (using 'layer')`)
   t.equal(props['Layers'][0], 'foo', `Layer matches: ${props['Layers'][0]}`)
   t.equal(props['Policies'].length, 1, `Got a single policy back (using 'policy')`)
@@ -131,7 +131,7 @@ policy fiz
 policy buz
 `)
   parsed = parse(arcfile)
-  props = package.toSAM(parsed).Resources.AnEvent.Properties
+  props = package(parsed).Resources.AnEvent.Properties
   t.equal(props['Layers'].length, 2, `Got a multiple layers back (repeating 'layer')`)
   t.equal(props['Layers'][0], 'foo', `Layer matches: ${props['Layers'][0]}`)
   t.equal(props['Layers'][1], 'bar', `Layer matches: ${props['Layers'][1]}`)
@@ -148,7 +148,7 @@ policy
   buz
 `)
   parsed = parse(arcfile)
-  props = package.toSAM(parsed).Resources.AnEvent.Properties
+  props = package(parsed).Resources.AnEvent.Properties
   t.equal(props['Layers'].length, 2, `Got a multiple layers back (using 'layer' as an array)`)
   t.equal(props['Layers'][0], 'foo', `Layer matches: ${props['Layers'][0]}`)
   t.equal(props['Policies'].length, 2, `Got a multiple policys back (using 'policy' as an array)`)
@@ -167,7 +167,7 @@ layers
   buz
 `)
   let parsed = parse(arcfile)
-  let props = package.toSAM(parsed).Resources.AnEvent.Properties
+  let props = package(parsed).Resources.AnEvent.Properties
   t.equal(props['Layers'].length, 5, `Got up to 5 layers back`)
 
   t.throws(() => {
@@ -181,7 +181,7 @@ layers
   quux
 `)
     let parsed = parse(arcfile)
-    package.toSAM(parsed)
+    package(parsed)
   }, 'Too many layers throws')
 
   t.throws(() => {
@@ -190,7 +190,7 @@ region us-west-1
 layers a:b:c:us-west-2:d
 `)
     let parsed = parse(arcfile)
-    package.toSAM(parsed)
+    package(parsed)
   }, 'Incorrect (.arc) layer region throws')
 
   process.env.AWS_REGION = 'us-west-1'
@@ -199,7 +199,7 @@ layers a:b:c:us-west-2:d
 layers a:b:c:us-west-2:d
 `)
     let parsed = parse(arcfile)
-    package.toSAM(parsed)
+    package(parsed)
   }, 'Incorrect (env) layer region throws')
   delete process.env.AWS_REGION
 })
@@ -222,7 +222,7 @@ layers foo
 policies fiz
 `)
   let parsed = parse(arcfile)
-  let props = package.toSAM(parsed).Resources.AnEvent.Properties
+  let props = package(parsed).Resources.AnEvent.Properties
   t.equal(props['Timeout'], timeout, `Timeout (control test): ${props['Timeout']}`)
   t.equal(props['MemorySize'], memory, `Memory (control test): ${props['MemorySize']}`)
   t.equal(props['Runtime'], runtime, `Runtime (control test): ${props['Runtime']}`)
@@ -248,7 +248,7 @@ policies weee
   mockFs({
     'src/events/an-event/.arc-config': Buffer.from(arcConfig)
   })
-  props = package.toSAM(parsed).Resources.AnEvent.Properties
+  props = package(parsed).Resources.AnEvent.Properties
   mockFs.restore()
   t.equal(props['Timeout'], timeout, `Timeout: ${props['Timeout']}`)
   t.equal(props['MemorySize'], memory, `Memory: ${props['MemorySize']}`)
@@ -270,7 +270,7 @@ test('Function type specific settings', t => {
 a-queue
 `)
   let parsed = parse(arcfile)
-  let props = package.toSAM(parsed).Resources.AQueueQueue.Properties
+  let props = package(parsed).Resources.AQueueQueue.Properties
   t.ok(props['FifoQueue'], `FifoQueue is set by default: ${props['FifoQueue']}`)
   t.ok(props['ContentBasedDeduplication'], `ContentBasedDeduplication is set by default: ${props['ContentBasedDeduplication']}`)
 
@@ -281,7 +281,7 @@ a-queue
 fifo false
 `)
   parsed = parse(arcfile)
-  props = package.toSAM(parsed).Resources.AQueueQueue.Properties
+  props = package(parsed).Resources.AQueueQueue.Properties
   t.notOk(props['FifoQueue'], `FifoQueue disabled by setting`)
   t.notOk(props['ContentBasedDeduplication'], `ContentBasedDeduplication disabled by setting`)
 })
