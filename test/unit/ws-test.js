@@ -11,7 +11,7 @@ myapp
 test('WebSockets have a policy doc', t => {
   t.plan(2)
   let parsed = parse(arcfile)
-  let cfn = pkg.toSAM(parsed)
+  let cfn = pkg(parsed)
   t.ok(pkg, 'pkg')
   t.ok(cfn.Resources.WebSocketPolicy, 'WebSocketPolicy')
 })

@@ -1,7 +1,6 @@
 let test = require('tape')
 let getEnv = require('../../../src/visitors/get-lambda-env')
 let parser = require('@architect/parser')
-// let sinon = require('sinon')
 let fs = require('fs')
 let path = require('path')
 let shortArcFile = fs.readFileSync(path.join(__dirname, '..', '.arc-short')).toString()
@@ -20,4 +19,3 @@ test('get-lambda-env: if static exists, sets ARC_STATIC_BUCKET', t => {
   let result = getEnv(arc, './fake')
   t.deepEquals(result.ARC_STATIC_BUCKET, { Ref: 'StaticBucket' }, 'ARC_STATIC_BUCKET set')
 })
-

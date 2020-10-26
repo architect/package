@@ -1,59 +1,14 @@
 let { version } = require('../package.json')
 let visitors = require('./visitors')
-let nested = require('./nested')
-let count = require('./resource-count')
 
 /**
- * returns AWS::Serverless JSON for a given (parsed) .arc file
- */
-module.exports = function toServerlessCloudFormation (arc) {
-  // if its greater than 100 resources
-  // create template files for nested stacks
-  // otherwise just create a single sam template
-  let exec = count(arc) > 200 ? module.exports.toCFN : module.exports.toSAM
-  return exec(arc)
-}
-
-// alias out direct methods
-module.exports.toCFN = toCFN
-module.exports.toSAM = toSAM
-
-/**
- * @param {Object} arc - parsed arcfile
- * @returns {Object} templates - nested template files for packaging/deployment
- */
-function toCFN (arc) {
-
-  let hasStream = tbl => tbl[Object.keys(tbl)[0]].stream
-  let appname = arc.app[0]
-  let template = {}
-
-  template[`${appname}-cfn.json`] = nested.base(arc)
-
-  if (arc.http)
-    template[`${appname}-cfn-http.json`] = nested.http(arc)
-
-  if (arc.events)
-    template[`${appname}-cfn-events.json`] = nested.events(arc)
-
-  if (arc.scheduled)
-    template[`${appname}-cfn-scheduled.json`] = nested.scheduled(arc)
-
-  if (arc.queues)
-    template[`${appname}-cfn-queues.json`] = nested.queues(arc)
-
-  if (arc.tables && arc.tables.some(hasStream))
-    template[`${appname}-cfn-tables.json`] = nested.tables(arc)
-
-  return template
-}
-
-/**
+ * Architect Package
+ * Generates and returns AWS::Serverless JSON for a given (parsed) .arc file
+ *
  * @param {Object} arc - parsed arcfile
  * @returns {CloudFormation::Serverless} template
  */
-function toSAM (arc) {
-
+module.exports = function toSAM (arc) {
   // allowed list of pragmas ['http', 'globals'...etc]
   let supports = Object.keys(visitors)
 
