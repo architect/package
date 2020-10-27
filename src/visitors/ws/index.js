@@ -1,5 +1,5 @@
 let { toLogicalID } = require('@architect/utils')
-let { getLambdaEnv } = require('../utils')
+let { createLambda } = require('../utils')
 
 /**
  * Visit arc.ws and merge in AWS::Serverless resources
@@ -66,49 +66,19 @@ module.exports = function visitWebSockets (inventory, template) {
   }
 
   inv.ws.forEach(route => {
-    let { src, config } = route
-    let { timeout, memory, runtime, handler, concurrency, layers, policies } = config
-
-    // Create the Lambda
     let name = toLogicalID(route.name)
     let wsLambda = `${name}WSLambda`
     let wsRoute = `${name}WSRoute`
     let wsIntegration = `${name}WSIntegration`
     let wsPermission = `${name}WSPermission`
 
-    let env = getLambdaEnv(runtime, inventory)
-
-    template.Resources[wsLambda] = {
-      Type: 'AWS::Serverless::Function',
-      Properties: {
-        Handler: handler,
-        CodeUri: src,
-        Runtime: runtime,
-        MemorySize: memory,
-        Timeout: timeout,
-        Environment: { Variables: env },
-        Role: {
-          'Fn::Sub': [
-            'arn:aws:iam::${AWS::AccountId}:role/${roleName}',
-            { roleName: { Ref: 'Role' } }
-          ]
-        },
-        Events: {}
-      }
-    }
-
-    if (concurrency !== 'unthrottled') {
-      template.Resources[wsLambda].Properties.ReservedConcurrentExecutions = concurrency
-    }
-
-    if (layers.length > 0) {
-      template.Resources[wsLambda].Properties.Layers = layers
-    }
-
-    if (policies.length > 0) {
-      template.Resources[wsLambda].Properties.Policies = policies
-    }
-
+    // Create the Lambda
+    createLambda({
+      lambda: route,
+      name: wsLambda,
+      template,
+      inventory,
+    })
 
     let defaults = [ 'default', 'connect', 'disconnect' ]
     template.Resources[wsRoute] = {

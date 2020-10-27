@@ -1,4 +1,4 @@
-let { getLambdaEnv } = require('../utils')
+let { createLambda } = require('../utils')
 let { toLogicalID } = require('@architect/utils')
 
 /**
@@ -9,48 +9,23 @@ module.exports = function visitQueues (inventory, template) {
   if (!inv.queues) return template
 
   inv.queues.forEach(queue => {
-    let { src, config } = queue
-    let { timeout, memory, runtime, handler, concurrency, layers, policies, fifo } = config
+    let { config } = queue
+    let { timeout, fifo } = config
 
-    // Create the Lambda
     let name = toLogicalID(queue.name)
     let queueLambda = `${name}QueueLambda`
     let queueEvent = `${name}QueueEvent`
     let queueQueue = `${name}Queue`
-    let env = getLambdaEnv(runtime, inventory)
 
-    template.Resources[queueLambda] = {
-      Type: 'AWS::Serverless::Function',
-      Properties: {
-        Handler: handler,
-        CodeUri: src,
-        Runtime: runtime,
-        MemorySize: memory,
-        Timeout: timeout,
-        Environment: { Variables: env },
-        Role: {
-          'Fn::Sub': [
-            'arn:aws:iam::${AWS::AccountId}:role/${roleName}',
-            { roleName: { Ref: 'Role' } }
-          ]
-        },
-        Events: {}
-      }
-    }
+    // Create the Lambda
+    createLambda({
+      lambda: queue,
+      name: queueLambda,
+      template,
+      inventory,
+    })
 
-    if (concurrency !== 'unthrottled') {
-      template.Resources[queueLambda].Properties.ReservedConcurrentExecutions = concurrency
-    }
-
-    if (layers.length > 0) {
-      template.Resources[queueLambda].Properties.Layers = layers
-    }
-
-    if (policies.length > 0) {
-      template.Resources[queueLambda].Properties.Policies = policies
-    }
-
-    // construct the event source so SAM can wire the permissions
+    // Construct the event source so SAM can wire the permissions
     template.Resources[queueLambda].Properties.Events[queueEvent] = {
       Type: 'SQS',
       Properties: {
@@ -58,14 +33,15 @@ module.exports = function visitQueues (inventory, template) {
       }
     }
 
-    // create the sqs queue
+    // Create the sqs queue
     template.Resources[queueQueue] = {
       Type: 'AWS::SQS::Queue',
       Properties: {
         VisibilityTimeout: timeout
       }
     }
-    // only add fifo when true; false will cause cfn to fail =/
+
+    // Only add fifo when true; false will cause cfn to fail =/
     if (fifo) {
       template.Resources[queueQueue].Properties.FifoQueue = fifo
       template.Resources[queueQueue].Properties.ContentBasedDeduplication = true

@@ -1,4 +1,4 @@
-let { getLambdaEnv } = require('../utils')
+let { createLambda } = require('../utils')
 let { toLogicalID } = require('@architect/utils')
 
 let getKeySchema = require('./get-key-schema')
@@ -59,49 +59,19 @@ module.exports = function visitTables (inventory, template) {
 
     // TODO impl for multiple streams against a single table, now possible!
     if (stream) {
-      // creates the stream
-      template.Resources[tableTable].Properties.StreamSpecification = {
-        StreamViewType: 'NEW_AND_OLD_IMAGES'
-      }
-
-      let { src, config } = get.streams(table.name)
-      let { timeout, memory, runtime, handler, concurrency, layers, policies } = config
+      let theStream = get.streams(table.name)
 
       let streamStream = `${name}Stream`
       let streamLambda = `${name}StreamLambda`
       let streamEvent = `${name}StreamEvent`
-      let env = getLambdaEnv(runtime, inventory)
 
-      template.Resources[streamLambda] = {
-        Type: 'AWS::Serverless::Function',
-        Properties: {
-          Handler: handler,
-          CodeUri: src,
-          Runtime: runtime,
-          MemorySize: memory,
-          Timeout: timeout,
-          Environment: { Variables: env },
-          Role: {
-            'Fn::Sub': [
-              'arn:aws:iam::${AWS::AccountId}:role/${roleName}',
-              { roleName: { Ref: 'Role' } }
-            ]
-          },
-        },
-        Events: {}
-      }
-
-      if (concurrency !== 'unthrottled') {
-        template.Resources[streamLambda].Properties.ReservedConcurrentExecutions = concurrency
-      }
-
-      if (layers.length > 0) {
-        template.Resources[streamLambda].Properties.Layers = layers
-      }
-
-      if (policies.length > 0) {
-        template.Resources[streamLambda].Properties.Policies = policies
-      }
+      // Create the Lambda
+      createLambda({
+        lambda: theStream,
+        name: streamLambda,
+        template,
+        inventory,
+      })
 
       template.Resources[streamEvent] = {
         Type: 'AWS::Lambda::EventSourceMapping',
@@ -111,6 +81,11 @@ module.exports = function visitTables (inventory, template) {
           FunctionName: { 'Fn::GetAtt': [ streamStream, 'Arn' ] },
           StartingPosition: 'TRIM_HORIZON'
         }
+      }
+
+      // Create the stream
+      template.Resources[tableTable].Properties.StreamSpecification = {
+        StreamViewType: 'NEW_AND_OLD_IMAGES'
       }
     }
   })

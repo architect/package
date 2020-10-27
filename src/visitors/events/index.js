@@ -1,4 +1,4 @@
-let { getLambdaEnv } = require('../utils')
+let { createLambda } = require('../utils')
 let { toLogicalID } = require('@architect/utils')
 
 /**
@@ -9,47 +9,18 @@ module.exports = function visitEvents (inventory, template) {
   if (!inv.events) return template
 
   inv.events.forEach(event => {
-    let { src, config } = event
-    let { timeout, memory, runtime, handler, concurrency, layers, policies } = config
-
-    // Create the Lambda
     let name = toLogicalID(event.name)
     let eventLambda = `${name}EventLambda`
     let eventEvent = `${name}Event`
     let eventTopic = `${name}EventTopic`
 
-    let env = getLambdaEnv(runtime, inventory)
-
-    template.Resources[eventLambda] = {
-      Type: 'AWS::Serverless::Function',
-      Properties: {
-        Handler: handler,
-        CodeUri: src,
-        Runtime: runtime,
-        MemorySize: memory,
-        Timeout: timeout,
-        Environment: { Variables: env },
-        Role: {
-          'Fn::Sub': [
-            'arn:aws:iam::${AWS::AccountId}:role/${roleName}',
-            { roleName: { Ref: 'Role' } }
-          ]
-        },
-        Events: {}
-      }
-    }
-
-    if (concurrency !== 'unthrottled') {
-      template.Resources[eventLambda].Properties.ReservedConcurrentExecutions = concurrency
-    }
-
-    if (layers.length > 0) {
-      template.Resources[eventLambda].Properties.Layers = layers
-    }
-
-    if (policies.length > 0) {
-      template.Resources[eventLambda].Properties.Policies = policies
-    }
+    // Create the Lambda
+    createLambda({
+      lambda: event,
+      name: eventLambda,
+      template,
+      inventory,
+    })
 
     // Construct the event source so SAM can wire the permissions
     template.Resources[eventLambda].Properties.Events[eventEvent] = {

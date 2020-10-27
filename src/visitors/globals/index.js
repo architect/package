@@ -9,10 +9,6 @@ let { toLogicalID } = require('@architect/utils')
 module.exports = function visitGlobals (inventory, template) {
   let { inv } = inventory
 
-  // interpolate required shape
-  if (!template.Resources)
-    template.Resources = {}
-
   // construct a least priv iam role
   template.Resources.Role = {
     Type: 'AWS::IAM::Role',
@@ -31,7 +27,7 @@ module.exports = function visitGlobals (inventory, template) {
     }
   }
 
-  // enables logs and capability reflection
+  // Enables logs and capability reflection
   template.Resources.Role.Properties.Policies.push({
     PolicyName: 'ArcGlobalPolicy',
     PolicyDocument: {

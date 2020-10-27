@@ -6,7 +6,7 @@ let { getLambdaName, toLogicalID, fingerprint: fingerprinter } = require('@archi
 let getApiProps = require('./get-api-properties')
 let renderRoute = require('./render-route')
 
-let { getLambdaEnv } = require('../utils')
+let { createLambda } = require('../utils')
 let forceStatic = require('../static')
 let proxy = require('./proxy')
 
@@ -27,49 +27,24 @@ module.exports = function visitHttp (inventory, template) {
 
   // Walk the HTTP routes
   http.forEach(route => {
-    let { method, src, config } = route
-    let { timeout, memory, runtime, handler, concurrency, layers, policies } = config
+    let { method } = route
 
     let path = renderRoute(route.path) // From `/foo/:bar` to `/foo/{bar}`
     let lambdaName = getLambdaName(route.path)
     let name = toLogicalID(`${method}${lambdaName.replace(/000/g, '')}`) // GetIndex
-    let env = getLambdaEnv(runtime, inventory)
+    let routeLambda = `${name}RouteLambda`
+    let routeEvent = `${name}RouteEvent`
 
-    // Add Lambda resources
-    template.Resources[name] = {
-      Type: 'AWS::Serverless::Function',
-      Properties: {
-        Handler: handler,
-        CodeUri: src,
-        Runtime: runtime,
-        MemorySize: memory,
-        Timeout: timeout,
-        Environment: { Variables: env },
-        Role: {
-          'Fn::Sub': [
-            'arn:aws:iam::${AWS::AccountId}:role/${roleName}',
-            { roleName: { Ref: 'Role' } }
-          ]
-        },
-        Events: {}
-      }
-    }
-
-    if (concurrency !== 'unthrottled') {
-      template.Resources[name].Properties.ReservedConcurrentExecutions = concurrency
-    }
-
-    if (layers.length > 0) {
-      template.Resources[name].Properties.Layers = layers
-    }
-
-    if (policies.length > 0) {
-      template.Resources[name].Properties.Policies = policies
-    }
+    // Create the Lambda
+    createLambda({
+      lambda: route,
+      name: routeLambda,
+      template,
+      inventory,
+    })
 
     // Construct the API event source so SAM can wire the permissions
-    let eventName = `${name}Event`
-    template.Resources[name].Properties.Events[eventName] = {
+    template.Resources[routeLambda].Properties.Events[routeEvent] = {
       Type: 'HttpApi',
       Properties: {
         Path: path,
