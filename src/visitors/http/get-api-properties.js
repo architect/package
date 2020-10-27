@@ -19,11 +19,13 @@ function getPaths (routes) {
 
   routes.forEach(r => {
     let method = r[0].toLowerCase()
+    // Special API Gateway OpenAPI impl for `any` method
+    let m = method === 'any' ? 'x-amazon-apigateway-any-method' : method
     let path = r[1]
     let cfPath = renderRoute(path)
     if (!paths[cfPath]) paths[cfPath] = {}
-    if (!paths[cfPath][method]) {
-      paths[cfPath][method] = {
+    if (!paths[cfPath][m]) {
+      paths[cfPath][m] = {
         'x-amazon-apigateway-integration': {
           payloadFormatVersion: '2.0',
           type: 'aws_proxy',
