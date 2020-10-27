@@ -17,9 +17,8 @@ module.exports = function getHttpApiProperties (http) {
 function getPaths (routes) {
   let paths = {}
 
-  routes.forEach(r => {
-    let method = r[0].toLowerCase()
-    let path = r[1]
+  routes.forEach(route => {
+    let { method, path } = route
     let cfPath = renderRoute(path)
     if (!paths[cfPath]) paths[cfPath] = {}
     if (!paths[cfPath][method]) {

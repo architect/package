@@ -1,4 +1,4 @@
-module.exports = function addStatic (arc, template) {
+module.exports = function addStatic (inventory, template) {
   template.Resources.HTTP.Properties.DefinitionBody.paths['/_static/{proxy+}'] = {
     get: {
       'x-amazon-apigateway-integration': {

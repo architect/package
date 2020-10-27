@@ -1,42 +1,31 @@
+let { getLambdaEnv } = require('../utils')
 let { toLogicalID } = require('@architect/utils')
 
-let clean = require('./clean')
-let getTTL = require('./get-ttl')
-let getHasLambda = require('./get-has-lambda')
 let getKeySchema = require('./get-key-schema')
 let getAttributes = require('./get-attribute-definitions')
-let getHasEncrypt = require('./get-encrypt')
-let getHasRecovery = require('./get-has-recovery')
-
-let getEnv = require('../get-lambda-env')
-let getPropertyHelper = require('../get-lambda-config')
 
 /**
- * visit arc.tables and merge in AWS::Serverless resources
+ * Visit arc.tables and merge in AWS::Serverless resources
  */
-module.exports = function visitTables (arc, template) {
+module.exports = function visitTables (inventory, template) {
+  let { inv, get } = inventory
+  if (!inv.tables) return template
 
-  if (!template.Resources)
-    template.Resources = {}
+  inv.tables.forEach(table => {
+    let {
+      stream,
+      ttl,
+      encrypt,
+      PointInTimeRecovery,
+    } = table
 
-  if (!template.Outputs)
-    template.Outputs = {}
+    let name = toLogicalID(table.name)
+    let tableTable = `${name}Table`
 
-  arc.tables.forEach(table => {
+    let KeySchema = getKeySchema(table)
+    let AttributeDefinitions = getAttributes(table)
 
-    let tbl = Object.keys(table)[0]
-    let attr = table[tbl]
-    let keys = Object.keys(clean(attr))
-
-    let KeySchema = getKeySchema(attr, keys)
-    let hasTTL = getTTL(attr)
-    let hasLambda = getHasLambda(attr)
-    let hasEncrypt = getHasEncrypt(attr)
-    let hasRecovery = getHasRecovery(attr)
-    let TableName = toLogicalID(tbl)
-    let AttributeDefinitions = getAttributes(clean(attr))
-
-    template.Resources[`${TableName}Table`] = {
+    template.Resources[tableTable] = {
       Type: 'AWS::DynamoDB::Table',
       // DeletionPolicy: 'Retain',
       Properties: {
@@ -46,89 +35,80 @@ module.exports = function visitTables (arc, template) {
       }
     }
 
-    if (hasEncrypt) {
+    if (encrypt) {
       let encryptSpec = { SSEEnabled: true }
-      if (typeof hasEncrypt !== 'boolean') {
-        encryptSpec.KMSMasterKeyId = hasEncrypt
+      if (typeof encrypt !== 'boolean') {
+        encryptSpec.KMSMasterKeyId = encrypt
         encryptSpec.SSEType = 'KMS'
       }
-      template.Resources[`${TableName}Table`].Properties.SSESpecification = encryptSpec
+      template.Resources[tableTable].Properties.SSESpecification = encryptSpec
     }
 
-    if (hasRecovery) {
-      template.Resources[`${TableName}Table`].Properties.PointInTimeRecoverySpecification = {
+    if (PointInTimeRecovery) {
+      template.Resources[tableTable].Properties.PointInTimeRecoverySpecification = {
         PointInTimeRecoveryEnabled: true
       }
     }
 
-    if (hasTTL) {
-      template.Resources[`${TableName}Table`].Properties.TimeToLiveSpecification = {
-        AttributeName: hasTTL,
+    if (ttl) {
+      template.Resources[tableTable].Properties.TimeToLiveSpecification = {
+        AttributeName: ttl,
         Enabled: true
       }
     }
 
-    /*
-    template.Outputs[`${TableName}Table`] = {
-      Description: 'Dynamo Table',
-      Value: {Ref: `${TableName}Table`},
-      Export: {
-        Name: {'Fn::Join': [":", [appname, {Ref:'AWS::StackName'}, `${TableName}Table`]]}
-      }
-    }*/
-
-    if (hasLambda) {
+    // TODO impl for multiple streams against a single table, now possible!
+    if (stream) {
       // creates the stream
-      template.Resources[`${TableName}Table`].Properties.StreamSpecification = {
+      template.Resources[tableTable].Properties.StreamSpecification = {
         StreamViewType: 'NEW_AND_OLD_IMAGES'
       }
 
-      let name = `${TableName}Stream`
-      let code = `./src/tables/${tbl}`
-      let prop = getPropertyHelper(arc, code) // helper function for getting props
-      let env = getEnv(arc, code)
+      let { src, config } = get.streams(table.name)
+      let { timeout, memory, runtime, handler, concurrency, layers, policies } = config
 
-      template.Resources[name] = {
+      let streamStream = `${name}Stream`
+      let streamLambda = `${name}StreamLambda`
+      let streamEvent = `${name}StreamEvent`
+      let env = getLambdaEnv(runtime, inventory)
+
+      template.Resources[streamLambda] = {
         Type: 'AWS::Serverless::Function',
         Properties: {
-          Handler: 'index.handler',
-          CodeUri: code,
-          Runtime: prop('runtime'),
-          MemorySize: prop('memory'),
-          Timeout: prop('timeout'),
+          Handler: handler,
+          CodeUri: src,
+          Runtime: runtime,
+          MemorySize: memory,
+          Timeout: timeout,
           Environment: { Variables: env },
           Role: {
             'Fn::Sub': [
               'arn:aws:iam::${AWS::AccountId}:role/${roleName}',
               { roleName: { Ref: 'Role' } }
             ]
-          }
+          },
         },
         Events: {}
       }
 
-      let concurrency = prop('concurrency')
-      if (concurrency != 'unthrottled') {
-        template.Resources[name].Properties.ReservedConcurrentExecutions = concurrency
+      if (concurrency !== 'unthrottled') {
+        template.Resources[streamLambda].Properties.ReservedConcurrentExecutions = concurrency
       }
 
-      let layers = prop('layers')
-      if (Array.isArray(layers) && layers.length > 0) {
-        template.Resources[name].Properties.Layers = layers
+      if (layers.length > 0) {
+        template.Resources[streamLambda].Properties.Layers = layers
       }
 
-      let policies = prop('policies')
-      if (Array.isArray(policies) && policies.length > 0) {
-        template.Resources[name].Properties.Policies = policies
+      if (policies.length > 0) {
+        template.Resources[streamLambda].Properties.Policies = policies
       }
 
-      let eventName = `${name}Event`
-      template.Resources[eventName] = {
+      template.Resources[streamEvent] = {
         Type: 'AWS::Lambda::EventSourceMapping',
         Properties: {
           BatchSize: 10,
-          EventSourceArn: { 'Fn::GetAtt': [ `${TableName}Table`, 'StreamArn' ] },
-          FunctionName: { 'Fn::GetAtt': [ name, 'Arn' ] },
+          EventSourceArn: { 'Fn::GetAtt': [ tableTable, 'StreamArn' ] },
+          FunctionName: { 'Fn::GetAtt': [ streamStream, 'Arn' ] },
           StartingPosition: 'TRIM_HORIZON'
         }
       }

@@ -1,29 +1,24 @@
-let getAttributeDefinitions = require('../tables/get-attribute-definitions')
 let { toLogicalID } = require('@architect/utils')
+
 let getGSI = require('./get-gsi-name')
 let getKeySchema = require('../tables/get-key-schema')
-let clean = require('../tables/clean')
+let getAttributes = require('../tables/get-attribute-definitions')
+
 /**
- * visit arc.indexes and merge in AWS::Serverless resources
+ * Visit arc.indexes and merge in AWS::Serverless resources
  */
-module.exports = function visitIndexes (arc, template) {
+module.exports = function visitIndexes (inventory, template) {
+  let { inv } = inventory
+  if (!inv.indexes) return template
 
-  // ensure cf standard sections exist
-  if (!template.Resources)
-    template.Resources = {}
+  inv.indexes.forEach(index => {
+    let name = toLogicalID(index.name)
+    let TableName = `${name}Table`
 
-  if (!template.Outputs)
-    template.Outputs = {}
+    let IndexName = getGSI(index)
+    let KeySchema = getKeySchema(index)
+    let AttributeDefinitions = getAttributes(index)
 
-  arc.indexes.forEach(index => {
-
-    let tbl = Object.keys(index)[0]
-    let attr = index[tbl]
-    let keys = Object.keys(clean(attr))
-
-    let TableName = `${toLogicalID(tbl)}Table`
-    let IndexName = getGSI(attr)
-    let KeySchema = getKeySchema(attr, keys)
     let Projection = { ProjectionType: 'ALL' }
 
     let ref = template.Resources[TableName]
@@ -41,28 +36,20 @@ module.exports = function visitIndexes (arc, template) {
     })
 
     // ensure the attribute defns match
-    ref.Properties.AttributeDefinitions = dedup(ref, attr)
+    let tableDefs = ref.Properties.AttributeDefinitions
+    ref.Properties.AttributeDefinitions = dedupe(tableDefs, AttributeDefinitions)
   })
+
+  function dedupe (tableDefs, indexDefs) {
+    let table = [ ...tableDefs ]
+    indexDefs.forEach(def => {
+      let { AttributeName } = def
+      if (!table.some(t => {
+        return t.AttributeName === AttributeName
+      })) table.push(def)
+    })
+    return table
+  }
 
   return template
-}
-
-function dedup (ref, attr) {
-  let tmp = {}
-  // write in current attrs
-  ref.Properties.AttributeDefinitions.forEach(def => {
-    tmp[def.AttributeName] = def.AttributeType
-  })
-  // overwrite w key schema values
-  let schemas = getAttributeDefinitions(attr)
-  schemas.forEach(def => {
-    tmp[def.AttributeName] = def.AttributeType
-  })
-  // reseralize into cfn
-  return Object.keys(tmp).map(key => {
-    return {
-      AttributeName: key,
-      AttributeType: tmp[key]
-    }
-  })
 }

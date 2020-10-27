@@ -1,7 +1,8 @@
-module.exports = function _getGsiName (attr) {
-  var keys = Object.keys(attr)
-  var hash = keys[0] // FIXME this is brittle should lookup *String, etc
-  var range = keys.length === 2 ? `${keys[1]}-` : false
-  return `${hash}-${range ? range : ''}index`
+module.exports = function _getGsiName (index) {
+  let { name, partitionKey, partitionKeyType, sortKey } = index
+  if (!partitionKey || !partitionKeyType) {
+    throw Error(`Invalid @indexes: ${name}`)
+  }
+  let s = sortKey ? `-${sortKey}` : '' // Naming extension for multi-keys
+  return `${partitionKey}${s}-index` // New school index naming
 }
-

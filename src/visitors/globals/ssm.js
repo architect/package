@@ -1,17 +1,12 @@
 let { toLogicalID } = require('@architect/utils')
 
-module.exports = function ssm (arc, template) {
-
-  if (!template.Resources)
-    template.Resources = {}
-
+module.exports = function ssm ({ inv }, template) {
   let hasParams = false
 
-  if (arc.tables) {
+  if (inv.tables) {
     hasParams = true
-    arc.tables.forEach(table => {
-      let tablename = Object.keys(table)[0]
-      let Table = toLogicalID(tablename)
+    inv.tables.forEach(({ name }) => {
+      let Table = toLogicalID(name)
       let TableName = `${Table}Table`
       let TableParam = `${Table}Param`
       template.Resources[TableParam] = {
@@ -21,7 +16,7 @@ module.exports = function ssm (arc, template) {
           Name: {
             'Fn::Sub': [
               '/${AWS::StackName}/tables/${tablename}',
-              { tablename }
+              { tablename: name }
             ]
           },
           Value: { Ref: TableName }
@@ -30,10 +25,10 @@ module.exports = function ssm (arc, template) {
     })
   }
 
-  if (arc.events) {
+  if (inv.events) {
     hasParams = true
-    arc.events.forEach(event => {
-      let Event = `${toLogicalID(event)}Topic`
+    inv.events.forEach(({ name }) => {
+      let Event = `${toLogicalID(name)}Topic`
       let EventParam = `${Event}Param`
       template.Resources[EventParam] = {
         Type: 'AWS::SSM::Parameter',
@@ -42,7 +37,7 @@ module.exports = function ssm (arc, template) {
           Name: {
             'Fn::Sub': [
               '/${AWS::StackName}/events/${event}',
-              { event }
+              { event: name }
             ]
           },
           Value: { Ref: Event }
@@ -51,10 +46,10 @@ module.exports = function ssm (arc, template) {
     })
   }
 
-  if (arc.queues) {
+  if (inv.queues) {
     hasParams = true
-    arc.queues.forEach(q => {
-      let Queue = `${toLogicalID(q)}Queue`
+    inv.queues.forEach(({ name }) => {
+      let Queue = `${toLogicalID(name)}Queue`
       let QueueParam = `${Queue}Param`
       template.Resources[QueueParam] = {
         Type: 'AWS::SSM::Parameter',
@@ -62,8 +57,8 @@ module.exports = function ssm (arc, template) {
           Type: 'String',
           Name: {
             'Fn::Sub': [
-              '/${AWS::StackName}/queues/${q}',
-              { q }
+              '/${AWS::StackName}/queues/${queue}',
+              { queue: name }
             ]
           },
           Value: { Ref: Queue }
@@ -72,7 +67,7 @@ module.exports = function ssm (arc, template) {
     })
   }
 
-  if (arc.static) {
+  if (inv.static) {
     hasParams = true
     template.Resources.StaticBucketParam = {
       Type: 'AWS::SSM::Parameter',
@@ -87,24 +82,21 @@ module.exports = function ssm (arc, template) {
         Value: { Ref: 'StaticBucket' }
       }
     }
-    ;[ 'fingerprint' ].forEach(key => {
-      let find = t => t[0] === key
-      let hasKey = arc.static.some(find)
-      let Value = hasKey ? arc.static.find(find)[1] + '' : 'false'
-      template.Resources[`Static${toLogicalID(key)}Param`] = {
-        Type: 'AWS::SSM::Parameter',
-        Properties: {
-          Type: 'String',
-          Name: {
-            'Fn::Sub': [
-              '/${AWS::StackName}/static/${key}',
-              { key }
-            ]
-          },
-          Value
-        }
+
+    let fingerprint = inv.static.fingerprint ? true : false
+    template.Resources[`Static${toLogicalID('fingerprint')}Param`] = {
+      Type: 'AWS::SSM::Parameter',
+      Properties: {
+        Type: 'String',
+        Name: {
+          'Fn::Sub': [
+            '/${AWS::StackName}/static/${key}',
+            { key: 'fingerprint' }
+          ]
+        },
+        Value: `${fingerprint}`
       }
-    })
+    }
   }
 
   if (hasParams) {

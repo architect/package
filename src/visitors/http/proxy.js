@@ -1,6 +1,6 @@
-module.exports = function proxy (arc, template) {
+module.exports = function proxy ({ inv }, template) {
 
-  let staging = arc.proxy.find(e => e[0] === 'staging')
+  let staging = inv.proxy.staging
 
   if (!staging) {
     throw SyntaxError(`@proxy missing 'staging' setting`)
@@ -14,7 +14,7 @@ module.exports = function proxy (arc, template) {
         payloadFormatVersion: '1.0',
         type: 'http_proxy',
         httpMethod: 'ANY',
-        uri: staging[1],
+        uri: staging,
         connectionType: 'INTERNET',
         timeoutInMillis: 30000
       }
