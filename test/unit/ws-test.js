@@ -1,17 +1,17 @@
-let parse = require('@architect/parser')
+let inventory = require('@architect/inventory')
 let test = require('tape')
 let pkg = require('../../')
 
-let arcfile = `
+let rawArc = `
 @app
 myapp
 @ws
 `
 
-test('WebSockets have a policy doc', t => {
+test('WebSockets have a policy doc', async t => {
   t.plan(2)
-  let parsed = parse(arcfile)
-  let cfn = pkg(parsed)
+  let inv = await inventory({ rawArc })
+  let cfn = pkg(inv)
   t.ok(pkg, 'pkg')
   t.ok(cfn.Resources.WebSocketPolicy, 'WebSocketPolicy')
 })

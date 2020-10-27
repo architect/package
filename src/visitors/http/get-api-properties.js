@@ -47,6 +47,6 @@ let getName = ({ path, method }) => toLogicalID(`${method}${getLambdaName(path).
 
 function getURI (route) {
   let name = getName(route)
-  let arn = `arn:aws:apigateway:\${AWS::Region}:lambda:path/2015-03-31/functions/\${${name}.Arn}/invocations`
+  let arn = `arn:aws:apigateway:\${AWS::Region}:lambda:path/2015-03-31/functions/\${${name}HTTPLambda.Arn}/invocations`
   return { 'Fn::Sub': arn }
 }

@@ -32,8 +32,8 @@ module.exports = function visitHttp (inventory, template) {
     let path = renderRoute(route.path) // From `/foo/:bar` to `/foo/{bar}`
     let lambdaName = getLambdaName(route.path)
     let name = toLogicalID(`${method}${lambdaName.replace(/000/g, '')}`) // GetIndex
-    let routeLambda = `${name}RouteLambda`
-    let routeEvent = `${name}RouteEvent`
+    let routeLambda = `${name}HTTPLambda`
+    let routeEvent = `${name}HTTPEvent`
 
     // Create the Lambda
     createLambda({
@@ -66,7 +66,7 @@ module.exports = function visitHttp (inventory, template) {
     else if (existsSync(local)) arcProxy = local
 
     // Set the runtime
-    template.Resources.GetCatchall.Properties.Runtime = 'nodejs12.x'
+    template.Resources.GetCatchallHTTPLambda.Properties.Runtime = 'nodejs12.x'
 
 
     let { fingerprint } = fingerprinter.config({ static: inv._project.arc.static })
@@ -84,17 +84,17 @@ module.exports = function visitHttp (inventory, template) {
       let staticManifest = readFileSync(join(staticFolder, 'static.json'))
       writeFileSync(join(shared, 'static.json'), staticManifest)
       // Ok we done
-      template.Resources.GetCatchall.Properties.CodeUri = tmp
+      template.Resources.GetCatchallHTTPLambda.Properties.CodeUri = tmp
     }
     else {
-      template.Resources.GetCatchall.Properties.CodeUri = arcProxy
+      template.Resources.GetCatchallHTTPLambda.Properties.CodeUri = arcProxy
     }
 
-    // Add permissions for Arc Static Asset Proxy (ASAP) at GetCatchall
+    // Add permissions for Arc Static Asset Proxy (ASAP) at GetCatchallHTTPLambda
     template.Resources.InvokeArcStaticAssetProxy = {
       Type: 'AWS::Lambda::Permission',
       Properties: {
-        FunctionName: { Ref: 'GetCatchall' },
+        FunctionName: { Ref: 'GetCatchallHTTPLambda' },
         Action: 'lambda:InvokeFunction',
         Principal: 'apigateway.amazonaws.com',
         SourceArn: {
