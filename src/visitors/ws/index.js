@@ -73,10 +73,8 @@ module.exports = function visitWebSockets (inventory, template) {
     let wsPermission = `${name}WSPermission`
 
     // Create the Lambda
-    createLambda({
+    template.Resources[wsLambda] = createLambda({
       lambda: route,
-      name: wsLambda,
-      template,
       inventory,
     })
 

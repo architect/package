@@ -15,10 +15,8 @@ module.exports = function visitEvents (inventory, template) {
     let eventTopic = `${name}EventTopic`
 
     // Create the Lambda
-    createLambda({
+    template.Resources[eventLambda] = createLambda({
       lambda: event,
-      name: eventLambda,
-      template,
       inventory,
     })
 

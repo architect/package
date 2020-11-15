@@ -36,10 +36,8 @@ module.exports = function visitHttp (inventory, template) {
     let routeEvent = `${name}HTTPEvent`
 
     // Create the Lambda
-    createLambda({
+    template.Resources[routeLambda] = createLambda({
       lambda: route,
-      name: routeLambda,
-      template,
       inventory,
     })
 

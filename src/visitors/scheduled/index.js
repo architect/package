@@ -19,10 +19,8 @@ module.exports = function visitScheduled (inventory, template) {
     let scheduleEvent = `${name}ScheduledEvent`
 
     // Create the Lambda
-    createLambda({
+    template.Resources[scheduleLambda] = createLambda({
       lambda: schedule,
-      name: scheduleLambda,
-      template,
       inventory,
     })
 

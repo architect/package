@@ -18,10 +18,8 @@ module.exports = function visitQueues (inventory, template) {
     let queueQueue = `${name}Queue`
 
     // Create the Lambda
-    createLambda({
+    template.Resources[queueLambda] = createLambda({
       lambda: queue,
-      name: queueLambda,
-      template,
       inventory,
     })
 
