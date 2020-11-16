@@ -22,9 +22,9 @@ module.exports = function visitWebSockets (inventory, template) {
   template.Resources.WebsocketDeployment = {
     Type: 'AWS::ApiGatewayV2::Deployment',
     DependsOn: [
-      'WebsocketConnectRoute',
-      'WebsocketDefaultRoute',
-      'WebsocketDisconnectRoute'
+      'ConnectWSRoute',
+      'DefaultWSRoute',
+      'DisconnectWSRoute'
     ],
     Properties: {
       ApiId: { Ref: 'WS' },
@@ -117,7 +117,7 @@ module.exports = function visitWebSockets (inventory, template) {
   })
 
   template.Outputs.WSS = {
-    Description: 'Websocket Endpoint',
+    Description: 'WebSocket Endpoint',
     Value: {
       'Fn::Sub': [
         // Always default to staging; mutate to production via macro where necessary
