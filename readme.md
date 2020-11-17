@@ -1,9 +1,7 @@
 # `@architect/package` [![GitHub CI status](https://github.com/architect/package/workflows/Node%20CI/badge.svg)](https://github.com/architect/package/actions?query=workflow%3A%22Node+CI%22)
 <!-- [![codecov](https://codecov.io/gh/architect/package/branch/master/graph/badge.svg)](https://codecov.io/gh/architect/package) -->
 
-[@architect/package][npm] packages @architect projects as [`AWS::Serverless`][sam]
--compatible JSON. Converts project `.arc` files into a [AWS Serverless Application
-Model (SAM)][sam]-compatible format.
+[@architect/package][npm] packages @architect projects as [`AWS::Serverless`][sam]-compatible JSON. Converts Architect projects into a [AWS Serverless Application Model (SAM)][sam]-compatible format.
 
 ## Install
 
@@ -11,18 +9,9 @@ Model (SAM)][sam]-compatible format.
 
 ## API
 
-All of this module's methods take as input an [@architect/parser][parser]-parsed
-@architect project `.arc` file.
+All of this module's methods take as input an [@architect/inventory][inventory]-parsed Architect project.
 
 ### pkg(arc)
-
-Depending on the size of your @architect project and its passed-in parsed `.arc`
-file(the `arc` parameter), will invoke either [`toCFN`][toCFN] for larger projects
-or [`toSAM`][toSAM] for smaller ones.
-
-### pkg.toCFN(arc)
-
-### pkg.toSAM(arc)
 
 ## Example Usage
 
@@ -47,8 +36,6 @@ let sam = pkg(arc)
 console.log(sam)
 ```
 
-[toCFN]: #pkgtoCFNarc
-[toSAM]: #pkgtoSAMarc
 [npm]: https://www.npmjs.com/package/@architect/package
-[parser]: https://www.npmjs.com/package/@architect/parser
+[inventory]: https://www.npmjs.com/package/@architect/inventory
 [sam]: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-template.html
