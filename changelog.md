@@ -2,6 +2,14 @@
 
 ---
 
+## [4.0.2] 2020-11-17
+
+### Changed
+
+- Updated Deno runtime to use version 1.5.2 from AWS SAR
+
+---
+
 ## [4.0.1] 2020-10-27
 
 ### Fixed
@@ -15,7 +23,6 @@
 ### Added
 
 - Added support for CloudFormation's new 500 resource limit! This makes us very happy!
-
 
 ### Changed
 
@@ -41,7 +48,6 @@
 - Added support for `@http` `any` method syntax (e.g. `any /path`)
 - Added support for `@proxy`
 
-
 ### Changed
 
 - Breaking change: with the addition of `@http` `any` and `*`, default `get /` greedy catchall is now deprecated
@@ -60,12 +66,10 @@
   - More info: https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api.html
   - Fixes #838
 
-
 ### Changed
 
 - Removed experimental support for static mocks
 - Internal change: implemented new code standard with `@architect/eslint-config`
-
 
 ### Fixed
 
@@ -78,7 +82,6 @@
 ### Changed
 
 - Apps now ensure least privilege HTTP methods on `/_static/*`, allowing only `GET`
-
 
 ### Fixed
 
@@ -101,12 +104,10 @@
 
 - Added layer region validation (instead of letting CloudFormation fail without a helpful error)
 
-
 ### Changed
 
 - Removed `mkdirp` in favor of Node.js >= 10.x `mkdir` recursive
 - Updated dependencies
-
 
 ### Fixed
 
@@ -158,7 +159,6 @@
 
 ---
 
-
 ## [1.2.5] 2020-02-05
 
 ### Changed
@@ -178,8 +178,8 @@
 ## [1.2.2] 2020-01-24
 
 ### Added
-- `FifoQueue: true` default for `@queues` (override with `fifo false` in `.arc-config`)
 
+- `FifoQueue: true` default for `@queues` (override with `fifo false` in `.arc-config`)
 
 ### Fixed
 
@@ -221,7 +221,6 @@
 
 ---
 
-
 ## [1.0.55] 2019-12-18
 
 ### Added
@@ -235,7 +234,6 @@
 ### Added
 
 - Adds `/staging` path part to WSS URL for printing and env vars
-
 
 ### Changed
 
