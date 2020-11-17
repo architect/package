@@ -61,7 +61,6 @@ module.exports = function visitTables (inventory, template) {
     if (stream) {
       let theStream = get.streams(table.name)
 
-      let streamStream = `${name}Stream`
       let streamLambda = `${name}StreamLambda`
       let streamEvent = `${name}StreamEvent`
 
@@ -76,7 +75,7 @@ module.exports = function visitTables (inventory, template) {
         Properties: {
           BatchSize: 10,
           EventSourceArn: { 'Fn::GetAtt': [ tableTable, 'StreamArn' ] },
-          FunctionName: { 'Fn::GetAtt': [ streamStream, 'Arn' ] },
+          FunctionName: { 'Fn::GetAtt': [ streamLambda, 'Arn' ] },
           StartingPosition: 'TRIM_HORIZON'
         }
       }

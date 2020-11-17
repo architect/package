@@ -28,7 +28,7 @@ module.exports = function ssm ({ inv }, template) {
   if (inv.events) {
     hasParams = true
     inv.events.forEach(({ name }) => {
-      let Event = `${toLogicalID(name)}Topic`
+      let Event = `${toLogicalID(name)}EventTopic`
       let EventParam = `${Event}Param`
       template.Resources[EventParam] = {
         Type: 'AWS::SSM::Parameter',
