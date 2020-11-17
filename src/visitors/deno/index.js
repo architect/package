@@ -28,7 +28,7 @@ module.exports = function visitDeno (arc, template) {
       Properties: {
         Location: {
           ApplicationId: 'arn:aws:serverlessrepo:us-east-1:455488262213:applications/Deno',
-          SemanticVersion: '0.26.0'
+          SemanticVersion: '1.5.2'
         }
       }
     }
