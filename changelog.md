@@ -7,6 +7,7 @@
 ### Added
 
 - Added support for custom file paths
+- Added `ARC_ENV` env var to all functions
 
 
 ### Changed
