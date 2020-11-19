@@ -4,7 +4,7 @@ module.exports = function createLambda (params) {
   let { lambda, inventory } = params
   let { src, config } = lambda
   let { timeout, memory, runtime, handler, concurrency, layers, policies } = config
-  let Variables = getLambdaEnv(runtime, inventory)
+  let Variables = getLambdaEnv({ config, runtime, inventory })
 
   // Add Lambda resources
   let item = {

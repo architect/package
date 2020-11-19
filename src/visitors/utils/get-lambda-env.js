@@ -1,13 +1,18 @@
-module.exports = function getEnv (runtime, { inv }) {
+module.exports = function getEnv (params) {
+  let { config, runtime, inventory } = params
+  let { inv } = inventory
 
   let env = {
-    ARC_ROLE: { Ref: 'Role' },
-    ARC_CLOUDFORMATION: { Ref: 'AWS::StackName' },
     ARC_APP_NAME: inv.app,
+    ARC_CLOUDFORMATION: { Ref: 'AWS::StackName' },
+    ARC_ENV: 'staging', // Always default to staging; mutate to production via macro where necessary
     ARC_HTTP: 'aws_proxy', // used for feature detection (could be 'aws' for vtl style)
-    NODE_ENV: 'staging', // Always default to staging; mutate to production via macro where necessary
+    ARC_ROLE: { Ref: 'Role' },
+    NODE_ENV: 'staging', // Same as above, always default to staging; userland may mutate
     SESSION_TABLE_NAME: 'jwe',
   }
+
+  if (config.env === false) env.ARC_DISABLE_ENV_VARS = true
 
   // Global add PYTHONPATH if the runtime is Python
   if (runtime.startsWith('python')) {
