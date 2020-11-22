@@ -24,7 +24,8 @@
     "@architect/http-proxy": "~3.12.3",
     "@architect/utils": "~2.0.0-RC.1",
     "glob": "~7.1.6",
-    "mime-types": "~2.1.27"
+    "mime-types": "~2.1.27",
+    "run-parallel": "~1.1.10"
   },
   "peerDependencies": {
     "aws-sdk": "2.712.0",
