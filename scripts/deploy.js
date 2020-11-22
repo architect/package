@@ -2,8 +2,9 @@
 let aws = require('aws-sdk')
 let series = require('run-series')
 let parallel = require('run-parallel')
-let { toCFN } = require('../')
-let utils = require('@architect/utils')
+let pkg = require('../')
+let { toLogicalID } = require('@architect/utils')
+let _inventory = require('@architect/inventory')
 let path = require('path')
 let fs = require('fs')
 let sam = require('./package')
@@ -66,16 +67,28 @@ module.exports = function deploy (params = {}, callback) {
   let log = params.log || false
   let verbose = params.verbose || false
   let production = params.production || false
-  let arc = params.arc || utils.readArc().arc
   let clean = params.clean || true
 
   // derived
-  let cfn = toCFN(arc)
-  let bucket = arc.aws.find(o => o[0] === 'bucket')[1]
-  let appname = arc.app[0]
-  let name = `${utils.toLogicalID(appname)}${production ? 'Production' : 'Staging'}`
+  let cfn
+  let bucket
+  let appname
+  let name
 
   series([
+    function getInv (callback) {
+      _inventory({}, function (err, inventory) {
+        if (err) callback(err)
+        else {
+          let { inv, get } = inventory
+          cfn = pkg(inventory)
+          bucket = get.aws('bucket')
+          appname = inv.app
+          name = `${toLogicalID(appname)}${production ? 'Production' : 'Staging'}`
+        }
+      })
+    },
+
     function toCFN (callback) {
       parallel(Object.keys(cfn).map(k => {
         return function writes (callback) {

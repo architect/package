@@ -1,7 +1,7 @@
 let { existsSync, mkdirSync, readFileSync, writeFileSync } = require('fs')
 let { join } = require('path')
 
-let { getLambdaName, toLogicalID, fingerprint: fingerprinter } = require('@architect/utils')
+let { getLambdaName, toLogicalID } = require('@architect/utils')
 
 let getApiProps = require('./get-api-properties')
 let renderRoute = require('./render-route')
@@ -14,7 +14,7 @@ let proxy = require('./proxy')
  * Visit arc.http and generate an HTTP API
  */
 module.exports = function visitHttp (inventory, template) {
-  let { inv } = inventory
+  let { inv, get } = inventory
   let { http } = inv
   if (!http) return template
 
@@ -65,10 +65,10 @@ module.exports = function visitHttp (inventory, template) {
 
     // Set the runtime
     template.Resources.GetCatchallHTTPLambda.Properties.Runtime = 'nodejs12.x'
-
-
-    let { fingerprint } = fingerprinter.config({ static: inv._project.arc.static })
-    if (fingerprint) {
+    // Only accept a bool true fingerprint status (bc external fingerprint setting)
+    let fingerprint = get.static('fingerprint')
+    // TODO move this into Deploy
+    if (fingerprint === true) {
       // Note: Arc's tmp dir will need to be cleaned up by a later process further down the line
       let tmp = join(process.cwd(), '__ARC_TMP__')
       let shared = join(tmp, 'node_modules', '@architect', 'shared')
