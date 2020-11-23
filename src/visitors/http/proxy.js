@@ -1,11 +1,4 @@
-module.exports = function proxy (arc, template) {
-
-  let staging = arc.proxy.find(e => e[0] === 'staging')
-
-  if (!staging) {
-    throw SyntaxError(`@proxy missing 'staging' setting`)
-  }
-
+module.exports = function proxy ({ inv }, template) {
   // Overwrite the default route to point at the configured http endpoint
   template.Resources.HTTP.Properties.DefinitionBody.paths['/$default'] = {
     'x-amazon-apigateway-any-method': {
@@ -14,7 +7,7 @@ module.exports = function proxy (arc, template) {
         payloadFormatVersion: '1.0',
         type: 'http_proxy',
         httpMethod: 'ANY',
-        uri: staging[1],
+        uri: inv.proxy.staging,
         connectionType: 'INTERNET',
         timeoutInMillis: 30000
       }

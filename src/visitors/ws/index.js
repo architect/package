@@ -1,21 +1,14 @@
 let { toLogicalID } = require('@architect/utils')
-let getPropertyHelper = require('../get-lambda-config')
-let getEnv = require('../get-lambda-env')
+let { createLambda } = require('../utils')
 
 /**
- * visit arc.ws and merge in AWS::Serverless resources
+ * Visit arc.ws and merge in AWS::Serverless resources
  */
-module.exports = function visitWebSockets (arc, template) {
+module.exports = function visitWebSockets (inventory, template) {
+  let { inv } = inventory
+  if (!inv.ws) return template
 
-  // ensure cf standard sections exist
-  if (!template.Resources)
-    template.Resources = {}
-
-  if (!template.Outputs)
-    template.Outputs = {}
-
-  let appname = arc.app[0]
-  let Name = toLogicalID(`${appname}-websocket`)
+  let Name = toLogicalID(`${inv.app}-websocket`)
 
   template.Resources.WS = {
     Type: 'AWS::ApiGatewayV2::Api',
@@ -29,9 +22,9 @@ module.exports = function visitWebSockets (arc, template) {
   template.Resources.WebsocketDeployment = {
     Type: 'AWS::ApiGatewayV2::Deployment',
     DependsOn: [
-      'WebsocketConnectRoute',
-      'WebsocketDefaultRoute',
-      'WebsocketDisconnectRoute'
+      'ConnectWSRoute',
+      'DefaultWSRoute',
+      'DisconnectWSRoute'
     ],
     Properties: {
       ApiId: { Ref: 'WS' },
@@ -72,92 +65,59 @@ module.exports = function visitWebSockets (arc, template) {
     }
   }
 
-  // add websocket functions
-  let defaults = [ 'default', 'connect', 'disconnect' ]
-  Array.from(new Set([ ...defaults, ...arc.ws ])).forEach(lambda => {
+  inv.ws.forEach(route => {
+    let name = toLogicalID(route.name)
+    let wsLambda = `${name}WSLambda`
+    let wsRoute = `${name}WSRoute`
+    let wsIntegration = `${name}WSIntegration`
+    let wsPermission = `${name}WSPermission`
 
-    let name = toLogicalID(`websocket-${lambda}`)
-    let code = `./src/ws/${lambda}`
-    let prop = getPropertyHelper(arc, code) // helper function for getting props
-    let env = getEnv(arc, code)
+    // Create the Lambda
+    template.Resources[wsLambda] = createLambda({
+      lambda: route,
+      inventory,
+    })
 
-    template.Resources[name] = {
-      Type: 'AWS::Serverless::Function',
-      Properties: {
-        Handler: 'index.handler',
-        CodeUri: code,
-        Runtime: prop('runtime'),
-        MemorySize: prop('memory'),
-        Timeout: prop('timeout'),
-        Environment: { Variables: env },
-        Role: {
-          'Fn::Sub': [
-            'arn:aws:iam::${AWS::AccountId}:role/${roleName}',
-            { roleName: { Ref: 'Role' } }
-          ]
-        },
-        Events: {}
-      }
-    }
-
-    let concurrency = prop('concurrency')
-    if (concurrency != 'unthrottled') {
-      template.Resources[name].Properties.ReservedConcurrentExecutions = concurrency
-    }
-
-    let layers = prop('layers')
-    if (Array.isArray(layers) && layers.length > 0) {
-      template.Resources[name].Properties.Layers = layers
-    }
-
-    let policies = prop('policies')
-    if (Array.isArray(policies) && policies.length > 0) {
-      template.Resources[name].Properties.Policies = policies
-    }
-
-    let Route = `${name}Route`
-    let Integration = `${name}Integration`
-    let Permission = `${name}Permission`
-
-    template.Resources[Route] = {
+    let defaults = [ 'default', 'connect', 'disconnect' ]
+    template.Resources[wsRoute] = {
       Type: 'AWS::ApiGatewayV2::Route',
       Properties: {
         ApiId: { Ref: 'WS' },
-        RouteKey: defaults.includes(lambda) ? `$${lambda}` : lambda,
-        OperationName: Route,
+        RouteKey: defaults.includes(route.name) ? `$${route.name}` : route.name,
+        OperationName: wsRoute,
         Target: {
-          'Fn::Join': [ '/', [ 'integrations', { Ref: Integration } ] ]
+          'Fn::Join': [ '/', [ 'integrations', { Ref: wsIntegration } ] ]
         }
       }
     }
 
-    template.Resources[Integration] = {
+    template.Resources[wsIntegration] = {
       Type: 'AWS::ApiGatewayV2::Integration',
       Properties: {
         ApiId: { Ref: 'WS' },
         IntegrationType: 'AWS_PROXY',
         IntegrationUri: {
           'Fn::Sub': [
-            'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${' + name + '.Arn}/invocations',
+            'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${' + wsLambda + '.Arn}/invocations',
             {}
           ]
         }
       }
     }
 
-    template.Resources[Permission] = {
+    template.Resources[wsPermission] = {
       Type: 'AWS::Lambda::Permission',
-      DependsOn: [ 'WS', name ],
+      DependsOn: [ 'WS', wsLambda ],
       Properties: {
         Action: 'lambda:InvokeFunction',
-        FunctionName: { Ref: name },
+        FunctionName: { Ref: wsLambda },
         Principal: 'apigateway.amazonaws.com'
       }
     }
   })
 
   template.Outputs.WSS = {
-    Description: 'Websocket Endpoint',
+    Description: 'WebSocket Endpoint',
     Value: {
       'Fn::Sub': [
         // Always default to staging; mutate to production via macro where necessary

@@ -1,13 +1,11 @@
 let addStatic = require('./add-static-proxy')
 
 /**
- * visit arc.static and merge in AWS::Serverless resources
+ * Visit arc.static and merge in AWS::Serverless resources
  */
-module.exports = function visitStatic (arc, template) {
-
-  // Ensure standard CF sections exist
-  if (!template.Resources) template.Resources = {}
-  if (!template.Outputs) template.Outputs = {}
+module.exports = function visitStatic (inventory, template) {
+  let { inv } = inventory
+  if (!inv.static) return template
 
   // Leave the bucket name generation up to CloudFormation
   template.Resources.StaticBucket = {
@@ -33,8 +31,8 @@ module.exports = function visitStatic (arc, template) {
   }
 
   // if an api is defined then add _static proxy and attempt to serialize ./public
-  if (arc.http) {
-    template = addStatic(arc, template)
+  if (inv.http) {
+    template = addStatic(inventory, template)
   }
 
   return template

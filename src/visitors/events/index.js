@@ -1,74 +1,35 @@
-let getEnv = require('../get-lambda-env')
+let { createLambda } = require('../utils')
 let { toLogicalID } = require('@architect/utils')
-let getPropertyHelper = require('../get-lambda-config')
 
 /**
- * visit arc.events and merge in AWS::Serverless resources
+ * Visit arc.events and merge in AWS::Serverless resources
  */
-module.exports = function visitEvents (arc, template) {
+module.exports = function visitEvents (inventory, template) {
+  let { inv } = inventory
+  if (!inv.events) return template
 
-  // ensure cf standard sections exist
-  if (!template.Resources)
-    template.Resources = {}
+  inv.events.forEach(event => {
+    let name = toLogicalID(event.name)
+    let eventLambda = `${name}EventLambda`
+    let eventEvent = `${name}Event`
+    let eventTopic = `${name}EventTopic`
 
-  if (!template.Outputs)
-    template.Outputs = {}
+    // Create the Lambda
+    template.Resources[eventLambda] = createLambda({
+      lambda: event,
+      inventory,
+    })
 
-  // let appname = toLogicalID(arc.app[0])
-
-  arc.events.forEach(event => {
-
-    // create the lambda
-    let name = toLogicalID(event)
-    let code = `./src/events/${event}`
-    let prop = getPropertyHelper(arc, code) // helper function for getting props
-    let env = getEnv(arc, code)
-
-    template.Resources[name] = {
-      Type: 'AWS::Serverless::Function',
-      Properties: {
-        Handler: 'index.handler',
-        CodeUri: code,
-        Runtime: prop('runtime'),
-        MemorySize: prop('memory'),
-        Timeout: prop('timeout'),
-        Environment: { Variables: env },
-        Role: {
-          'Fn::Sub': [
-            'arn:aws:iam::${AWS::AccountId}:role/${roleName}',
-            { roleName: { Ref: 'Role' } }
-          ]
-        },
-        Events: {}
-      }
-    }
-
-    let concurrency = prop('concurrency')
-    if (concurrency != 'unthrottled') {
-      template.Resources[name].Properties.ReservedConcurrentExecutions = concurrency
-    }
-
-    let layers = prop('layers')
-    if (Array.isArray(layers) && layers.length > 0) {
-      template.Resources[name].Properties.Layers = layers
-    }
-
-    let policies = prop('policies')
-    if (Array.isArray(policies) && policies.length > 0) {
-      template.Resources[name].Properties.Policies = policies
-    }
-
-    // construct the event source so SAM can wire the permissions
-    let eventName = `${name}Event`
-    template.Resources[name].Properties.Events[eventName] = {
+    // Construct the event source so SAM can wire the permissions
+    template.Resources[eventLambda].Properties.Events[eventEvent] = {
       Type: 'SNS',
       Properties: {
-        Topic: { Ref: `${name}Topic` }
+        Topic: { Ref: eventTopic }
       }
     }
 
-    // create the sns topic
-    template.Resources[`${name}Topic`] = {
+    // Create the sns topic
+    template.Resources[eventTopic] = {
       Type: 'AWS::SNS::Topic',
       Properties: {
         DisplayName: name,
@@ -76,15 +37,9 @@ module.exports = function visitEvents (arc, template) {
       }
     }
 
-    template.Outputs[`${name}SnsTopic`] = {
+    template.Outputs[eventTopic] = {
       Description: 'An SNS Topic',
-      Value: { Ref: `${name}Topic` },
-      /*
-      Export: {
-        Name: {
-          'Fn::Join': [":", [appname, {Ref:'AWS::StackName'}, `${name}Topic`]]
-        }
-      }*/
+      Value: { Ref: eventTopic },
     }
   })
 

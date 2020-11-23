@@ -1,13 +1,17 @@
-let parse = require('@architect/parser')
+let inventory = require('@architect/inventory')
 let test = require('tape')
 let child = require('child_process')
-let path = require('path')
+let { join } = require('path')
 let fs = require('fs')
 let pkg = require('../../')
 
+/**
+ * Heads up! Running this test from npm introduces some funkiness re cwd and other bits
+ */
+
 // run package
 // run deploy
-let arcfile = `
+let rawArc = `
 @app
 test-pkg
 
@@ -20,18 +24,26 @@ runtime deno
 get /api
 get /foo
 `
+// Replace as necessary during testing
+let bucket = 'cf-sam-deployments-east'
+let cwd = join(__dirname, 'mock')
+process.chdir(cwd)
 
-test('write sam.json', t => {
+test('write sam.json', async t => {
   t.plan(1)
-  let sam = pkg(parse(arcfile))
-  fs.writeFileSync(__dirname + '/mock/sam.json', JSON.stringify(sam, null, 2))
-  t.ok(true, 'ran')
-  console.log(sam)
+  let inv = await inventory({ rawArc })
+  try {
+    let sam = pkg(inv)
+    let file = join(__dirname, 'mock', 'sam.json')
+    fs.writeFileSync(file, JSON.stringify(sam, null, 2))
+    t.pass('ran')
+    console.log(sam)
+  }
+  catch (err) { t.fail(err) }
 })
 
 // helper function for child.spawn
 function spawn (command, args, callback) {
-  let cwd = path.join(__dirname, 'mock')
   let pkg = child.spawn(command, args, { cwd, shell: true })
   pkg.stdout.on('data', b => console.log(b.toString()))
   pkg.stderr.on('data', function (b) {
@@ -42,42 +54,34 @@ function spawn (command, args, callback) {
   pkg.on('error', callback)
 }
 
-test('sam package', t => {
+test('Transform SAM to CFN', t => {
   t.plan(1)
-  spawn('sam', [
+  spawn('aws', [
+    'cloudformation',
     'package',
-    '--template-file',
-    `sam.json`,
-    '--output-template-file',
-    `sam.yaml`,
-    '--s3-bucket',
-    'cf-sam-deployments-east',
+    '--template-file', `sam.json`,
+    '--output-template-file', `sam.yaml`,
+    '--s3-bucket', bucket
   ],
   function done (err) {
     if (err) t.fail(err)
-    else {
-      t.ok(true, 'packaged')
-    }
+    else t.pass('packaged')
   })
 })
 
-test('deploy', t => {
+test('Deploy', t => {
   t.plan(1)
-  spawn('sam', [
+  spawn('aws', [
+    'cloudformation',
     'deploy',
-    '--template-file',
-    `sam.yaml`,
-    '--stack-name',
-    'PackageTestApp',
-    '--s3-bucket',
-    'cf-sam-deployments-east',
+    '--template-file', `sam.yaml`,
+    '--stack-name', 'PackageTestApp1',
+    '--s3-bucket', bucket,
     '--capabilities',
     'CAPABILITY_IAM CAPABILITY_AUTO_EXPAND'
   ],
   function done (err) {
     if (err) t.fail(err)
-    else {
-      t.ok(true, 'deployed')
-    }
+    else t.pass('deployed')
   })
 })

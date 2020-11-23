@@ -17,11 +17,10 @@ module.exports = function getHttpApiProperties (http) {
 function getPaths (routes) {
   let paths = {}
 
-  routes.forEach(r => {
-    let method = r[0].toLowerCase()
+  routes.forEach(route => {
+    let { method, path } = route
     // Special API Gateway OpenAPI impl for `any` method
     let m = method === 'any' ? 'x-amazon-apigateway-any-method' : method
-    let path = r[1]
     let cfPath = renderRoute(path)
     if (!paths[cfPath]) paths[cfPath] = {}
     if (!paths[cfPath][m]) {
@@ -50,6 +49,6 @@ let getName = ({ path, method }) => toLogicalID(`${method}${getLambdaName(path).
 
 function getURI (route) {
   let name = getName(route)
-  let arn = `arn:aws:apigateway:\${AWS::Region}:lambda:path/2015-03-31/functions/\${${name}.Arn}/invocations`
+  let arn = `arn:aws:apigateway:\${AWS::Region}:lambda:path/2015-03-31/functions/\${${name}HTTPLambda.Arn}/invocations`
   return { 'Fn::Sub': arn }
 }

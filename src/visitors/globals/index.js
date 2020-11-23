@@ -1,17 +1,13 @@
 let ssm = require('./ssm')
-// let cf = require('./cf') // Moved to deploy, managed via SDK calls for now
 let { toLogicalID } = require('@architect/utils')
 
 /**
- * visit arc and merge in any global AWS::Serverless resources
+ * Visit arc and merge in any global AWS::Serverless resources
  *
  * - AWS::IAM::Role
  */
-module.exports = function visitGlobals (arc, template) {
-
-  // interpolate required shape
-  if (!template.Resources)
-    template.Resources = {}
+module.exports = function visitGlobals (inventory, template) {
+  let { inv } = inventory
 
   // construct a least priv iam role
   template.Resources.Role = {
@@ -31,7 +27,7 @@ module.exports = function visitGlobals (arc, template) {
     }
   }
 
-  // enables logs and capability reflection
+  // Enables logs and capability reflection
   template.Resources.Role.Properties.Policies.push({
     PolicyName: 'ArcGlobalPolicy',
     PolicyDocument: {
@@ -49,7 +45,7 @@ module.exports = function visitGlobals (arc, template) {
   })
 
   // allow lambdas read/write on the static bucket
-  if (arc.static) {
+  if (inv.static) {
     template.Resources.Role.Properties.Policies.push({
       PolicyName: 'ArcStaticBucketPolicy',
       PolicyDocument: {
@@ -79,7 +75,7 @@ module.exports = function visitGlobals (arc, template) {
   }
 
   // allow lambdas to CRUD tables
-  if (arc.tables) {
+  if (inv.tables) {
     template.Resources.Role.Properties.Policies.push({
       PolicyName: 'ArcDynamoPolicy',
       PolicyDocument: {
@@ -99,14 +95,13 @@ module.exports = function visitGlobals (arc, template) {
             'dynamodb:DescribeStream',
             'dynamodb:ListStreams'
           ],
-          Resource: getTableArns(arc.tables),
+          Resource: getTableArns(inv.tables),
         } ]
       }
     })
-    function getTableArns (tbls) {
-      let flip = tbl => Object.keys(tbl)[0]
-      return tbls.map(flip).map(table => {
-        let name = `${toLogicalID(table)}Table`
+    function getTableArns (tables) {
+      return tables.map(table => {
+        let name = `${toLogicalID(table.name)}Table`
         return [ {
           'Fn::Sub': [
             'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tablename}',
@@ -130,7 +125,7 @@ module.exports = function visitGlobals (arc, template) {
   }
 
   // allow lambdas to publish to events
-  if (arc.events) {
+  if (inv.events) {
     template.Resources.Role.Properties.Policies.push({
       PolicyName: 'ArcSimpleNotificationServicePolicy',
       PolicyDocument: {
@@ -138,7 +133,6 @@ module.exports = function visitGlobals (arc, template) {
           Effect: 'Allow',
           Action: [
             'sns:Publish',
-            // 'sns:ListTopics'
           ],
           Resource: getTopicArn(),
         } ]
@@ -155,7 +149,7 @@ module.exports = function visitGlobals (arc, template) {
   }
 
   // allow lambdas to publish to queues
-  if (arc.queues) {
+  if (inv.queues) {
     template.Resources.Role.Properties.Policies.push({
       PolicyName: 'ArcSimpleQueueServicePolicy',
       PolicyDocument: {
@@ -168,29 +162,14 @@ module.exports = function visitGlobals (arc, template) {
             'sqs:DeleteMessage',
             'sqs:GetQueueAttributes',
           ],
-          Resource: '*'// getQueueArns(arc.queues),
+          Resource: '*'
         } ]
       }
     })
-    /*
-    function getQueueArns(queues) {
-      return queues.map(q=> {
-        let name = `${toLogicalID(q)}Queue`
-        return {
-          'Fn::Sub': [
-            'arn:aws:sqs:${AWS::Region}:${AWS::AccountId}:${queue}',
-            {queue: {Ref: name}}
-          ]
-        }
-      })
-    }*/
   }
 
   // rip in some ssm params
-  template = ssm(arc, template)
+  template = ssm(inventory, template)
 
-  // add an edge mabye
-  // Moved to deploy, managed via SDK calls for now
-  // template = cf(arc, template)
   return template
 }

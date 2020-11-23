@@ -1,6 +1,6 @@
 {
   "name": "@architect/package",
-  "version": "4.0.1",
+  "version": "4.1.0-RC.5",
   "description": "Package .arc for deployment with CloudFormation",
   "main": "src/index.js",
   "scripts": {
@@ -22,22 +22,24 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@architect/http-proxy": "~3.12.3",
-    "@architect/parser": "~2.3.0",
-    "@architect/utils": "~1.5.13",
+    "@architect/utils": "~2.0.0",
     "glob": "~7.1.6",
-    "mime-types": "~2.1.27"
+    "mime-types": "~2.1.27",
+    "run-parallel": "~1.1.10"
   },
   "peerDependencies": {
-    "aws-sdk": "~2.644.0"
+    "aws-sdk": "2.712.0",
+    "@architect/inventory": "~1.1.0"
   },
   "devDependencies": {
     "@architect/eslint-config": "1.0.0",
-    "codecov": "^3.8.0",
+    "@architect/inventory": "~1.1.0-RC.10",
+    "codecov": "^3.8.1",
     "cross-env": "^7.0.2",
-    "eslint": "^7.12.0",
+    "eslint": "^7.14.0",
     "mock-fs": "~4.13.0",
     "nyc": "^15.1.0",
-    "sinon": "^9.2.0",
+    "sinon": "^9.2.1",
     "tap-spec": "^5.0.0",
     "tape": "^5.0.1"
   },

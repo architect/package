@@ -1,4 +1,4 @@
-let parse = require('@architect/parser')
+let inventory = require('@architect/inventory')
 let test = require('tape')
 let package = require('../../')
 let mockFs = require('mock-fs')
@@ -10,6 +10,9 @@ app
 @events
 an-event
 `
+
+let layer = num => `arn:aws:lambda:us-west-2:foo:layer:bar:${num}`
+let policy = num => `arn:aws:iam:foo:bar:${num}`
 let arc = config => `${base}\n${config ? config : ''}`
 
 let origRegion
@@ -26,7 +29,7 @@ test('Module is present', t => {
   t.ok(package, 'Package module is present')
 })
 
-test('Basic config', t => {
+test('Basic config', async t => {
   t.plan(14)
 
   let timeout = 10
@@ -35,10 +38,14 @@ test('Basic config', t => {
   let concurrency = 1337
   // let fifo = false
 
+  let rawArc
+  let inv
+  let props
+
   // Control
-  let arcfile = arc()
-  let parsed = parse(arcfile)
-  let props = package(parsed).Resources.AnEvent.Properties
+  rawArc = arc()
+  inv = await inventory({ rawArc })
+  props = package(inv).Resources.AnEventEventLambda.Properties
   t.notEqual(props['Timeout'], timeout, `Timeout (control test): ${props['Timeout']}`)
   t.notEqual(props['MemorySize'], memory, `Memory (control test): ${props['MemorySize']}`)
   t.notEqual(props['Runtime'], runtime, `Runtime (control test): ${props['Runtime']}`)
@@ -47,165 +54,182 @@ test('Basic config', t => {
   t.notOk(props['Layers'], `Layers (control test, not speficied)`)
   t.notOk(props['Policies'], `Policies (control test, not speficied)`)
 
-  arcfile = arc(`@aws
+  rawArc = arc(`@aws
 timeout ${timeout}
 memory ${memory}
 runtime ${runtime}
 concurrency ${concurrency}
-layers foo
-policies fiz
+layers ${layer(1)}
+policies ${policy(1)}
 `)
-  parsed = parse(arcfile)
-  props = package(parsed).Resources.AnEvent.Properties
+  inv = await inventory({ rawArc })
+  props = package(inv).Resources.AnEventEventLambda.Properties
   t.equal(props['Timeout'], timeout, `Timeout (control test): ${props['Timeout']}`)
   t.equal(props['MemorySize'], memory, `Memory (control test): ${props['MemorySize']}`)
   t.equal(props['Runtime'], runtime, `Runtime (control test): ${props['Runtime']}`)
   t.equal(props['ReservedConcurrentExecutions'], concurrency, `Concurrency (control test, should be undefined): ${props['ReservedConcurrentExecutions']}`)
   // t.equal(props['Fifo'], fifo, `Fifo (control test): ${props['Fifo']}`)
   t.equal(props['Layers'].length, 1, `Got a single layer back (using 'layers')`)
-  t.equal(props['Layers'][0], 'foo', `Layer matches: ${props['Layers'][0]}`)
+  t.equal(props['Layers'][0], layer(1), `Layer matches: ${props['Layers'][0]}`)
   t.equal(props['Policies'].length, 1, `Got a single policy back (using 'policies')`)
-  t.equal(props['Policies'][0], 'fiz', `Policy matches: ${props['Layers'][0]}`)
+  t.equal(props['Policies'][0], policy(1), `Policy matches: ${props['Layers'][0]}`)
 })
 
-test('Config - layers & policies (vectors and scalars)', t => {
+test('Config - layers & policies (vectors and scalars)', async t => {
   t.plan(28)
 
-  let arcfile = arc(`@aws
-layers foo
-policies fiz
+  let rawArc
+  let inv
+  let props
+
+  rawArc = arc(`@aws
+layers ${layer(1)}
+policies ${policy(1)}
 `)
-  let parsed = parse(arcfile)
-  let props = package(parsed).Resources.AnEvent.Properties
+  inv = await inventory({ rawArc })
+  props = package(inv).Resources.AnEventEventLambda.Properties
   t.equal(props['Layers'].length, 1, `Got a single layer back (using 'layers')`)
-  t.equal(props['Layers'][0], 'foo', `Layer matches: ${props['Layers'][0]}`)
+  t.equal(props['Layers'][0], layer(1), `Layer matches: ${props['Layers'][0]}`)
   t.equal(props['Policies'].length, 1, `Got a single policy back (using 'policies')`)
-  t.equal(props['Policies'][0], 'fiz', `Policy matches: ${props['Layers'][0]}`)
+  t.equal(props['Policies'][0], policy(1), `Policy matches: ${props['Layers'][0]}`)
 
-  arcfile = arc(`@aws
-layers foo
-layers bar
-policies fiz
-policies buz
+  rawArc = arc(`@aws
+layers ${layer(1)}
+layers ${layer(2)}
+policies ${policy(1)}
+policies ${policy(2)}
 `)
-  parsed = parse(arcfile)
-  props = package(parsed).Resources.AnEvent.Properties
+  inv = await inventory({ rawArc })
+  props = package(inv).Resources.AnEventEventLambda.Properties
   t.equal(props['Layers'].length, 2, `Got a multiple layers back (repeating 'layers')`)
-  t.equal(props['Layers'][0], 'foo', `Layer matches: ${props['Layers'][0]}`)
-  t.equal(props['Layers'][1], 'bar', `Layer matches: ${props['Layers'][1]}`)
+  t.equal(props['Layers'][0], layer(1), `Layer matches: ${props['Layers'][0]}`)
+  t.equal(props['Layers'][1], layer(2), `Layer matches: ${props['Layers'][1]}`)
   t.equal(props['Policies'].length, 2, `Got a multiple policys back (repeating 'policies')`)
-  t.equal(props['Policies'][0], 'fiz', `Policy matches: ${props['Layers'][0]}`)
-  t.equal(props['Policies'][1], 'buz', `Policy matches: ${props['Layers'][1]}`)
+  t.equal(props['Policies'][0], policy(1), `Policy matches: ${props['Layers'][0]}`)
+  t.equal(props['Policies'][1], policy(2), `Policy matches: ${props['Layers'][1]}`)
 
-  arcfile = arc(`@aws
+  rawArc = arc(`@aws
 layers
-  foo
-  bar
+  ${layer(1)}
+  ${layer(2)}
 policies
-  fiz
-  buz
+  ${policy(1)}
+  ${policy(2)}
 `)
-  parsed = parse(arcfile)
-  props = package(parsed).Resources.AnEvent.Properties
+  inv = await inventory({ rawArc })
+  props = package(inv).Resources.AnEventEventLambda.Properties
   t.equal(props['Layers'].length, 2, `Got a multiple layers back (using 'layers' as an array)`)
-  t.equal(props['Layers'][0], 'foo', `Layer matches: ${props['Layers'][0]}`)
+  t.equal(props['Layers'][0], layer(1), `Layer matches: ${props['Layers'][0]}`)
   t.equal(props['Policies'].length, 2, `Got a multiple policys back (using 'policies' as an array)`)
-  t.equal(props['Policies'][0], 'fiz', `Policy matches: ${props['Layers'][0]}`)
+  t.equal(props['Policies'][0], policy(1), `Policy matches: ${props['Layers'][0]}`)
 
 
-  arcfile = arc(`@aws
-layer foo
-policy fiz
+  rawArc = arc(`@aws
+layer ${layer(1)}
+policy ${policy(1)}
 `)
-  parsed = parse(arcfile)
-  props = package(parsed).Resources.AnEvent.Properties
+  inv = await inventory({ rawArc })
+  props = package(inv).Resources.AnEventEventLambda.Properties
   t.equal(props['Layers'].length, 1, `Got a single layer back (using 'layer')`)
-  t.equal(props['Layers'][0], 'foo', `Layer matches: ${props['Layers'][0]}`)
+  t.equal(props['Layers'][0], layer(1), `Layer matches: ${props['Layers'][0]}`)
   t.equal(props['Policies'].length, 1, `Got a single policy back (using 'policy')`)
-  t.equal(props['Policies'][0], 'fiz', `Policy matches: ${props['Layers'][0]}`)
+  t.equal(props['Policies'][0], policy(1), `Policy matches: ${props['Layers'][0]}`)
 
-  arcfile = arc(`@aws
-layer foo
-layer bar
-policy fiz
-policy buz
+  rawArc = arc(`@aws
+layer ${layer(1)}
+layer ${layer(2)}
+policy ${policy(1)}
+policy ${policy(2)}
 `)
-  parsed = parse(arcfile)
-  props = package(parsed).Resources.AnEvent.Properties
+  inv = await inventory({ rawArc })
+  props = package(inv).Resources.AnEventEventLambda.Properties
   t.equal(props['Layers'].length, 2, `Got a multiple layers back (repeating 'layer')`)
-  t.equal(props['Layers'][0], 'foo', `Layer matches: ${props['Layers'][0]}`)
-  t.equal(props['Layers'][1], 'bar', `Layer matches: ${props['Layers'][1]}`)
+  t.equal(props['Layers'][0], layer(1), `Layer matches: ${props['Layers'][0]}`)
+  t.equal(props['Layers'][1], layer(2), `Layer matches: ${props['Layers'][1]}`)
   t.equal(props['Policies'].length, 2, `Got a multiple policys back (repeating 'policy')`)
-  t.equal(props['Policies'][0], 'fiz', `Policy matches: ${props['Layers'][0]}`)
-  t.equal(props['Policies'][1], 'buz', `Policy matches: ${props['Layers'][1]}`)
+  t.equal(props['Policies'][0], policy(1), `Policy matches: ${props['Layers'][0]}`)
+  t.equal(props['Policies'][1], policy(2), `Policy matches: ${props['Layers'][1]}`)
 
-  arcfile = arc(`@aws
+  rawArc = arc(`@aws
 layer
-  foo
-  bar
+  ${layer(1)}
+  ${layer(2)}
 policy
-  fiz
-  buz
+  ${policy(1)}
+  ${policy(2)}
 `)
-  parsed = parse(arcfile)
-  props = package(parsed).Resources.AnEvent.Properties
+  inv = await inventory({ rawArc })
+  props = package(inv).Resources.AnEventEventLambda.Properties
   t.equal(props['Layers'].length, 2, `Got a multiple layers back (using 'layer' as an array)`)
-  t.equal(props['Layers'][0], 'foo', `Layer matches: ${props['Layers'][0]}`)
+  t.equal(props['Layers'][0], layer(1), `Layer matches: ${props['Layers'][0]}`)
   t.equal(props['Policies'].length, 2, `Got a multiple policys back (using 'policy' as an array)`)
-  t.equal(props['Policies'][0], 'fiz', `Policy matches: ${props['Layers'][0]}`)
+  t.equal(props['Policies'][0], policy(1), `Policy matches: ${props['Layers'][0]}`)
 })
 
-test('Config - layer validation', t => {
+test('Config - layer validation', async t => {
   t.plan(4)
 
-  let arcfile = arc(`@aws
+  let rawArc
+  let inv
+  let props
+
+  rawArc = arc(`@aws
 layers
-  foo
-  bar
-  baz
-  fiz
-  buz
+  ${layer(1)}
+  ${layer(2)}
+  ${layer(3)}
+  ${layer(4)}
+  ${layer(5)}
 `)
-  let parsed = parse(arcfile)
-  let props = package(parsed).Resources.AnEvent.Properties
+  inv = await inventory({ rawArc })
+  props = package(inv).Resources.AnEventEventLambda.Properties
   t.equal(props['Layers'].length, 5, `Got up to 5 layers back`)
 
-  t.throws(() => {
-    let arcfile = arc(`@aws
+  rawArc = arc(`@aws
 layers
-  foo
-  bar
-  baz
-  fiz
-  buz
-  quux
+  ${layer(1)}
+  ${layer(2)}
+  ${layer(3)}
+  ${layer(4)}
+  ${layer(5)}
+  ${layer(6)}
 `)
-    let parsed = parse(arcfile)
-    package(parsed)
-  }, 'Too many layers throws')
+  try {
+    let inv = await inventory({ rawArc })
+    package(inv)
+  }
+  catch (err) {
+    t.pass('Too many layers fails')
+  }
 
-  t.throws(() => {
-    let arcfile = arc(`@aws
+  rawArc = arc(`@aws
 region us-west-1
 layers a:b:c:us-west-2:d
 `)
-    let parsed = parse(arcfile)
-    package(parsed)
-  }, 'Incorrect (.arc) layer region throws')
+  try {
+    let inv = await inventory({ rawArc })
+    package(inv)
+  }
+  catch (err) {
+    t.pass('Incorrect (.arc) layer region fails')
+  }
 
   process.env.AWS_REGION = 'us-west-1'
-  t.throws(() => {
-    let arcfile = arc(`@aws
+  rawArc = arc(`@aws
 layers a:b:c:us-west-2:d
 `)
-    let parsed = parse(arcfile)
-    package(parsed)
-  }, 'Incorrect (env) layer region throws')
+  try {
+    let inv = await inventory({ rawArc })
+    package(inv)
+  }
+  catch (err) {
+    t.pass('Incorrect (env) layer region fails')
+  }
   delete process.env.AWS_REGION
 })
 
-test('.arc-config overrides root config', t => {
-  t.plan(18)
+test('.arc-config overrides root config', async t => {
+  t.plan(16)
 
   let timeout = 10
   let memory = 3008
@@ -213,24 +237,24 @@ test('.arc-config overrides root config', t => {
   let concurrency = 1337
 
   // Control
-  let arcfile = arc(`@aws
+  let rawArc = arc(`@aws
 timeout ${timeout}
 memory ${memory}
 runtime ${runtime}
 concurrency ${concurrency}
-layers foo
-policies fiz
+layers ${layer(1)}
+policies ${policy(1)}
 `)
-  let parsed = parse(arcfile)
-  let props = package(parsed).Resources.AnEvent.Properties
+  let inv = await inventory({ rawArc })
+  let props = package(inv).Resources.AnEventEventLambda.Properties
   t.equal(props['Timeout'], timeout, `Timeout (control test): ${props['Timeout']}`)
   t.equal(props['MemorySize'], memory, `Memory (control test): ${props['MemorySize']}`)
   t.equal(props['Runtime'], runtime, `Runtime (control test): ${props['Runtime']}`)
   t.equal(props['ReservedConcurrentExecutions'], concurrency, `Concurrency (control test): ${props['ReservedConcurrentExecutions']}`)
   t.equal(props['Layers'].length, 1, `Got a single layer back (using 'layers')`)
-  t.equal(props['Layers'][0], 'foo', `Layer matches: ${props['Layers'][0]}`)
+  t.equal(props['Layers'][0], layer(1), `Layer matches: ${props['Layers'][0]}`)
   t.equal(props['Policies'].length, 1, `Got a single policy back (using 'policies')`)
-  t.equal(props['Policies'][0], 'fiz', `Policy matches: ${props['Layers'][0]}`)
+  t.equal(props['Policies'][0], policy(1), `Policy matches: ${props['Layers'][0]}`)
 
   // Overlay settings
   timeout = 15
@@ -242,46 +266,45 @@ timeout ${timeout}
 memory ${memory}
 runtime ${runtime}
 concurrency ${concurrency}
-layers lol
-policies weee
+layers ${layer(2)}
+policies ${policy(2)}
 `
   mockFs({
     'src/events/an-event/.arc-config': Buffer.from(arcConfig)
   })
-  props = package(parsed).Resources.AnEvent.Properties
+  inv = await inventory({ rawArc })
+  props = package(inv).Resources.AnEventEventLambda.Properties
   mockFs.restore()
   t.equal(props['Timeout'], timeout, `Timeout: ${props['Timeout']}`)
   t.equal(props['MemorySize'], memory, `Memory: ${props['MemorySize']}`)
   t.equal(props['Runtime'], runtime, `Runtime: ${props['Runtime']}`)
   t.equal(props['ReservedConcurrentExecutions'], concurrency, `Concurrency: ${props['ReservedConcurrentExecutions']}`)
-  t.equal(props['Layers'].length, 2, `Got a multiple layers back`)
-  t.equal(props['Layers'][0], 'foo', `Layer matches: ${props['Layers'][0]}`)
-  t.equal(props['Layers'][1], 'lol', `Layer matches: ${props['Layers'][1]}`)
-  t.equal(props['Policies'].length, 2, `Got a multiple policies back`)
-  t.equal(props['Policies'][0], 'fiz', `Policy matches: ${props['Layers'][0]}`)
-  t.equal(props['Policies'][1], 'weee', `Policy matches: ${props['Layers'][1]}`)
+  t.equal(props['Layers'].length, 1, `Got a single layer back (using 'layers')`)
+  t.equal(props['Layers'][0], layer(2), `Layer matches: ${props['Layers'][1]}`)
+  t.equal(props['Policies'].length, 1, `Got a single policy back (using 'policies')`)
+  t.equal(props['Policies'][0], policy(2), `Policy matches: ${props['Layers'][1]}`)
 })
 
-test('Function type specific settings', t => {
+test('Function type specific settings', async t => {
   t.plan(4)
 
   // Control
-  let arcfile = arc(`@queues
+  let rawArc = arc(`@queues
 a-queue
 `)
-  let parsed = parse(arcfile)
-  let props = package(parsed).Resources.AQueueQueue.Properties
+  let inv = await inventory({ rawArc })
+  let props = package(inv).Resources.AQueueQueue.Properties
   t.ok(props['FifoQueue'], `FifoQueue is set by default: ${props['FifoQueue']}`)
   t.ok(props['ContentBasedDeduplication'], `ContentBasedDeduplication is set by default: ${props['ContentBasedDeduplication']}`)
 
-  arcfile = arc(`@queues
+  rawArc = arc(`@queues
 a-queue
 
 @aws
 fifo false
 `)
-  parsed = parse(arcfile)
-  props = package(parsed).Resources.AQueueQueue.Properties
+  inv = await inventory({ rawArc })
+  props = package(inv).Resources.AQueueQueue.Properties
   t.notOk(props['FifoQueue'], `FifoQueue disabled by setting`)
   t.notOk(props['ContentBasedDeduplication'], `ContentBasedDeduplication disabled by setting`)
 })

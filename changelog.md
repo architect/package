@@ -2,6 +2,20 @@
 
 ---
 
+## [4.1.0] 2020-11-15
+
+### Added
+
+- Added support for custom file paths
+- Added `ARC_ENV` env var to all functions
+
+
+### Changed
+
+- Implemented Inventory (`@architect/inventory`)
+
+---
+
 ## [4.0.1] 2020-10-27
 
 ### Fixed

@@ -1,87 +1,53 @@
-let getEnv = require('../get-lambda-env')
+let { createLambda } = require('../utils')
 let { toLogicalID } = require('@architect/utils')
-let getPropertyHelper = require('../get-lambda-config')
 
 /**
- * visit arc.queues and merge in AWS::Serverless resources
+ * Visit arc.queues and merge in AWS::Serverless resources
  */
-module.exports = function visitQueues (arc, template) {
+module.exports = function visitQueues (inventory, template) {
+  let { inv } = inventory
+  if (!inv.queues) return template
 
-  // ensure cf standard sections exist
-  if (!template.Resources)
-    template.Resources = {}
+  inv.queues.forEach(queue => {
+    let { config } = queue
+    let { timeout, fifo } = config
 
-  if (!template.Outputs)
-    template.Outputs = {}
+    let name = toLogicalID(queue.name)
+    let queueLambda = `${name}QueueLambda`
+    let queueEvent = `${name}QueueEvent`
+    let queueQueue = `${name}Queue`
 
-  arc.queues.forEach(event => {
+    // Create the Lambda
+    template.Resources[queueLambda] = createLambda({
+      lambda: queue,
+      inventory,
+    })
 
-    // create the lambda
-    let name = toLogicalID(event)
-    let code = `./src/queues/${event}`
-    let prop = getPropertyHelper(arc, code) // helper function for getting props
-    let env = getEnv(arc, code)
-
-    template.Resources[name] = {
-      Type: 'AWS::Serverless::Function',
-      Properties: {
-        Handler: 'index.handler',
-        CodeUri: code,
-        Runtime: prop('runtime'),
-        MemorySize: prop('memory'),
-        Timeout: prop('timeout'),
-        Environment: { Variables: env },
-        Role: {
-          'Fn::Sub': [
-            'arn:aws:iam::${AWS::AccountId}:role/${roleName}',
-            { roleName: { Ref: 'Role' } }
-          ]
-        },
-        Events: {}
-      }
-    }
-
-    let concurrency = prop('concurrency')
-    if (concurrency != 'unthrottled') {
-      template.Resources[name].Properties.ReservedConcurrentExecutions = concurrency
-    }
-
-    let layers = prop('layers')
-    if (Array.isArray(layers) && layers.length > 0) {
-      template.Resources[name].Properties.Layers = layers
-    }
-
-    let policies = prop('policies')
-    if (Array.isArray(policies) && policies.length > 0) {
-      template.Resources[name].Properties.Policies = policies
-    }
-
-    // construct the event source so SAM can wire the permissions
-    let eventName = `${name}QueueEvent`
-    template.Resources[name].Properties.Events[eventName] = {
+    // Construct the event source so SAM can wire the permissions
+    template.Resources[queueLambda].Properties.Events[queueEvent] = {
       Type: 'SQS',
       Properties: {
-        Queue: { 'Fn::GetAtt': [ `${name}Queue`, 'Arn' ] }
+        Queue: { 'Fn::GetAtt': [ queueQueue, 'Arn' ] }
       }
     }
 
-    // create the sqs queue
-    template.Resources[`${name}Queue`] = {
+    // Create the sqs queue
+    template.Resources[queueQueue] = {
       Type: 'AWS::SQS::Queue',
       Properties: {
-        VisibilityTimeout: prop('timeout')
+        VisibilityTimeout: timeout
       }
     }
-    // only add fifo when true; false will cause cfn to fail =/
-    let fifo = prop('fifo')
+
+    // Only add fifo when true; false will cause cfn to fail =/
     if (fifo) {
-      template.Resources[`${name}Queue`].Properties.FifoQueue = fifo
-      template.Resources[`${name}Queue`].Properties.ContentBasedDeduplication = true
+      template.Resources[queueQueue].Properties.FifoQueue = fifo
+      template.Resources[queueQueue].Properties.ContentBasedDeduplication = true
     }
 
     template.Outputs[`${name}SqsQueue`] = {
       Description: 'An SQS Queue',
-      Value: { Ref: `${name}Queue` },
+      Value: { Ref: queueQueue },
     }
   })
 

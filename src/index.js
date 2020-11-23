@@ -6,21 +6,28 @@ let visitors = require('./visitors')
  * Generates and returns AWS::Serverless JSON for a given (parsed) .arc file
  *
  * @param {Object} arc - parsed arcfile
- * @returns {CloudFormation::Serverless} template
+ * @returns {CloudFormation::Serverless} CloudFormation template
  */
-module.exports = function toSAM (arc) {
+module.exports = function package (inventory) {
+  let { inv } = inventory
+
   // allowed list of pragmas ['http', 'globals'...etc]
   let supports = Object.keys(visitors)
 
   // helper to filter an array to only supported pragmas
   let supported = pragma => supports.includes(pragma)
 
-  // list of pragmas defined in the arc file
-  let httpFirst = (x, y) => x == 'http' ? -1 : y == 'http' ? 1 : 0
-  let pragmas = Object.keys(arc).filter(supported).sort(httpFirst)
+  // List of pragmas defined in the arc file
+  let order = (x, y) => {
+    // HTTP first, then tables
+    if (x == 'http') return -1
+    if (x == 'tables' && y !== 'http') return -1
+    if (y == 'http' || y == 'tables') return 1
+  }
+  let pragmas = Object.keys(inv).filter(supported).sort(order)
 
-  // walk the template invoking the visitor for the given pragma
-  let visit = (template, pragma) => visitors[pragma](arc, template)
+  // Walk the CloudFormation template invoking the visitor for each given pragma
+  let visit = (template, pragma) => visitors[pragma](inventory, template)
 
   // force globals first (last?)
   pragmas.push('globals')
@@ -33,6 +40,8 @@ module.exports = function toSAM (arc) {
     AWSTemplateFormatVersion: '2010-09-09',
     Transform: 'AWS::Serverless-2016-10-31',
     Description: `Exported by architect/package@${version} on ${timestamp}`,
+    Resources: {},
+    Outputs: {},
   }
 
   // walk pragmas to reduce final template contents
