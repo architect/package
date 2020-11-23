@@ -22,21 +22,21 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@architect/http-proxy": "~3.12.3",
-    "@architect/utils": "~2.0.0-RC.1",
+    "@architect/utils": "~2.0.0",
     "glob": "~7.1.6",
     "mime-types": "~2.1.27",
     "run-parallel": "~1.1.10"
   },
   "peerDependencies": {
     "aws-sdk": "2.712.0",
-    "@architect/inventory": "~1.1.0-RC.8"
+    "@architect/inventory": "~1.1.0"
   },
   "devDependencies": {
     "@architect/eslint-config": "1.0.0",
     "@architect/inventory": "~1.1.0-RC.10",
     "codecov": "^3.8.1",
     "cross-env": "^7.0.2",
-    "eslint": "^7.13.0",
+    "eslint": "^7.14.0",
     "mock-fs": "~4.13.0",
     "nyc": "^15.1.0",
     "sinon": "^9.2.1",
