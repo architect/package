@@ -2,7 +2,7 @@
 
 ---
 
-## [4.1.0] 2020-11-15
+## [5.0.0] 2020-11-22
 
 ### Added
 
@@ -13,6 +13,7 @@
 ### Changed
 
 - Implemented Inventory (`@architect/inventory`)
+- Breaking change: Package now accepts an Inventory object, and no longer accepts a raw Architect object
 
 ---
 
