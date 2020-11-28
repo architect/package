@@ -2,6 +2,14 @@
 
 ---
 
+## [6.0.0] 2020-11-28
+
+### Changed
+
+- Breaking change: Package now assumes Deploy will handle `static.json` injection into ASAP if fingerprinting is enabled
+
+---
+
 ## [5.0.0] 2020-11-22
 
 ### Added
