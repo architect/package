@@ -1,6 +1,3 @@
-let { existsSync, mkdirSync, readFileSync, writeFileSync } = require('fs')
-let { join } = require('path')
-
 let { getLambdaName, toLogicalID } = require('@architect/utils')
 
 let getApiProps = require('./get-api-properties')
@@ -14,7 +11,7 @@ let proxy = require('./proxy')
  * Visit arc.http and generate an HTTP API
  */
 module.exports = function visitHttp (inventory, template) {
-  let { inv, get } = inventory
+  let { inv } = inventory
   let { http } = inv
   if (!http) return template
 
@@ -51,59 +48,6 @@ module.exports = function visitHttp (inventory, template) {
       }
     }
   })
-
-  // If we added get index, we need to fix the code path
-  if (inv._project.rootHandler === 'arcStaticAssetProxy') {
-    // Package running as a dependency (most common use case)
-    let arcProxy = join(process.cwd(), 'node_modules', '@architect', 'http-proxy', 'dist')
-    // Package running as a global install
-    let global = join(__dirname, '..', '..', '..', '..', 'http-proxy', 'dist')
-    // Package running from a local (symlink) context (usually testing/dev)
-    let local = join(__dirname, '..', '..', '..', 'node_modules', '@architect', 'http-proxy', 'dist')
-    if (existsSync(global)) arcProxy = global
-    else if (existsSync(local)) arcProxy = local
-
-    // Set the runtime
-    template.Resources.GetCatchallHTTPLambda.Properties.Runtime = 'nodejs12.x'
-    // Only accept a bool true fingerprint status (bc external fingerprint setting)
-    let fingerprint = get.static('fingerprint')
-    // TODO move this into Deploy
-    if (fingerprint === true) {
-      // Note: Arc's tmp dir will need to be cleaned up by a later process further down the line
-      let tmp = join(process.cwd(), '__ARC_TMP__')
-      let shared = join(tmp, 'node_modules', '@architect', 'shared')
-      mkdirSync(shared, { recursive: true })
-      // Handle proxy
-      let proxy = readFileSync(join(arcProxy, 'index.js'))
-      writeFileSync(join(tmp, 'index.js'), proxy)
-      // Handle static.json
-      let staticFolder = inv.static.folder
-      staticFolder = join(process.cwd(), staticFolder)
-      let staticManifest = readFileSync(join(staticFolder, 'static.json'))
-      writeFileSync(join(shared, 'static.json'), staticManifest)
-      // Ok we done
-      template.Resources.GetCatchallHTTPLambda.Properties.CodeUri = tmp
-    }
-    else {
-      template.Resources.GetCatchallHTTPLambda.Properties.CodeUri = arcProxy
-    }
-
-    // Add permissions for Arc Static Asset Proxy (ASAP) at GetCatchallHTTPLambda
-    template.Resources.InvokeArcStaticAssetProxy = {
-      Type: 'AWS::Lambda::Permission',
-      Properties: {
-        FunctionName: { Ref: 'GetCatchallHTTPLambda' },
-        Action: 'lambda:InvokeFunction',
-        Principal: 'apigateway.amazonaws.com',
-        SourceArn: {
-          'Fn::Sub': [
-            'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiId}/*/*',
-            { ApiId: { Ref: 'HTTP' } }
-          ]
-        }
-      }
-    }
-  }
 
   // add the deployment url to the output
   template.Outputs.API = {
