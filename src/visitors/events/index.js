@@ -28,7 +28,7 @@ module.exports = function visitEvents (inventory, template) {
       }
     }
 
-    // Create the sns topic
+    // Create the SNS topic
     template.Resources[eventTopic] = {
       Type: 'AWS::SNS::Topic',
       Properties: {

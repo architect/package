@@ -2,6 +2,19 @@
 
 ---
 
+## [6.0.2] 2020-12-04
+
+### Changed
+
+- Updated dependencies
+
+
+### Fixed
+
+- Fixed issue where longer `@scheduled` function names would fail to deploy due to funky SAM transform behavior; thanks @gmartins, fixes #1038
+
+---
+
 ## [6.0.1] 2020-12-04
 
 ### Changed

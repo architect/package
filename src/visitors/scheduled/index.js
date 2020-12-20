@@ -24,11 +24,17 @@ module.exports = function visitScheduled (inventory, template) {
       inventory,
     })
 
-    // construct the event source so SAM can wire the permissions
-    template.Resources[scheduleLambda].Properties.Events[scheduleEvent] = {
-      Type: 'Schedule',
+    // Create the scheduled event rule
+    template.Resources[scheduleEvent] = {
+      Type: 'AWS::Events::Rule',
       Properties: {
-        Schedule: rule
+        ScheduleExpression: rule,
+        Targets: [
+          {
+            Arn: { 'Fn::GetAtt': [ scheduleLambda, 'Arn' ] },
+            Id: scheduleLambda
+          }
+        ]
       }
     }
   })
