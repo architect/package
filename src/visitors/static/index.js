@@ -1,7 +1,7 @@
 let addStatic = require('./add-static-proxy')
 
 // See https://docs.aws.amazon.com/general/latest/gr/s3.html#s3_website_region_endpoints
-function getBuckerUrlForRegion (region) {
+function getBucketUrlForRegion (region) {
   let olderRegions = [
     'us-east-1',
     'us-west-1',
@@ -43,7 +43,7 @@ module.exports = function visitStatic (inventory, template) {
     Description: 'Bucket URL',
     Value: {
       'Fn::Sub': [
-        getBuckerUrlForRegion(inv.aws.region),
+        getBucketUrlForRegion(inv.aws.region),
         { bukkit: { Ref: 'StaticBucket' } }
       ]
     }
