@@ -2,10 +2,14 @@
 
 ---
 
-## vNext
+## [6.0.3] 2020-12-21
 
 ### Fixed
+
+- Fixed regression where `@scheduled` functions may not fire; fixes #1040, thanks @alexbepple!
 - Fixed issue where the static bucket url in the Cloudformation Output was wrong for newer AWS regions; thanks @thedersen
+
+---
 
 ## [6.0.2] 2020-12-04
 

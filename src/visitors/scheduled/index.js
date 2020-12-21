@@ -17,6 +17,7 @@ module.exports = function visitScheduled (inventory, template) {
     let name = toLogicalID(schedule.name)
     let scheduleLambda = `${name}ScheduledLambda`
     let scheduleEvent = `${name}ScheduledEvent`
+    let schedulePermission = `${name}ScheduledPermission`
 
     // Create the Lambda
     template.Resources[scheduleLambda] = createLambda({
@@ -35,6 +36,17 @@ module.exports = function visitScheduled (inventory, template) {
             Id: scheduleLambda
           }
         ]
+      }
+    }
+
+    // Wire the permission
+    template.Resources[schedulePermission] = {
+      Type: 'AWS::Lambda::Permission',
+      Properties: {
+        Action: 'lambda:InvokeFunction',
+        FunctionName: { Ref: scheduleLambda },
+        Principal: 'events.amazonaws.com',
+        SourceArn: { 'Fn::GetAtt': [ scheduleEvent, 'Arn' ] }
       }
     }
   })
