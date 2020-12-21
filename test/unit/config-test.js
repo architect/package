@@ -309,6 +309,50 @@ fifo false
   t.notOk(props['ContentBasedDeduplication'], `ContentBasedDeduplication disabled by setting`)
 })
 
+test('Older AWS regions uses older static url format', async t => {
+  t.plan(9)
+
+  let olderFormat = 'http://${bukkit}.s3-website-${AWS::Region}.amazonaws.com'
+  let olderRegions = [
+    'us-east-1',
+    'us-west-1',
+    'us-west-2',
+    'us-gov-west-1',
+    'ap-southeast-1',
+    'ap-southeast-2',
+    'ap-northeast-1',
+    'sa-east-1',
+    'eu-west-1',
+  ]
+  for (const region of olderRegions) {
+    let rawArc = arc(
+      `@aws
+region ${region}
+
+@static
+`)
+    let inv = await inventory({ rawArc })
+    let bucketUrl = package(inv).Outputs.BucketURL.Value['Fn::Sub'][0]
+    t.equal(bucketUrl, olderFormat, `${region} uses older format`)
+  }
+})
+
+test('Newer AWS regions uses newer static url format', async t => {
+  t.plan(1)
+
+  let newerFormat = 'http://${bukkit}.s3-website.${AWS::Region}.amazonaws.com'
+  let region = 'eu-central-1'
+  let rawArc = arc(
+    `@aws
+region ${region}
+
+@static
+`)
+  let inv = await inventory({ rawArc })
+  let bucketUrl = package(inv).Outputs.BucketURL.Value['Fn::Sub'][0]
+  t.equal(bucketUrl, newerFormat, `${region} uses newer format`)
+})
+
 test('Config test teardown', t => {
   t.plan(1)
   process.env.AWS_REGION = origRegion
