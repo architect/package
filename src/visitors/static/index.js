@@ -1,5 +1,24 @@
 let addStatic = require('./add-static-proxy')
 
+// See https://docs.aws.amazon.com/general/latest/gr/s3.html#s3_website_region_endpoints
+function getBuckerUrlForRegion (region) {
+  let olderRegions = [
+    'us-east-1',
+    'us-west-1',
+    'us-west-2',
+    'us-gov-west-1',
+    'ap-southeast-1',
+    'ap-southeast-2',
+    'ap-northeast-1',
+    'sa-east-1',
+    'eu-west-1',
+  ]
+  if (olderRegions.includes(region)) {
+    return 'http://${bukkit}.s3-website-${AWS::Region}.amazonaws.com'
+  }
+  return 'http://${bukkit}.s3-website.${AWS::Region}.amazonaws.com'
+}
+
 /**
  * Visit arc.static and merge in AWS::Serverless resources
  */
@@ -24,7 +43,7 @@ module.exports = function visitStatic (inventory, template) {
     Description: 'Bucket URL',
     Value: {
       'Fn::Sub': [
-        'http://${bukkit}.s3-website-${AWS::Region}.amazonaws.com',
+        getBuckerUrlForRegion(inv.aws.region),
         { bukkit: { Ref: 'StaticBucket' } }
       ]
     }
