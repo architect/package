@@ -2,6 +2,19 @@
 
 ---
 
+## [6.0.4] 2021-01-07
+
+### Added
+
+- Added ability for `@static` buckets – otherwise enabled by default – to be disabled with `@static false`
+
+
+### Changed
+
+- Updated dependencies
+
+---
+
 ## [6.0.3] 2020-12-21
 
 ### Fixed
