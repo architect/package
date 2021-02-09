@@ -2,6 +2,14 @@
 
 ---
 
+## [6.2.0] 2021-03-02
+
+### Added
+
+- Added helper method `createLambdaJSON` for `@plugins` authors to help in defining CloudFormation-compatible Lambda definitions
+
+---
+
 ## [6.1.0] 2021-03-02
 
 ### Added
