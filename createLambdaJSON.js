@@ -20,7 +20,9 @@ module.exports = function createLambdaJSON (inventory, src) {
 // compile any per-function config.arc customizations
 function getFunctionConfig (src) {
   let defaults = defaultFunctionConfig()
-  let customizations = read({ type: 'functionConfig', cwd: src }).arc.aws
+  let customizations = []
+  let existingConfig = read({ type: 'functionConfig', cwd: src })
+  if (existingConfig.arc) customizations = existingConfig.arc.aws || []
   let overrides = {}
   for (let config of customizations) {
     overrides[config[0]] = config[1]
