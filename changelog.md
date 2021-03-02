@@ -6,7 +6,7 @@
 
 ### Added
 
-- Added support for `name` property in `@indexes` pragma to allow explicit naming of GSIs
+- Added support for `name` property in `@indexes` pragma to allow explicit naming of GSIs; thanks @anatomic!
 
 ---
 
