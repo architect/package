@@ -54,5 +54,5 @@ test('createLambdaJSON should return a CFN definition with proper path', t => {
   let result = json(inv, join('src', 'lambda', 'beepboop'))
   mockFs.restore()
   let defn = result[1]
-  t.equals(defn.Properties.CodeUri, 'src/lambda/beepboop', 'Correct CodeUri set based on local path')
+  t.equals(defn.Properties.CodeUri, join('src', 'lambda', 'beepboop'), 'Correct CodeUri set based on local path')
 })
