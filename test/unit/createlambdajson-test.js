@@ -18,21 +18,32 @@ test('createLambdaJSON should return a CFN definition with correct config.arc fu
   mockFs({
     'src/lambda/one/config.arc': '@aws\nmemory 1337'
   })
-  let result = json(inv, 'src/lambda/one')
+  let result = json(inv, join('src', 'lambda', 'one'))
   mockFs.restore()
   let defn = result[1]
   t.equals(defn.Properties.MemorySize, 1337, 'Correct memory override read')
 })
 
-test('createLambdaJSON should return a properly formatted name based on the basename of the provided path to the function', t => {
+test('createLambdaJSON should return a properly formatted name based on the provided path to the function', t => {
   t.plan(1)
   mockFs({
     'src/lambda/comb-the-desert/config.arc': '@aws\nmemory 1337'
   })
-  let result = json(inv, 'src/lambda/comb-the-desert')
+  let result = json(inv, join('src', 'lambda', 'comb-the-desert'))
   mockFs.restore()
   let name = result[0]
-  t.equals(name, 'CombTheDesertPluginLambda', 'Lambda name is PascalCase and ends with PluginLambda')
+  t.equals(name, 'LambdaCombTheDesertPluginLambda', 'Lambda name is PascalCase, prefix is based on path after src/ and ends with PluginLambda')
+})
+
+test('createLambdaJSON should return a properly formatted name based on the provided path to the function (even if path is absolute)', t => {
+  t.plan(1)
+  mockFs({
+    'src/timestream/dont-cross-them/config.arc': '@aws\nmemory 1337'
+  })
+  let result = json(inv, join(process.cwd(), 'src', 'timestream', 'dont-cross-them'))
+  mockFs.restore()
+  let name = result[0]
+  t.equals(name, 'TimestreamDontCrossThemPluginLambda', 'Lambda name is PascalCase, prefix is based on path after src/ and ends with PluginLambda')
 })
 
 test('createLambdaJSON should return a CFN definition with proper path', t => {
@@ -40,7 +51,7 @@ test('createLambdaJSON should return a CFN definition with proper path', t => {
   mockFs({
     'src/lambda/beepboop/config.arc': '@aws\nmemory 1337'
   })
-  let result = json(inv, 'src/lambda/beepboop')
+  let result = json(inv, join('src', 'lambda', 'beepboop'))
   mockFs.restore()
   let defn = result[1]
   t.equals(defn.Properties.CodeUri, 'src/lambda/beepboop', 'Correct CodeUri set based on local path')
