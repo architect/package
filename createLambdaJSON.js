@@ -4,7 +4,7 @@ let read = require('@architect/inventory/src/read')
 let defaultFunctionConfig = require('@architect/inventory/src/defaults/function-config')
 let { toLogicalID } = require('@architect/utils')
 
-module.exports = function createLambdaJSON (inventory, src) {
+module.exports = function createLambdaJSON ({ inventory, src }) {
   // clean up the path only for logical ID assembly
   // make sure it doesnt end with a slash
   let pathToCode = src.endsWith(sep) ? src.substr(0, src.length - 1) : src
