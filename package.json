@@ -21,17 +21,17 @@
   "author": "Brian LeRoux <b@brian.io>",
   "license": "Apache-2.0",
   "dependencies": {
-    "@architect/utils": "~2.0.5-RC.0",
+    "@architect/utils": "~2.0.5",
     "glob": "~7.1.6",
     "mime-types": "~2.1.28",
     "run-parallel": "~1.1.10"
   },
   "peerDependencies": {
-    "@architect/inventory": "^1.3.0-RC.1"
+    "@architect/inventory": "^1.3.1"
   },
   "devDependencies": {
     "@architect/eslint-config": "1.0.0",
-    "@architect/inventory": "^1.3.0-RC.1",
+    "@architect/inventory": "^1.3.1",
     "aws-sdk": "2.712.0",
     "codecov": "^3.8.1",
     "cross-env": "^7.0.3",
