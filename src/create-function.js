@@ -1,10 +1,11 @@
 let { sep } = require('path')
-let { createLambda } = require('./src/visitors/utils')
+let { createLambda } = require('./visitors/utils')
 let read = require('@architect/inventory/src/read')
 let defaultFunctionConfig = require('@architect/inventory/src/defaults/function-config')
 let { toLogicalID } = require('@architect/utils')
 
-module.exports = function createLambdaJSON ({ inventory, src }) {
+// this module is for plugin authors use when creating new AWS::Serverless::Function CloudFormation Resource entries
+module.exports = function createFunction ({ inventory, src }) {
   // clean up the path only for logical ID assembly
   // make sure it doesnt end with a slash
   let pathToCode = src.endsWith(sep) ? src.substr(0, src.length - 1) : src
