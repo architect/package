@@ -1,5 +1,6 @@
 let { version } = require('../package.json')
 let visitors = require('./visitors')
+let createFunctions = require('./create-function')
 
 /**
  * Architect Package
@@ -47,3 +48,5 @@ module.exports = function package (inventory) {
   // walk pragmas to reduce final template contents
   return pragmas.reduce(visit, template)
 }
+
+module.exports.createFunction = createFunctions
