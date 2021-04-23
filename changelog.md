@@ -2,6 +2,14 @@
 
 ---
 
+## [6.2.1] 2021-04-23
+
+### Added
+
+- Moved and renamed helper method `createFunction` (formerly `createLambdaJSON`) for `@plugins` authors as export on main module export, it is now available at `require('@architect/package').createFunction`
+
+---
+
 ## [6.2.0] 2021-03-02
 
 ### Added

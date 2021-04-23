@@ -1,7 +1,7 @@
 let test = require('tape')
 let mockFs = require('mock-fs')
 let inv = require('@architect/inventory')
-let json = require('../../createLambdaJSON')
+let json = require('../../src/create-function')
 let fs = require('fs')
 let { join } = require('path')
 let base = fs.readFileSync(join(__dirname, '.arc-short')).toString()
