@@ -1,7 +1,7 @@
+let mockFs = require('mock-fs')
 let inventory = require('@architect/inventory')
 let test = require('tape')
 let package = require('../../')
-let mockFs = require('mock-fs')
 
 let base =
 `@app
