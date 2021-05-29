@@ -40,16 +40,16 @@ module.exports = function visitIndexes (inventory, template) {
     ref.Properties.AttributeDefinitions = dedupe(tableDefs, AttributeDefinitions)
   })
 
-  function dedupe (tableDefs, indexDefs) {
-    let table = [ ...tableDefs ]
-    indexDefs.forEach(def => {
-      let { AttributeName } = def
-      if (!table.some(t => {
-        return t.AttributeName === AttributeName
-      })) table.push(def)
-    })
-    return table
-  }
-
   return template
+}
+
+function dedupe (tableDefs, indexDefs) {
+  let table = [ ...tableDefs ]
+  indexDefs.forEach(def => {
+    let { AttributeName } = def
+    if (!table.some(t => {
+      return t.AttributeName === AttributeName
+    })) table.push(def)
+  })
+  return table
 }
