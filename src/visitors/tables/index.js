@@ -16,7 +16,7 @@ module.exports = function visitTables (inventory, template) {
       stream,
       ttl,
       encrypt,
-      PointInTimeRecovery,
+      pitr,
     } = table
 
     let name = toLogicalID(table.name)
@@ -44,7 +44,7 @@ module.exports = function visitTables (inventory, template) {
       template.Resources[tableTable].Properties.SSESpecification = encryptSpec
     }
 
-    if (PointInTimeRecovery) {
+    if (pitr || table.PointInTimeRecovery) {
       template.Resources[tableTable].Properties.PointInTimeRecoverySpecification = {
         PointInTimeRecoveryEnabled: true
       }
