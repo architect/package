@@ -7,6 +7,7 @@
 ### Changed
 
 - Changed internal Inventory parameter from `PointInTimeRecovery` to `pitr` to support a cleaner Arc `@tables` option; fixes #1155
+- Updated dependencies
 
 ---
 
