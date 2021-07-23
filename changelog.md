@@ -2,6 +2,15 @@
 
 ---
 
+## [7.0.0] 2021-07-22
+
+### Changed
+
+- Breaking change: removed support for Node.js 10.x (now EOL, and no longer available to created in AWS Lambda)
+- Updated + tidied dependencies
+
+---
+
 ## [6.2.2] 2021-06-04
 
 ### Changed

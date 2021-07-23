@@ -16,7 +16,7 @@ All of this module's methods take as input an [@architect/inventory][inventory]-
 ## Example Usage
 
 ```javascript
-let parse = require('@architect/parser')
+let inventory = require('@architect/inventory')
 let pkg = require('@architect/package')
 
 // fake out an .arc file as a string
@@ -28,11 +28,8 @@ mybasicapp
 get /
 `
 
-// parse .arc string into a plain javascript object
-let arc = parse(arcString)
-
 // export as sam
-let sam = pkg(arc)
+let sam = pkg(inventory({ rawArc: arcString }))
 console.log(sam)
 ```
 
