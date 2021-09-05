@@ -5,7 +5,7 @@ let defaultFunctionConfig = require('@architect/inventory/src/defaults/function-
 let { toLogicalID } = require('@architect/utils')
 
 // this module is for plugin authors use when creating new AWS::Serverless::Function CloudFormation Resource entries
-module.exports = function createFunction ({ inventory, src }) {
+module.exports = function createFunction ({ inventory, src, template }) {
   // clean up the path only for logical ID assembly
   // make sure it doesnt end with a slash
   let pathToCode = src.endsWith(sep) ? src.substr(0, src.length - 1) : src
@@ -22,7 +22,8 @@ module.exports = function createFunction ({ inventory, src }) {
     lambda: {
       src: src,
       config: functionConfig
-    }
+    },
+    template,
   })
   return [ `${name}PluginLambda`, functionDefinition ]
 }

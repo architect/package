@@ -30,7 +30,7 @@ test('Module is present', t => {
 })
 
 test('Basic config', async t => {
-  t.plan(14)
+  t.plan(16)
 
   let timeout = 10
   let memory = 3008
@@ -53,6 +53,7 @@ test('Basic config', async t => {
   // t.notEqual(props['Fifo'], fifo, `Fifo (control test): ${props['Fifo']}`)
   t.notOk(props['Layers'], `Layers (control test, not speficied)`)
   t.notOk(props['Policies'], `Policies (control test, not speficied)`)
+  t.ok(props['Role'], `Role is present (because Policies are not specified)`)
 
   rawArc = arc(`@aws
 timeout ${timeout}
@@ -73,6 +74,7 @@ policies ${policy(1)}
   t.equal(props['Layers'][0], layer(1), `Layer matches: ${props['Layers'][0]}`)
   t.equal(props['Policies'].length, 1, `Got a single policy back (using 'policies')`)
   t.equal(props['Policies'][0], policy(1), `Policy matches: ${props['Layers'][0]}`)
+  t.notOk(props['Role'], `Role is not present (because Policies are specified)`)
 })
 
 test('Config - layers & policies (vectors and scalars)', async t => {
@@ -91,7 +93,7 @@ policies ${policy(1)}
   t.equal(props['Layers'].length, 1, `Got a single layer back (using 'layers')`)
   t.equal(props['Layers'][0], layer(1), `Layer matches: ${props['Layers'][0]}`)
   t.equal(props['Policies'].length, 1, `Got a single policy back (using 'policies')`)
-  t.equal(props['Policies'][0], policy(1), `Policy matches: ${props['Layers'][0]}`)
+  t.equal(props['Policies'][0], policy(1), `Policy matches: ${props['Policies'][0]}`)
 
   rawArc = arc(`@aws
 layers ${layer(1)}
@@ -101,12 +103,12 @@ policies ${policy(2)}
 `)
   inv = await inventory({ rawArc })
   props = package(inv).Resources.AnEventEventLambda.Properties
-  t.equal(props['Layers'].length, 2, `Got a multiple layers back (repeating 'layers')`)
+  t.equal(props['Layers'].length, 2, `Got multiple layers back (repeating 'layers')`)
   t.equal(props['Layers'][0], layer(1), `Layer matches: ${props['Layers'][0]}`)
   t.equal(props['Layers'][1], layer(2), `Layer matches: ${props['Layers'][1]}`)
-  t.equal(props['Policies'].length, 2, `Got a multiple policys back (repeating 'policies')`)
-  t.equal(props['Policies'][0], policy(1), `Policy matches: ${props['Layers'][0]}`)
-  t.equal(props['Policies'][1], policy(2), `Policy matches: ${props['Layers'][1]}`)
+  t.equal(props['Policies'].length, 2, `Got multiple policies back (repeating 'policies')`)
+  t.equal(props['Policies'][0], policy(1), `Policy matches: ${props['Policies'][0]}`)
+  t.equal(props['Policies'][1], policy(2), `Policy matches: ${props['Policies'][1]}`)
 
   rawArc = arc(`@aws
 layers
@@ -118,10 +120,10 @@ policies
 `)
   inv = await inventory({ rawArc })
   props = package(inv).Resources.AnEventEventLambda.Properties
-  t.equal(props['Layers'].length, 2, `Got a multiple layers back (using 'layers' as an array)`)
+  t.equal(props['Layers'].length, 2, `Got multiple layers back (using 'layers' as an array)`)
   t.equal(props['Layers'][0], layer(1), `Layer matches: ${props['Layers'][0]}`)
-  t.equal(props['Policies'].length, 2, `Got a multiple policys back (using 'policies' as an array)`)
-  t.equal(props['Policies'][0], policy(1), `Policy matches: ${props['Layers'][0]}`)
+  t.equal(props['Policies'].length, 2, `Got multiple policies back (using 'policies' as an array)`)
+  t.equal(props['Policies'][0], policy(1), `Policy matches: ${props['Policies'][0]}`)
 
 
   rawArc = arc(`@aws
@@ -133,7 +135,7 @@ policy ${policy(1)}
   t.equal(props['Layers'].length, 1, `Got a single layer back (using 'layer')`)
   t.equal(props['Layers'][0], layer(1), `Layer matches: ${props['Layers'][0]}`)
   t.equal(props['Policies'].length, 1, `Got a single policy back (using 'policy')`)
-  t.equal(props['Policies'][0], policy(1), `Policy matches: ${props['Layers'][0]}`)
+  t.equal(props['Policies'][0], policy(1), `Policy matches: ${props['Policies'][0]}`)
 
   rawArc = arc(`@aws
 layer ${layer(1)}
@@ -143,12 +145,12 @@ policy ${policy(2)}
 `)
   inv = await inventory({ rawArc })
   props = package(inv).Resources.AnEventEventLambda.Properties
-  t.equal(props['Layers'].length, 2, `Got a multiple layers back (repeating 'layer')`)
+  t.equal(props['Layers'].length, 2, `Got multiple layers back (repeating 'layer')`)
   t.equal(props['Layers'][0], layer(1), `Layer matches: ${props['Layers'][0]}`)
   t.equal(props['Layers'][1], layer(2), `Layer matches: ${props['Layers'][1]}`)
-  t.equal(props['Policies'].length, 2, `Got a multiple policys back (repeating 'policy')`)
-  t.equal(props['Policies'][0], policy(1), `Policy matches: ${props['Layers'][0]}`)
-  t.equal(props['Policies'][1], policy(2), `Policy matches: ${props['Layers'][1]}`)
+  t.equal(props['Policies'].length, 2, `Got multiple policies back (repeating 'policy')`)
+  t.equal(props['Policies'][0], policy(1), `Policy matches: ${props['Policies'][0]}`)
+  t.equal(props['Policies'][1], policy(2), `Policy matches: ${props['Policies'][1]}`)
 
   rawArc = arc(`@aws
 layer
@@ -160,10 +162,98 @@ policy
 `)
   inv = await inventory({ rawArc })
   props = package(inv).Resources.AnEventEventLambda.Properties
-  t.equal(props['Layers'].length, 2, `Got a multiple layers back (using 'layer' as an array)`)
+  t.equal(props['Layers'].length, 2, `Got multiple layers back (using 'layer' as an array)`)
   t.equal(props['Layers'][0], layer(1), `Layer matches: ${props['Layers'][0]}`)
-  t.equal(props['Policies'].length, 2, `Got a multiple policys back (using 'policy' as an array)`)
-  t.equal(props['Policies'][0], policy(1), `Policy matches: ${props['Layers'][0]}`)
+  t.equal(props['Policies'].length, 2, `Got multiple policies back (using 'policy' as an array)`)
+  t.equal(props['Policies'][0], policy(1), `Policy matches: ${props['Policies'][0]}`)
+})
+
+test('Config - Arc default policy opt-in', async t => {
+  t.plan(30)
+
+  let rawArc
+  let inv
+  let props
+
+  rawArc = arc(`@aws
+policies
+  ${policy(1)}
+  foo
+  bar
+  architect-default-policies
+`)
+  inv = await inventory({ rawArc })
+  props = package(inv).Resources.AnEventEventLambda.Properties
+  t.equal(props['Policies'].length, 4, `Got multiple policies back (using 'policies' inline)`)
+  t.equal(props['Policies'][0], policy(1), `Policy matches: ${props['Policies'][0]}`)
+  t.equal(props['Policies'][1], 'foo', `Policy matches: foo`)
+  t.equal(props['Policies'][2], 'bar', `Policy matches: bar`)
+  t.ok(props['Policies'][3].Statement, `Embedded policy statement added by 'architect-default-policies'`)
+
+  rawArc = arc(`@aws
+policies ${policy(1)} foo bar architect-default-policies
+`)
+  inv = await inventory({ rawArc })
+  props = package(inv).Resources.AnEventEventLambda.Properties
+  t.equal(props['Policies'].length, 4, `Got multiple policies back (using 'policies' inline)`)
+  t.equal(props['Policies'][0], policy(1), `Policy matches: ${props['Policies'][0]}`)
+  t.equal(props['Policies'][1], 'foo', `Policy matches: foo`)
+  t.equal(props['Policies'][2], 'bar', `Policy matches: bar`)
+  t.ok(props['Policies'][3].Statement, `Embedded policy statement added by 'architect-default-policies'`)
+
+  rawArc = arc(`@aws
+policies ${policy(1)}
+policies foo
+policies bar
+policies architect-default-policies
+`)
+  inv = await inventory({ rawArc })
+  props = package(inv).Resources.AnEventEventLambda.Properties
+  t.equal(props['Policies'].length, 4, `Got multiple policies back (repeating 'policies')`)
+  t.equal(props['Policies'][0], policy(1), `Policy matches: ${props['Policies'][0]}`)
+  t.equal(props['Policies'][1], 'foo', `Policy matches: foo`)
+  t.equal(props['Policies'][2], 'bar', `Policy matches: bar`)
+  t.ok(props['Policies'][3].Statement, `Embedded policy statement added by 'architect-default-policies'`)
+
+  rawArc = arc(`@aws
+policy
+  ${policy(1)}
+  foo
+  bar
+  architect-default-policies
+`)
+  inv = await inventory({ rawArc })
+  props = package(inv).Resources.AnEventEventLambda.Properties
+  t.equal(props['Policies'].length, 4, `Got multiple policies back (using 'policy' inline)`)
+  t.equal(props['Policies'][0], policy(1), `Policy matches: ${props['Policies'][0]}`)
+  t.equal(props['Policies'][1], 'foo', `Policy matches: foo`)
+  t.equal(props['Policies'][2], 'bar', `Policy matches: bar`)
+  t.ok(props['Policies'][3].Statement, `Embedded policy statement added by 'architect-default-policies'`)
+
+  rawArc = arc(`@aws
+policy ${policy(1)} foo bar architect-default-policies
+`)
+  inv = await inventory({ rawArc })
+  props = package(inv).Resources.AnEventEventLambda.Properties
+  t.equal(props['Policies'].length, 4, `Got multiple policies back (using 'policy' inline)`)
+  t.equal(props['Policies'][0], policy(1), `Policy matches: ${props['Policies'][0]}`)
+  t.equal(props['Policies'][1], 'foo', `Policy matches: foo`)
+  t.equal(props['Policies'][2], 'bar', `Policy matches: bar`)
+  t.ok(props['Policies'][3].Statement, `Embedded policy statement added by 'architect-default-policies'`)
+
+  rawArc = arc(`@aws
+policy ${policy(1)}
+policy foo
+policy bar
+policy architect-default-policies
+`)
+  inv = await inventory({ rawArc })
+  props = package(inv).Resources.AnEventEventLambda.Properties
+  t.equal(props['Policies'].length, 4, `Got multiple policies back (repeating 'policy')`)
+  t.equal(props['Policies'][0], policy(1), `Policy matches: ${props['Policies'][0]}`)
+  t.equal(props['Policies'][1], 'foo', `Policy matches: foo`)
+  t.equal(props['Policies'][2], 'bar', `Policy matches: bar`)
+  t.ok(props['Policies'][3].Statement, `Embedded policy statement added by 'architect-default-policies'`)
 })
 
 test('Config - layer validation', async t => {

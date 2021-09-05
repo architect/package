@@ -18,6 +18,7 @@ module.exports = function visitEvents (inventory, template) {
     template.Resources[eventLambda] = createLambda({
       lambda: event,
       inventory,
+      template,
     })
 
     // Construct the event source so SAM can wire the permissions
