@@ -36,6 +36,7 @@ module.exports = function visitHttp (inventory, template) {
     template.Resources[routeLambda] = createLambda({
       lambda: route,
       inventory,
+      template,
     })
 
     // Construct the API event source so SAM can wire the permissions

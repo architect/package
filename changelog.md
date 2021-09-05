@@ -2,6 +2,21 @@
 
 ---
 
+## [7.0.2] 2021-09-05
+
+### Changed
+
+- Updated dependencies
+
+
+### Fixed
+
+- Fixed issue where specified policies would not be adopted by Lambdas so long as the default role remained intact; fixes #1212
+- Fixed issue where multiple layers or policies specified in a single line would lose all but the first
+- Fixed a few minor bugs in unit tests
+
+---
+
 ## [7.0.0 - 7.0.1] 2021-07-22
 
 ### Changed

@@ -68,6 +68,7 @@ module.exports = function visitTables (inventory, template) {
       template.Resources[streamLambda] = createLambda({
         lambda: theStream,
         inventory,
+        template,
       })
 
       template.Resources[streamEvent] = {

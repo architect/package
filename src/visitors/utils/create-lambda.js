@@ -1,7 +1,7 @@
 let getLambdaEnv = require('./get-lambda-env')
 
 module.exports = function createLambda (params) {
-  let { lambda, inventory } = params
+  let { lambda, inventory, template } = params
   let { src, config } = lambda
   let { timeout, memory, runtime, handler, concurrency, layers, policies } = config
   let Variables = getLambdaEnv({ config, runtime, inventory })
@@ -36,6 +36,19 @@ module.exports = function createLambda (params) {
 
   if (policies.length > 0) {
     item.Properties.Policies = policies
+    delete item.Properties.Role // Policies are ignored if Role is present
+
+    // Allow opt-in to generated Architect policy statements
+    let arcPolicies = 'architect-default-policies'
+    if (policies.includes(arcPolicies)) {
+      // Remove the opt-in
+      item.Properties.Policies = policies.filter(p => p !== arcPolicies)
+      let Statement = []
+      template.Resources.Role.Properties.Policies.forEach(policy => {
+        policy.PolicyDocument.Statement.forEach(p => Statement.push(p))
+      })
+      item.Properties.Policies.push({ Statement })
+    }
   }
 
   return item

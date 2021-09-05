@@ -26,13 +26,13 @@ module.exports = function package (inventory) {
     if (y == 'http' || y == 'tables') return 1
   }
   let pragmas = Object.keys(inv).filter(supported).sort(order)
+  pragmas.push('deno')
 
   // Walk the CloudFormation template invoking the visitor for each given pragma
   let visit = (template, pragma) => visitors[pragma](inventory, template)
 
-  // force globals first (last?)
-  pragmas.push('globals')
-  pragmas.push('deno')
+  // Force globals first for policies
+  pragmas.unshift('globals')
 
   // default cloudformation template
   // visitors will interpolate: Parameters, Mappings, Conditions, Resources, and Outputs

@@ -76,6 +76,7 @@ module.exports = function visitWebSockets (inventory, template) {
     template.Resources[wsLambda] = createLambda({
       lambda: route,
       inventory,
+      template,
     })
 
     let defaults = [ 'default', 'connect', 'disconnect' ]

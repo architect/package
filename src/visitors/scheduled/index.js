@@ -23,6 +23,7 @@ module.exports = function visitScheduled (inventory, template) {
     template.Resources[scheduleLambda] = createLambda({
       lambda: schedule,
       inventory,
+      template,
     })
 
     // Create the scheduled event rule
