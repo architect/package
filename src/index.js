@@ -27,6 +27,7 @@ module.exports = function package (inventory) {
   }
   let pragmas = Object.keys(inv).filter(supported).sort(order)
   pragmas.push('deno')
+  pragmas.push('php')
 
   // Walk the CloudFormation template invoking the visitor for each given pragma
   let visit = (template, pragma) => visitors[pragma](inventory, template)
