@@ -18,18 +18,18 @@
         }
         template.Resources[resource].Properties.Layers.push({ 'Fn::GetAtt': [ 'PHP', 'Outputs.PhpRuntimeArn' ] })
         template.Resources[resource].Properties.Handler = 'index.handler'
-        template.Resources[resource].Properties.Runtime = 'provided'
+        template.Resources[resource].Properties.Runtime = 'provided.al2'
       }
     }
   
-    // Add the PHP custom runtime layer
+    // Add the PHP custom runtime layer (TODO: look-up latest SemanticVersion from remote JSON file on S3?)
     if (hasPhp) {
       template.Resources.PHP = {
         Type: 'AWS::Serverless::Application',
         Properties: {
           Location: {
-            ApplicationId: 'arn:aws:serverlessrepo:us-east-1:455488262213:applications/arc-php',
-            SemanticVersion: '0.1.0'
+            ApplicationId: 'arn:aws:serverlessrepo:us-east-1:275960034841:applications/arc-php',
+            SemanticVersion: '0.2.0'
           }
         }
       }
