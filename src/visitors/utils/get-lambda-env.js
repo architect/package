@@ -19,6 +19,11 @@ module.exports = function getEnv (params) {
     env.PYTHONPATH = '/var/task/vendor:/var/runtime:/opt/python'
   }
 
+  // Glocabl add LD_LIBRARY_PATH if the runtime is PHP
+  if (runtime.startsWith('php')) {
+    env.LD_LIBRARY_PATH = '/opt/arc/lib64:/opt/arc/lib'
+  }
+
   // add the ARC_STATIC_BUCKET if defined
   if (inv.static) {
     env.ARC_STATIC_BUCKET = { Ref: 'StaticBucket' }
