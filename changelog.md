@@ -2,6 +2,14 @@
 
 ---
 
+## [7.0.3] 2021-09-27
+
+### Changed
+
+- Removed internal `ARC_HTTP` env var (partly used for Arc v5 backwards compat, which is no longer supported)
+
+---
+
 ## [7.0.2] 2021-09-05
 
 ### Changed
