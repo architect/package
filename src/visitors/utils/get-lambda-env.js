@@ -6,7 +6,6 @@ module.exports = function getEnv (params) {
     ARC_APP_NAME: inv.app,
     ARC_CLOUDFORMATION: { Ref: 'AWS::StackName' },
     ARC_ENV: 'staging', // Always default to staging; mutate to production via macro where necessary
-    ARC_HTTP: 'aws_proxy', // used for feature detection (could be 'aws' for vtl style)
     ARC_ROLE: { Ref: 'Role' },
     NODE_ENV: 'staging', // Same as above, always default to staging; userland may mutate
     SESSION_TABLE_NAME: 'jwe',

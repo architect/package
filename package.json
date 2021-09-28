@@ -1,6 +1,6 @@
 {
   "name": "@architect/package",
-  "version": "7.0.2",
+  "version": "7.0.3",
   "description": "Package .arc for deployment with CloudFormation",
   "main": "src/index.js",
   "scripts": {
@@ -21,8 +21,8 @@
   "author": "Brian LeRoux <b@brian.io>",
   "license": "Apache-2.0",
   "dependencies": {
-    "@architect/inventory": "~2.0.5",
-    "@architect/utils": "~3.0.2",
+    "@architect/inventory": "~2.0.6",
+    "@architect/utils": "~3.0.3",
     "chalk": "~4.1.2"
   },
   "devDependencies": {
