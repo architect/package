@@ -3,7 +3,7 @@ let getLambdaEnv = require('./get-lambda-env')
 module.exports = function createLambda (params) {
   let { lambda, inventory, template } = params
   let { src, config } = lambda
-  let { timeout, memory, runtime, handler, concurrency, layers, policies } = config
+  let { architecture, timeout, memory, runtime, handler, concurrency, layers, policies } = config
   let Variables = getLambdaEnv({ config, runtime, inventory })
 
   // Add Lambda resources
@@ -13,6 +13,7 @@ module.exports = function createLambda (params) {
       Handler: handler,
       CodeUri: src,
       Runtime: runtime,
+      Architectures: [ architecture ],
       MemorySize: memory,
       Timeout: timeout,
       Environment: { Variables },

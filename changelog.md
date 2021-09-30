@@ -2,6 +2,14 @@
 
 ---
 
+## [7.1.0] 2021-09-30
+
+### Added
+
+- Added support for AWS's new Lambda `arm64` architecture via `@aws architecture` setting; default remains `x86_64`
+
+---
+
 ## [7.0.3] 2021-09-27
 
 ### Changed
