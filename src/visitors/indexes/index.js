@@ -1,6 +1,7 @@
 let { toLogicalID } = require('@architect/utils')
 
 let getGSI = require('./get-gsi-name')
+let getProjection = require('./get-projection')
 let getKeySchema = require('../tables/get-key-schema')
 let getAttributes = require('../tables/get-attribute-definitions')
 
@@ -15,15 +16,14 @@ module.exports = function visitIndexes (inventory, template) {
     let name = toLogicalID(index.name)
     let TableName = `${name}Table`
 
-    let IndexName = getGSI(index)
-    let KeySchema = getKeySchema(index)
-    let AttributeDefinitions = getAttributes(index)
-
-    let Projection = { ProjectionType: 'ALL' }
-
     let ref = template.Resources[TableName]
     if (!ref)
       throw ReferenceError('@indexes failure: ' + TableName + ' is undefined')
+
+    let IndexName = getGSI(index)
+    let KeySchema = getKeySchema(index)
+    let AttributeDefinitions = getAttributes(index)
+    let Projection = getProjection(index)
 
     // write in the index
     if (!ref.Properties.GlobalSecondaryIndexes)
