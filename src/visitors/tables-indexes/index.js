@@ -5,13 +5,15 @@ let getKeySchema = require('../tables/get-key-schema')
 let getAttributes = require('../tables/get-attribute-definitions')
 
 /**
- * Visit arc.indexes and merge in AWS::Serverless resources
+ * Visit @tables-indexes + @indexes and merge in AWS::Serverless resources
  */
-module.exports = function visitIndexes (inventory, template) {
+module.exports = function visitTablesIndexes (inventory, template) {
   let { inv } = inventory
-  if (!inv.indexes) return template
+  if (!inv['tables-indexes'] && !inv.indexes) return template
 
-  inv.indexes.forEach(index => {
+  let indexes = inv['tables-indexes'] || inv.indexes
+
+  indexes.forEach(index => {
     let name = toLogicalID(index.name)
     let TableName = `${name}Table`
 
