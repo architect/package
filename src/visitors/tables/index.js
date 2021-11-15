@@ -1,4 +1,3 @@
-let { createLambda } = require('../utils')
 let { toLogicalID } = require('@architect/utils')
 
 let getKeySchema = require('./get-key-schema')
@@ -8,16 +7,11 @@ let getAttributes = require('./get-attribute-definitions')
  * Visit arc.tables and merge in AWS::Serverless resources
  */
 module.exports = function visitTables (inventory, template) {
-  let { inv, get } = inventory
+  let { inv } = inventory
   if (!inv.tables) return template
 
   inv.tables.forEach(table => {
-    let {
-      stream,
-      ttl,
-      encrypt,
-      pitr,
-    } = table
+    let { ttl, encrypt, pitr } = table // Streams are handled by Inventory
 
     let name = toLogicalID(table.name)
     let tableTable = `${name}Table`
@@ -54,36 +48,6 @@ module.exports = function visitTables (inventory, template) {
       template.Resources[tableTable].Properties.TimeToLiveSpecification = {
         AttributeName: ttl,
         Enabled: true
-      }
-    }
-
-    // TODO impl for multiple streams against a single table, now possible!
-    if (stream) {
-      let theStream = get.streams(table.name)
-
-      let streamLambda = `${name}StreamLambda`
-      let streamEvent = `${name}StreamEvent`
-
-      // Create the Lambda
-      template.Resources[streamLambda] = createLambda({
-        lambda: theStream,
-        inventory,
-        template,
-      })
-
-      template.Resources[streamEvent] = {
-        Type: 'AWS::Lambda::EventSourceMapping',
-        Properties: {
-          BatchSize: 10,
-          EventSourceArn: { 'Fn::GetAtt': [ tableTable, 'StreamArn' ] },
-          FunctionName: { 'Fn::GetAtt': [ streamLambda, 'Arn' ] },
-          StartingPosition: 'TRIM_HORIZON'
-        }
-      }
-
-      // Create the stream
-      template.Resources[tableTable].Properties.StreamSpecification = {
-        StreamViewType: 'NEW_AND_OLD_IMAGES'
       }
     }
   })

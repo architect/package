@@ -1,5 +1,5 @@
 let test = require('tape')
-let gsiName = require('../../../../src/visitors/indexes/get-gsi-name')
+let gsiName = require('../../../../src/visitors/tables-indexes/get-gsi-name')
 
 let index = {
   name: 'accounts',

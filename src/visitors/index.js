@@ -2,11 +2,13 @@ let deno = require('./deno')
 let events = require('./events')
 let globals = require('./globals')
 let http = require('./http')
-let indexes = require('./indexes')
+let indexes = require('./tables-indexes')
 let queues = require('./queues')
 let scheduled = require('./scheduled')
-let statics = require('./static')
+let _static = require('./static')
 let tables = require('./tables')
+let tablesIndexes = require('./tables-indexes')
+let tablesStreams = require('./tables-streams')
 let ws = require('./ws')
 
 module.exports = {
@@ -17,7 +19,9 @@ module.exports = {
   indexes,
   queues,
   scheduled,
-  static: statics,
+  static: _static,
   tables,
+  tablesIndexes,
+  tablesStreams,
   ws,
 }

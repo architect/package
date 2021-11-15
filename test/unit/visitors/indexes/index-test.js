@@ -1,6 +1,6 @@
 let test = require('tape')
 let inventory = require('@architect/inventory')
-let visit = require('../../../../src/visitors/indexes')
+let visit = require('../../../../src/visitors/tables-indexes')
 let tables = require('../../../../src/visitors/tables')
 let base =
 `@app

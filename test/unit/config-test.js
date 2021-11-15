@@ -349,7 +349,7 @@ policies ${policy(1)}
   // Overlay settings
   timeout = 15
   memory = 128
-  runtime = 'ruby2.5'
+  runtime = 'ruby2.7'
   concurrency = 100
   let arcConfig = `@aws
 timeout ${timeout}
