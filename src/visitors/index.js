@@ -21,7 +21,7 @@ module.exports = {
   scheduled,
   static: _static,
   tables,
-  tablesIndexes,
-  tablesStreams,
+  'tables-indexes': tablesIndexes,
+  'tables-streams': tablesStreams,
   ws,
 }

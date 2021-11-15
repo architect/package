@@ -2,17 +2,17 @@ let { toLogicalID } = require('@architect/utils')
 let { createLambda } = require('../utils')
 
 /**
- * Visit arc.tables and merge in AWS::Serverless resources
+ * Visit arc['tables-streams'] and merge in AWS::Serverless resources
  */
-module.exports = function visitTables (inventory, template) {
+module.exports = function visitTablesStreams (inventory, template) {
   let { inv } = inventory
   let streams = inv['tables-streams'] || inv.streams
   if (!streams) return template
 
   streams.forEach(lambda => {
     let { name, table } = lambda
-    let streamLambda = `${name}TableStreamLambda`
-    let streamEvent = `${name}TableStreamEvent`
+    let streamLambda = `${toLogicalID(name)}TableStreamLambda`
+    let streamEvent = `${toLogicalID(name)}TableStreamEvent`
     let tableTable = `${toLogicalID(table)}Table`
 
     // Create the Lambda
@@ -37,4 +37,5 @@ module.exports = function visitTables (inventory, template) {
       StreamViewType: 'NEW_AND_OLD_IMAGES'
     }
   })
+  return template
 }
