@@ -17,7 +17,7 @@ module.exports = function visitHttp (inventory, template) {
 
   // Base props
   let Type = 'AWS::Serverless::HttpApi'
-  let Properties = getApiProps(http)
+  let Properties = getApiProps(inventory)
 
   // Construct the API resource
   template.Resources.HTTP = { Type, Properties }

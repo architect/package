@@ -11,6 +11,9 @@ let createFunctions = require('./create-function')
  */
 module.exports = function package (inventory) {
   let { inv } = inventory
+  if (!inv._arc.deployStage) {
+    throw ReferenceError('@architect/package can only be used with a valid deploy stage set')
+  }
 
   // allowed list of pragmas ['http', 'globals'...etc]
   let supports = Object.keys(visitors)

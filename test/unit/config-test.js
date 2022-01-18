@@ -10,6 +10,7 @@ app
 @events
 an-event
 `
+let deployStage = 'staging'
 
 let layer = num => `arn:aws:lambda:us-west-2:foo:layer:bar:${num}`
 let policy = num => `arn:aws:iam:foo:bar:${num}`
@@ -44,7 +45,7 @@ test('Basic config', async t => {
 
   // Control
   rawArc = arc()
-  inv = await inventory({ rawArc })
+  inv = await inventory({ rawArc, deployStage })
   props = package(inv).Resources.AnEventEventLambda.Properties
   t.notEqual(props['Timeout'], timeout, `Timeout (control test): ${props['Timeout']}`)
   t.notEqual(props['MemorySize'], memory, `Memory (control test): ${props['MemorySize']}`)
@@ -63,7 +64,7 @@ concurrency ${concurrency}
 layers ${layer(1)}
 policies ${policy(1)}
 `)
-  inv = await inventory({ rawArc })
+  inv = await inventory({ rawArc, deployStage })
   props = package(inv).Resources.AnEventEventLambda.Properties
   t.equal(props['Timeout'], timeout, `Timeout (control test): ${props['Timeout']}`)
   t.equal(props['MemorySize'], memory, `Memory (control test): ${props['MemorySize']}`)
@@ -88,7 +89,7 @@ test('Config - layers & policies (vectors and scalars)', async t => {
 layers ${layer(1)}
 policies ${policy(1)}
 `)
-  inv = await inventory({ rawArc })
+  inv = await inventory({ rawArc, deployStage })
   props = package(inv).Resources.AnEventEventLambda.Properties
   t.equal(props['Layers'].length, 1, `Got a single layer back (using 'layers')`)
   t.equal(props['Layers'][0], layer(1), `Layer matches: ${props['Layers'][0]}`)
@@ -101,7 +102,7 @@ layers ${layer(2)}
 policies ${policy(1)}
 policies ${policy(2)}
 `)
-  inv = await inventory({ rawArc })
+  inv = await inventory({ rawArc, deployStage })
   props = package(inv).Resources.AnEventEventLambda.Properties
   t.equal(props['Layers'].length, 2, `Got multiple layers back (repeating 'layers')`)
   t.equal(props['Layers'][0], layer(1), `Layer matches: ${props['Layers'][0]}`)
@@ -118,7 +119,7 @@ policies
   ${policy(1)}
   ${policy(2)}
 `)
-  inv = await inventory({ rawArc })
+  inv = await inventory({ rawArc, deployStage })
   props = package(inv).Resources.AnEventEventLambda.Properties
   t.equal(props['Layers'].length, 2, `Got multiple layers back (using 'layers' as an array)`)
   t.equal(props['Layers'][0], layer(1), `Layer matches: ${props['Layers'][0]}`)
@@ -130,7 +131,7 @@ policies
 layer ${layer(1)}
 policy ${policy(1)}
 `)
-  inv = await inventory({ rawArc })
+  inv = await inventory({ rawArc, deployStage })
   props = package(inv).Resources.AnEventEventLambda.Properties
   t.equal(props['Layers'].length, 1, `Got a single layer back (using 'layer')`)
   t.equal(props['Layers'][0], layer(1), `Layer matches: ${props['Layers'][0]}`)
@@ -143,7 +144,7 @@ layer ${layer(2)}
 policy ${policy(1)}
 policy ${policy(2)}
 `)
-  inv = await inventory({ rawArc })
+  inv = await inventory({ rawArc, deployStage })
   props = package(inv).Resources.AnEventEventLambda.Properties
   t.equal(props['Layers'].length, 2, `Got multiple layers back (repeating 'layer')`)
   t.equal(props['Layers'][0], layer(1), `Layer matches: ${props['Layers'][0]}`)
@@ -160,7 +161,7 @@ policy
   ${policy(1)}
   ${policy(2)}
 `)
-  inv = await inventory({ rawArc })
+  inv = await inventory({ rawArc, deployStage })
   props = package(inv).Resources.AnEventEventLambda.Properties
   t.equal(props['Layers'].length, 2, `Got multiple layers back (using 'layer' as an array)`)
   t.equal(props['Layers'][0], layer(1), `Layer matches: ${props['Layers'][0]}`)
@@ -182,7 +183,7 @@ policies
   bar
   architect-default-policies
 `)
-  inv = await inventory({ rawArc })
+  inv = await inventory({ rawArc, deployStage })
   props = package(inv).Resources.AnEventEventLambda.Properties
   t.equal(props['Policies'].length, 4, `Got multiple policies back (using 'policies' inline)`)
   t.equal(props['Policies'][0], policy(1), `Policy matches: ${props['Policies'][0]}`)
@@ -193,7 +194,7 @@ policies
   rawArc = arc(`@aws
 policies ${policy(1)} foo bar architect-default-policies
 `)
-  inv = await inventory({ rawArc })
+  inv = await inventory({ rawArc, deployStage })
   props = package(inv).Resources.AnEventEventLambda.Properties
   t.equal(props['Policies'].length, 4, `Got multiple policies back (using 'policies' inline)`)
   t.equal(props['Policies'][0], policy(1), `Policy matches: ${props['Policies'][0]}`)
@@ -207,7 +208,7 @@ policies foo
 policies bar
 policies architect-default-policies
 `)
-  inv = await inventory({ rawArc })
+  inv = await inventory({ rawArc, deployStage })
   props = package(inv).Resources.AnEventEventLambda.Properties
   t.equal(props['Policies'].length, 4, `Got multiple policies back (repeating 'policies')`)
   t.equal(props['Policies'][0], policy(1), `Policy matches: ${props['Policies'][0]}`)
@@ -222,7 +223,7 @@ policy
   bar
   architect-default-policies
 `)
-  inv = await inventory({ rawArc })
+  inv = await inventory({ rawArc, deployStage })
   props = package(inv).Resources.AnEventEventLambda.Properties
   t.equal(props['Policies'].length, 4, `Got multiple policies back (using 'policy' inline)`)
   t.equal(props['Policies'][0], policy(1), `Policy matches: ${props['Policies'][0]}`)
@@ -233,7 +234,7 @@ policy
   rawArc = arc(`@aws
 policy ${policy(1)} foo bar architect-default-policies
 `)
-  inv = await inventory({ rawArc })
+  inv = await inventory({ rawArc, deployStage })
   props = package(inv).Resources.AnEventEventLambda.Properties
   t.equal(props['Policies'].length, 4, `Got multiple policies back (using 'policy' inline)`)
   t.equal(props['Policies'][0], policy(1), `Policy matches: ${props['Policies'][0]}`)
@@ -247,7 +248,7 @@ policy foo
 policy bar
 policy architect-default-policies
 `)
-  inv = await inventory({ rawArc })
+  inv = await inventory({ rawArc, deployStage })
   props = package(inv).Resources.AnEventEventLambda.Properties
   t.equal(props['Policies'].length, 4, `Got multiple policies back (repeating 'policy')`)
   t.equal(props['Policies'][0], policy(1), `Policy matches: ${props['Policies'][0]}`)
@@ -271,7 +272,7 @@ layers
   ${layer(4)}
   ${layer(5)}
 `)
-  inv = await inventory({ rawArc })
+  inv = await inventory({ rawArc, deployStage })
   props = package(inv).Resources.AnEventEventLambda.Properties
   t.equal(props['Layers'].length, 5, `Got up to 5 layers back`)
 
@@ -285,7 +286,7 @@ layers
   ${layer(6)}
 `)
   try {
-    let inv = await inventory({ rawArc })
+    let inv = await inventory({ rawArc, deployStage })
     package(inv)
   }
   catch (err) {
@@ -297,7 +298,7 @@ region us-west-1
 layers a:b:c:us-west-2:d
 `)
   try {
-    let inv = await inventory({ rawArc })
+    let inv = await inventory({ rawArc, deployStage })
     package(inv)
   }
   catch (err) {
@@ -309,7 +310,7 @@ layers a:b:c:us-west-2:d
 layers a:b:c:us-west-2:d
 `)
   try {
-    let inv = await inventory({ rawArc })
+    let inv = await inventory({ rawArc, deployStage })
     package(inv)
   }
   catch (err) {
@@ -335,7 +336,7 @@ concurrency ${concurrency}
 layers ${layer(1)}
 policies ${policy(1)}
 `)
-  let inv = await inventory({ rawArc })
+  let inv = await inventory({ rawArc, deployStage })
   let props = package(inv).Resources.AnEventEventLambda.Properties
   t.equal(props['Timeout'], timeout, `Timeout (control test): ${props['Timeout']}`)
   t.equal(props['MemorySize'], memory, `Memory (control test): ${props['MemorySize']}`)
@@ -362,7 +363,7 @@ policies ${policy(2)}
   mockFs({
     'src/events/an-event/.arc-config': Buffer.from(arcConfig)
   })
-  inv = await inventory({ rawArc })
+  inv = await inventory({ rawArc, deployStage })
   props = package(inv).Resources.AnEventEventLambda.Properties
   mockFs.restore()
   t.equal(props['Timeout'], timeout, `Timeout: ${props['Timeout']}`)
@@ -382,7 +383,7 @@ test('Function type specific settings', async t => {
   let rawArc = arc(`@queues
 a-queue
 `)
-  let inv = await inventory({ rawArc })
+  let inv = await inventory({ rawArc, deployStage })
   let props = package(inv).Resources.AQueueQueue.Properties
   t.ok(props['FifoQueue'], `FifoQueue is set by default: ${props['FifoQueue']}`)
   t.ok(props['ContentBasedDeduplication'], `ContentBasedDeduplication is set by default: ${props['ContentBasedDeduplication']}`)
@@ -393,7 +394,7 @@ a-queue
 @aws
 fifo false
 `)
-  inv = await inventory({ rawArc })
+  inv = await inventory({ rawArc, deployStage })
   props = package(inv).Resources.AQueueQueue.Properties
   t.notOk(props['FifoQueue'], `FifoQueue disabled by setting`)
   t.notOk(props['ContentBasedDeduplication'], `ContentBasedDeduplication disabled by setting`)
@@ -421,7 +422,7 @@ region ${region}
 
 @static
 `)
-    let inv = await inventory({ rawArc })
+    let inv = await inventory({ rawArc, deployStage })
     let bucketUrl = package(inv).Outputs.BucketURL.Value['Fn::Sub'][0]
     t.equal(bucketUrl, olderFormat, `${region} uses older format`)
   }
@@ -438,7 +439,7 @@ region ${region}
 
 @static
 `)
-  let inv = await inventory({ rawArc })
+  let inv = await inventory({ rawArc, deployStage })
   let bucketUrl = package(inv).Outputs.BucketURL.Value['Fn::Sub'][0]
   t.equal(bucketUrl, newerFormat, `${region} uses newer format`)
 })

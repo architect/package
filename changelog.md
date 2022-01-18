@@ -2,6 +2,28 @@
 
 ---
 
+## [8.0.0] 2022-01-13
+
+### Added
+
+- Architect 10 plugin API support!
+- Added support for Inventory's `deployStage` property, allowing proper stage awareness to CloudFormation / SAM generation
+  - Took over a variety of CloudFormation mutations in Deploy
+
+
+### Changed
+
+- Breaking change: Package (and thus Architect) no longer automatically populates `NODE_ENV` env var
+  - For environment identification needs, Architect now relies solely on `ARC_ENV`
+  - Thus, `NODE_ENV` is returned to userland, and is entirely optional
+
+
+### Fixed
+
+- Fixed issue where `@static prefix` + `spa` settings were not getting populated into root handlers other than `get /`
+
+---
+
 ## [7.2.0] 2021-11-16
 
 ### Added

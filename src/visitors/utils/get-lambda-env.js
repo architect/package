@@ -1,21 +1,15 @@
 module.exports = function getEnv (params) {
-  let { config, runtime, inventory } = params
-  let { inv } = inventory
+  let { config, inventory, lambda, runtime } = params
+  let { inv, get } = inventory
+  let { deployStage } = inv._arc
+  let { env: userEnv, rootHandler } = inv._project
 
   let env = {
     ARC_APP_NAME: inv.app,
     ARC_CLOUDFORMATION: { Ref: 'AWS::StackName' },
-    ARC_ENV: 'staging', // Always default to staging; mutate to production via macro where necessary
+    ARC_ENV: deployStage,
     ARC_ROLE: { Ref: 'Role' },
-    NODE_ENV: 'staging', // Same as above, always default to staging; userland may mutate
     SESSION_TABLE_NAME: 'jwe',
-  }
-
-  if (config.env === false) env.ARC_DISABLE_ENV_VARS = true
-
-  // Global add PYTHONPATH if the runtime is Python
-  if (runtime.startsWith('python')) {
-    env.PYTHONPATH = '/var/task/vendor:/var/runtime:/opt/python'
   }
 
   // add the ARC_STATIC_BUCKET if defined
@@ -27,11 +21,40 @@ module.exports = function getEnv (params) {
   if (inv.ws) {
     env.ARC_WSS_URL = {
       'Fn::Sub': [
-        // Always default to staging; mutate to production via macro where necessary
-        'wss://${WS}.execute-api.${AWS::Region}.amazonaws.com/staging',
+        'wss://${WS}.execute-api.${AWS::Region}.amazonaws.com/' + deployStage,
         {}
       ]
     }
+  }
+
+  // ASAP + SPA static app variables
+  if (lambda.pragma === 'http' && rootHandler) {
+    if (rootHandler === 'arcStaticAssetProxy' ||
+        rootHandler === lambda.name) {
+      let prefix = get.static('prefix')
+      if (prefix) env.ARC_STATIC_PREFIX = prefix
+
+      // SPA defaults to false if env var isn't set
+      let spaSetting = get.static('spa')
+      let hasSpa = typeof spaSetting !== undefined
+      if (hasSpa) env.ARC_STATIC_SPA = spaSetting
+    }
+  }
+
+  // Populate userland env vars if any are present and this Lambda has them enabled
+  let envVars = userEnv?.aws?.[deployStage]
+  if (envVars && config.env !== false) {
+    Object.entries(envVars).forEach(([ k, v ]) => {
+      if (!env[k]) env[k] = v
+    })
+  }
+  if (config.env === true) {
+    env.ARC_DISABLE_ENV_VARS = true
+  }
+
+  // Global add PYTHONPATH if the runtime is Python; do it down here to allow userland customization
+  if (runtime.startsWith('python') && !env.PYTHONPATH) {
+    env.PYTHONPATH = '/var/task/vendor:/var/runtime:/opt/python'
   }
 
   return env

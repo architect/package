@@ -1,8 +1,12 @@
 let { getLambdaName, toLogicalID } = require('@architect/utils')
 let renderRoute = require('./render-route')
 
-module.exports = function getHttpApiProperties (http) {
-  let paths = getPaths(http)
+module.exports = function getHttpApiProperties (inventory) {
+  let { inv } = inventory
+  let { http } = inv
+  let payloadVersion = inv.aws.apigateway === 'httpv1' ? '1.0' : '2.0'
+
+  let paths = getPaths(http, payloadVersion)
   let Properties = {
     StageName: '$default', // Default, but specify for safety
     DefinitionBody: {
@@ -14,7 +18,7 @@ module.exports = function getHttpApiProperties (http) {
   return Properties
 }
 
-function getPaths (routes) {
+function getPaths (routes, payloadFormatVersion) {
   let paths = {}
 
   routes.forEach(route => {
@@ -26,7 +30,7 @@ function getPaths (routes) {
     if (!paths[cfPath][m]) {
       paths[cfPath][m] = {
         'x-amazon-apigateway-integration': {
-          payloadFormatVersion: '2.0',
+          payloadFormatVersion,
           type: 'aws_proxy',
           httpMethod: 'POST',
           uri: getURI({ path, method }),
