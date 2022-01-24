@@ -6,10 +6,9 @@ module.exports = function getEnv (params) {
 
   let env = {
     ARC_APP_NAME: inv.app,
-    ARC_CLOUDFORMATION: { Ref: 'AWS::StackName' },
     ARC_ENV: deployStage,
     ARC_ROLE: { Ref: 'Role' },
-    SESSION_TABLE_NAME: 'jwe',
+    ARC_SESSION_TABLE_NAME: 'jwe',
   }
 
   // add the ARC_STATIC_BUCKET if defined
@@ -47,6 +46,9 @@ module.exports = function getEnv (params) {
     Object.entries(envVars).forEach(([ k, v ]) => {
       if (!env[k]) env[k] = v
     })
+    if (envVars.SESSION_TABLE_NAME && !envVars.ARC_SESSION_TABLE_NAME) {
+      env.ARC_SESSION_TABLE_NAME = envVars.SESSION_TABLE_NAME
+    }
   }
   if (config.env === true) {
     env.ARC_DISABLE_ENV_VARS = true

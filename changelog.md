@@ -13,9 +13,12 @@
 
 ### Changed
 
-- Breaking change: Package (and thus Architect) no longer automatically populates `NODE_ENV` env var
+- Package now populates `ARC_SESSION_TABLE_NAME`, and prefers it to the non-namespaced `SESSION_TABLE_NAME`
+  - Both are supported, we suggest using only `ARC_SESSION_TABLE_NAME` moving forward, as all non-namespaced env vars will be retired in a future release
+- Breaking change: Package (and thus Architect) no longer automatically populates `NODE_ENV` + `ARC_CLOUDFORMATION` env vars
   - For environment identification needs, Architect now relies solely on `ARC_ENV`
   - Thus, `NODE_ENV` is returned to userland, and is entirely optional
+- Stop publishing to the GitHub Package registry
 
 
 ### Fixed
