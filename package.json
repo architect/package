@@ -5,8 +5,8 @@
   "main": "src/index.js",
   "scripts": {
     "lint": "eslint . --fix",
-    "test:unit": "cross-env PORT=6666 tape 'test/unit/**/*-test.js' | tap-spec",
-    "test:slow": "cross-env PORT=6666 tape 'test/slow/**/*-test.js' | tap-spec",
+    "test:unit": "cross-env tape 'test/unit/**/*-test.js' | tap-spec",
+    "test:integration": "cross-env tape 'test/integration/**/*-test.js' | tap-spec",
     "coverage": "nyc --reporter=lcov --reporter=text npm run test:unit",
     "test": "npm run lint && npm run coverage",
     "rc": "npm version prerelease --preid RC"
@@ -22,8 +22,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@architect/inventory": "~3.0.0-RC.3",
-    "@architect/utils": "~3.0.4",
-    "chalk": "~4.1.2"
+    "@architect/utils": "~3.0.4"
   },
   "devDependencies": {
     "@architect/eslint-config": "~2.0.1",
