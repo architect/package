@@ -50,7 +50,7 @@ module.exports = function getEnv (params) {
       env.ARC_SESSION_TABLE_NAME = envVars.SESSION_TABLE_NAME
     }
   }
-  if (config.env === true) {
+  if (config.env === false) {
     env.ARC_DISABLE_ENV_VARS = true
   }
 
