@@ -10,6 +10,8 @@ let tables = require('./tables')
 let tablesIndexes = require('./tables-indexes')
 let tablesStreams = require('./tables-streams')
 let ws = require('./ws')
+let customLambdas = require('./custom-lambdas')
+
 
 module.exports = {
   deno,
@@ -24,4 +26,5 @@ module.exports = {
   'tables-indexes': tablesIndexes,
   'tables-streams': tablesStreams,
   ws,
+  customLambdas,
 }

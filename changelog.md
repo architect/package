@@ -14,6 +14,7 @@
 ### Changed
 
 - Breaking change: Package can no longer be run via CLI, and now serves purely as a module generating CloudFormation
+- Breaking change: `createFunction` helper exported for the plugins beta is now deprecated in favor of `set.customLambdas`
 - Package now populates `ARC_SESSION_TABLE_NAME`, and prefers it to the non-namespaced `SESSION_TABLE_NAME`
   - Both are supported, we suggest using only `ARC_SESSION_TABLE_NAME` moving forward, as all non-namespaced env vars will be retired in a future release
 - Breaking change: Package (and thus Architect) no longer automatically populates `NODE_ENV` + `ARC_CLOUDFORMATION` env vars
