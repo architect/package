@@ -109,7 +109,10 @@ module.exports = function ssm ({ inv }, template) {
           Statement: [
             {
               Effect: 'Allow',
-              Action: 'ssm:GetParametersByPath',
+              Action: [
+                'ssm:GetParametersByPath',
+                'ssm:GetParameter',
+              ],
               Resource: {
                 'Fn::Sub': [
                   'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AWS::StackName}',
@@ -119,10 +122,26 @@ module.exports = function ssm ({ inv }, template) {
             },
             {
               Effect: 'Allow',
-              Action: 'ssm:GetParametersByPath',
+              Action: [
+                'ssm:GetParametersByPath',
+                'ssm:GetParameter',
+              ],
               Resource: {
                 'Fn::Sub': [
                   'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AWS::StackName}/*',
+                  {}
+                ]
+              }
+            },
+            {
+              Effect: 'Allow',
+              Action: [
+                'ssm:GetParametersByPath',
+                'ssm:GetParameter',
+              ],
+              Resource: {
+                'Fn::Sub': [
+                  'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AWS::StackName}/*/*',
                   {}
                 ]
               }
