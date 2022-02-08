@@ -106,16 +106,28 @@ module.exports = function ssm ({ inv }, template) {
       Properties: {
         PolicyName: `ArcParameterStorePolicy`,
         PolicyDocument: {
-          Statement: [ {
-            Effect: 'Allow',
-            Action: 'ssm:GetParametersByPath',
-            Resource: {
-              'Fn::Sub': [
-                'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AWS::StackName}',
-                {}
-              ]
-            }
-          } ]
+          Statement: [
+            {
+              Effect: 'Allow',
+              Action: 'ssm:GetParametersByPath',
+              Resource: {
+                'Fn::Sub': [
+                  'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AWS::StackName}',
+                  {}
+                ]
+              }
+            },
+            {
+              Effect: 'Allow',
+              Action: 'ssm:GetParametersByPath',
+              Resource: {
+                'Fn::Sub': [
+                  'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AWS::StackName}/*',
+                  {}
+                ]
+              }
+            },
+          ]
         },
         Roles: [ { Ref: 'Role' } ],
       }
