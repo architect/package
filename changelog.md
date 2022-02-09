@@ -26,6 +26,7 @@
 ### Fixed
 
 - Fixed issue where `@static prefix` + `spa` settings were not getting populated into root handlers other than `get /`
+- Fixed issue where using `architect-default-policies` did not include SSM IAM permissions; thanks @tbeseda!
 
 ---
 

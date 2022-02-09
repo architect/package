@@ -49,6 +49,9 @@ module.exports = function createLambda (params) {
       template.Resources.Role.Properties.Policies.forEach(policy => {
         policy.PolicyDocument.Statement.forEach(p => Statement.push(p))
       })
+      if (template.Resources.ParameterStorePolicy) {
+        template.Resources.ParameterStorePolicy.Properties.PolicyDocument.Statement.forEach(p => Statement.push(p))
+      }
       item.Properties.Policies.push({ Statement })
     }
   }
