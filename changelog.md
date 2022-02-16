@@ -21,6 +21,8 @@
   - For environment identification needs, Architect now relies solely on `ARC_ENV`
   - Thus, `NODE_ENV` is returned to userland, and is entirely optional
 - Stop publishing to the GitHub Package registry
+- Migrate static bucket permissions from per-object ACLs to a bucket policy so users can customize the static bucket permissions using plugins
+  - See: https://github.com/architect/package/pull/148, https://github.com/architect/deploy/pull/350
 
 
 ### Fixed

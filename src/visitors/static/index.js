@@ -30,7 +30,13 @@ module.exports = function visitStatic (inventory, template) {
   template.Resources.StaticBucket = {
     Type: 'AWS::S3::Bucket',
     Properties: {
-      AccessControl: 'PublicRead',
+      OwnershipControls: {
+        Rules: [
+          {
+            ObjectOwnership: "BucketOwnerEnforced"
+          }
+        ]
+      },
       WebsiteConfiguration: {
         IndexDocument: 'index.html',
         ErrorDocument: '404.html'
@@ -46,6 +52,31 @@ module.exports = function visitStatic (inventory, template) {
         getBucketUrlForRegion(inv.aws.region),
         { bukkit: { Ref: 'StaticBucket' } }
       ]
+    }
+  }
+
+  // Allow public read access to all objects in the static bucket
+  template.Resources.StaticBucketPolicy = {
+    Type: 'AWS::S3::BucketPolicy',
+    Properties: {
+      Bucket: { Ref: 'StaticBucket' },
+      PolicyDocument: {
+        Version: '2012-10-17',
+        Statement: [
+          {
+            Action: [ 's3:GetObject' ],
+            Effect: 'Allow',
+            Principal: '*',
+            Resource: [ {
+              'Fn::Sub': [
+                'arn:aws:s3:::${bukkit}/*',
+                { bukkit: { Ref: 'StaticBucket' } }
+              ]
+            } ],
+            Sid: 'PublicReadGetObject'
+          }
+        ]
+      }
     }
   }
 
