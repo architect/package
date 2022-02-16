@@ -2,13 +2,33 @@
 
 ---
 
-## [8.0.0] unreleased
+## [8.0.0] 2022-01-13
+
+### Added
+
+- Architect 10 plugin API support!
+- Added support for Inventory's `deployStage` property, allowing proper stage awareness to CloudFormation / SAM generation
+  - Took over a variety of CloudFormation mutations in Deploy
+
 
 ### Changed
 
-- Migrate static bucket permissions from per-object ACLs to a bucket policy so
-  that users can customize the static bucket permissions using macros.
+- Breaking change: Package can no longer be run via CLI, and now serves purely as a module generating CloudFormation
+- Breaking change: `createFunction` helper exported for the plugins beta is now deprecated in favor of `set.customLambdas`
+- Package now populates `ARC_SESSION_TABLE_NAME`, and prefers it to the non-namespaced `SESSION_TABLE_NAME`
+  - Both are supported, we suggest using only `ARC_SESSION_TABLE_NAME` moving forward, as all non-namespaced env vars will be retired in a future release
+- Breaking change: Package (and thus Architect) no longer automatically populates `NODE_ENV` + `ARC_CLOUDFORMATION` env vars
+  - For environment identification needs, Architect now relies solely on `ARC_ENV`
+  - Thus, `NODE_ENV` is returned to userland, and is entirely optional
+- Stop publishing to the GitHub Package registry
+- Migrate static bucket permissions from per-object ACLs to a bucket policy so users can customize the static bucket permissions using plugins
   - See: https://github.com/architect/package/pull/148, https://github.com/architect/deploy/pull/350
+
+
+### Fixed
+
+- Fixed issue where `@static prefix` + `spa` settings were not getting populated into root handlers other than `get /`
+- Fixed issue where using `architect-default-policies` did not include SSM IAM permissions; thanks @tbeseda!
 
 ---
 

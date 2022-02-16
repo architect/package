@@ -10,13 +10,14 @@ app
 surfboards
   nickname *String
 `
+let deployStage = 'staging'
 let arc = config => `${base}\n${config ? config : ''}`
 let cfn = () => JSON.parse(JSON.stringify({ Resources: {} }))
 
 test('index visitor should return untouched template if inventory contains no indexes', async t => {
   t.plan(1)
   let rawArc = arc()
-  let inv = await inventory({ rawArc })
+  let inv = await inventory({ rawArc, deployStage })
   let template = tables(inv, cfn())
   let output = visit(inv, template)
   t.equals(JSON.stringify(template), JSON.stringify(output), 'app without indexes do not change cfn template')
@@ -24,8 +25,8 @@ test('index visitor should return untouched template if inventory contains no in
 
 test('index visitor should support named indexes', async t => {
   t.plan(1)
-  let rawArc = arc('@indexes\nsurfboards\n  name ByMake\n  make *String')
-  let inv = await inventory({ rawArc })
+  let rawArc = arc('@tables-indexes\nsurfboards\n  name ByMake\n  make *String')
+  let inv = await inventory({ rawArc, deployStage })
   let template = tables(inv, cfn())
   let output = visit(inv, template)
   let indexName = output.Resources.SurfboardsTable.Properties.GlobalSecondaryIndexes[0].IndexName
@@ -34,8 +35,8 @@ test('index visitor should support named indexes', async t => {
 
 test('index visitor should set proper key schema for any generated indexes', async t => {
   t.plan(2)
-  let rawArc = arc('@indexes\nsurfboards\n  make *String\n  birthday **String')
-  let inv = await inventory({ rawArc })
+  let rawArc = arc('@tables-indexes\nsurfboards\n  make *String\n  birthday **String')
+  let inv = await inventory({ rawArc, deployStage })
   let template = tables(inv, cfn())
   let output = visit(inv, template)
   let gsi = output.Resources.SurfboardsTable.Properties.GlobalSecondaryIndexes[0]
@@ -47,8 +48,8 @@ test('index visitor should set proper key schema for any generated indexes', asy
 
 test('index visitor should aggregate and dedupeindex keys into table attribute definitions', async t => {
   t.plan(3)
-  let rawArc = arc('@indexes\nsurfboards\n  make *String\n  nickname **String')
-  let inv = await inventory({ rawArc })
+  let rawArc = arc('@tables-indexes\nsurfboards\n  make *String\n  nickname **String')
+  let inv = await inventory({ rawArc, deployStage })
   let template = tables(inv, cfn())
   let output = visit(inv, template)
   let attrs = output.Resources.SurfboardsTable.Properties.AttributeDefinitions

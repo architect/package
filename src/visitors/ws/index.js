@@ -8,7 +8,8 @@ module.exports = function visitWebSockets (inventory, template) {
   let { inv } = inventory
   if (!inv.ws) return template
 
-  let Name = toLogicalID(`${inv.app}-websocket`)
+  let { deployStage } = inv._arc
+  let Name = toLogicalID(`${inv.app}-websocket-${deployStage}`)
 
   template.Resources.WS = {
     Type: 'AWS::ApiGatewayV2::Api',
@@ -34,7 +35,7 @@ module.exports = function visitWebSockets (inventory, template) {
   template.Resources.WebsocketStage = {
     Type: 'AWS::ApiGatewayV2::Stage',
     Properties: {
-      StageName: 'staging',
+      StageName: deployStage,
       DeploymentId: { Ref: 'WebsocketDeployment' },
       ApiId: { Ref: 'WS' },
     }
@@ -122,7 +123,7 @@ module.exports = function visitWebSockets (inventory, template) {
     Value: {
       'Fn::Sub': [
         // Always default to staging; mutate to production via macro where necessary
-        'wss://${WS}.execute-api.${AWS::Region}.amazonaws.com/staging',
+        'wss://${WS}.execute-api.${AWS::Region}.amazonaws.com/' + deployStage,
         {}
       ]
     }

@@ -2,17 +2,18 @@ let getLambdaEnv = require('./get-lambda-env')
 
 module.exports = function createLambda (params) {
   let { lambda, inventory, template } = params
-  let { src, config } = lambda
-  let { architecture, timeout, memory, runtime, handler, concurrency, layers, policies } = config
-  let Variables = getLambdaEnv({ config, runtime, inventory })
+  let { build, src, config } = lambda
+  let { architecture, timeout, memory, runtime, runtimeConfig, handler, concurrency, layers, policies } = config
+  let Variables = getLambdaEnv({ config, inventory, lambda, runtime })
+  let Runtime = runtimeConfig?.baseRuntime || runtime
 
   // Add Lambda resources
   let item = {
     Type: 'AWS::Serverless::Function',
     Properties: {
       Handler: handler,
-      CodeUri: src,
-      Runtime: runtime,
+      CodeUri: build || src,
+      Runtime,
       Architectures: [ architecture ],
       MemorySize: memory,
       Timeout: timeout,
@@ -48,6 +49,9 @@ module.exports = function createLambda (params) {
       template.Resources.Role.Properties.Policies.forEach(policy => {
         policy.PolicyDocument.Statement.forEach(p => Statement.push(p))
       })
+      if (template.Resources.ParameterStorePolicy) {
+        template.Resources.ParameterStorePolicy.Properties.PolicyDocument.Statement.forEach(p => Statement.push(p))
+      }
       item.Properties.Policies.push({ Statement })
     }
   }
