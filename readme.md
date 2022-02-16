@@ -29,7 +29,8 @@ get /
 `
 
 // export as sam
-let sam = pkg(inventory({ rawArc: arcString }))
+let inv = inventory({ rawArc: arcString, deployStage: 'staging' })
+let sam = pkg(inv)
 console.log(sam)
 ```
 
