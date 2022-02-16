@@ -33,7 +33,7 @@ module.exports = function visitStatic (inventory, template) {
       OwnershipControls: {
         Rules: [
           {
-            ObjectOwnership: "BucketOwnerEnforced"
+            ObjectOwnership: 'BucketOwnerEnforced'
           }
         ]
       },

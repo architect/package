@@ -29,7 +29,7 @@ get /
 `
 
 // export as sam
-let inv = inventory({ rawArc: arcString, deployStage: 'staging' })
+let inv = await inventory({ rawArc: arcString, deployStage: 'staging' })
 let sam = pkg(inv)
 console.log(sam)
 ```
