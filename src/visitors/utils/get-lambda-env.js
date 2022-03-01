@@ -9,6 +9,7 @@ module.exports = function getEnv (params) {
     ARC_ENV: deployStage,
     ARC_ROLE: { Ref: 'Role' },
     ARC_SESSION_TABLE_NAME: 'jwe',
+    ARC_STACK_NAME: { Ref: 'AWS::StackName' },
   }
 
   // add the ARC_STATIC_BUCKET if defined

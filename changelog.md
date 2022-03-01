@@ -2,6 +2,14 @@
 
 ---
 
+## [8.0.1] 2022-03-01
+
+### Added
+
+- Added `ARC_STACK_NAME` env var to fix missing stack name data; fixes #1322, thanks @Lugana707, @pgte
+
+---
+
 ## [8.0.0] 2022-01-13
 
 ### Added
