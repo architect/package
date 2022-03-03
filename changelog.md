@@ -2,6 +2,14 @@
 
 ---
 
+## [8.0.2] 2022-03-03
+
+### Fixed
+
+- Fixed regression where S3 IAM policy could prevent `@architect/asap` from properly peeking into a directory to look for a default index.html file
+
+---
+
 ## [8.0.1] 2022-03-01
 
 ### Added
