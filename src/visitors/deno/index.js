@@ -31,7 +31,7 @@ module.exports = function visitDeno (inventory, template) {
         template.Resources[resource].Properties.Layers = []
       template.Resources[resource].Properties.Layers.push(deno[inventory.inv.aws.region])
       template.Resources[resource].Properties.Handler = 'index.handler'
-      template.Resources[resource].Properties.Runtime = 'provided'
+      template.Resources[resource].Properties.Runtime = 'provided.al2'
     }
   }
 
