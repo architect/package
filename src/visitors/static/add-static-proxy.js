@@ -7,7 +7,7 @@ module.exports = function addStatic (inventory, template) {
         httpMethod: 'GET',
         uri: {
           'Fn::Sub': [
-            'http://${bukkit}.s3.${AWS::Region}.amazonaws.com/{proxy}',
+            'https://${bukkit}.s3.${AWS::Region}.amazonaws.com/{proxy}',
             { bukkit: { Ref: 'StaticBucket' } }
           ]
         },
