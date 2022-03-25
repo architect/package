@@ -36,7 +36,7 @@ module.exports = function getEnv (params) {
 
       // SPA defaults to false if env var isn't set
       let spaSetting = get.static('spa')
-      let hasSpa = typeof spaSetting !== undefined
+      let hasSpa = spaSetting !== undefined && spaSetting !== null
       if (hasSpa) env.ARC_STATIC_SPA = spaSetting
     }
   }

@@ -2,6 +2,14 @@
 
 ---
 
+## [8.1.0] 2022-03-24
+
+### Added
+
+- Added support for configuring Lambda's ephemeral storage feature
+
+---
+
 ## [8.0.3] 2022-03-07
 
 ### Changed
