@@ -75,29 +75,23 @@ module.exports = function visitGlobals (inventory, template) {
     })
   }
 
-  // allow lambdas to CRUD tables
+  // Allow Lambdas full access to tables (with the exception of table deletion)
   if (inv.tables) {
     template.Resources.Role.Properties.Policies.push({
       PolicyName: 'ArcDynamoPolicy',
       PolicyDocument: {
-        Statement: [ {
-          Effect: 'Allow',
-          Action: [
-            'dynamodb:BatchGetItem',
-            'dynamodb:BatchWriteItem',
-            'dynamodb:PutItem',
-            'dynamodb:DeleteItem',
-            'dynamodb:GetItem',
-            'dynamodb:Query',
-            'dynamodb:Scan',
-            'dynamodb:UpdateItem',
-            'dynamodb:GetRecords',
-            'dynamodb:GetShardIterator',
-            'dynamodb:DescribeStream',
-            'dynamodb:ListStreams'
-          ],
-          Resource: getTableArns(inv.tables),
-        } ]
+        Statement: [
+          {
+            Effect: 'Allow',
+            Action: 'dynamodb:*',
+            Resource: getTableArns(inv.tables),
+          },
+          {
+            Effect: 'Deny',
+            Action: 'dynamodb:DeleteTable',
+            Resource: 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/*',
+          },
+        ]
       }
     })
     function getTableArns (tables) {
@@ -112,12 +106,6 @@ module.exports = function visitGlobals (inventory, template) {
         {
           'Fn::Sub': [
             'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tablename}/*',
-            { tablename: { Ref: name } }
-          ]
-        },
-        {
-          'Fn::Sub': [
-            'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tablename}/stream/*',
             { tablename: { Ref: name } }
           ]
         } ]

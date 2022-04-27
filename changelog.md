@@ -2,6 +2,19 @@
 
 ---
 
+## [8.1.1] 2022-04-26
+
+### Added
+
+- Relaxed `@tables` permissions in the default role
+
+
+### Fixed
+
+- Reduced excess CloudFormation statements for `@tables`; thanks @frankleng!
+
+---
+
 ## [8.1.0] 2022-03-24
 
 ### Added
