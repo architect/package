@@ -2,11 +2,12 @@
 
 ---
 
-## [8.1.1] 2022-04-26
+## [8.1.1] 2022-04-28
 
 ### Added
 
 - Relaxed `@tables` permissions in the default role
+
 
 ### Changed
 
