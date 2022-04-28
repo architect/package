@@ -8,6 +8,10 @@
 
 - Relaxed `@tables` permissions in the default role
 
+### Changed
+
+- Use https, not http, for API Gateway proxy to static bucket; thanks @lpsinger!
+
 
 ### Fixed
 
