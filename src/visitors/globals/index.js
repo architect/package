@@ -89,7 +89,9 @@ module.exports = function visitGlobals (inventory, template) {
           {
             Effect: 'Deny',
             Action: 'dynamodb:DeleteTable',
-            Resource: 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/*',
+            Resource: {
+              'Fn::Sub': 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/*',
+            },
           },
         ]
       }
