@@ -2,6 +2,10 @@
 
 ---
 
+## [8.1.2] unreleased
+
+- Fixed a CloudFormation syntax error that was introduced in 8.1.1.
+
 ## [8.1.1] 2022-04-28
 
 ### Added
