@@ -4,7 +4,9 @@
 
 ## [8.1.2] unreleased
 
-- Fixed a CloudFormation syntax error that was introduced in 8.1.1.
+- Fixed a CloudFormation syntax error that was introduced in 8.1.1; thanks @lpsinger!
+
+---
 
 ## [8.1.1] 2022-04-28
 
