@@ -2,7 +2,15 @@
 
 ---
 
-## [8.1.2] unreleased
+## [8.1.3] 2022-05-10
+
+### Changed
+
+- Updated dependencies; sub-dep `lambda-runtimes` adds `nodejs16.x`.
+
+---
+
+## [8.1.2] 2022-04-29
 
 - Fixed a CloudFormation syntax error that was introduced in 8.1.1; thanks @lpsinger!
 

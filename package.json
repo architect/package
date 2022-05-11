@@ -5,8 +5,8 @@
   "main": "src/index.js",
   "scripts": {
     "lint": "eslint . --fix",
-    "test:unit": "cross-env tape 'test/unit/**/*-test.js' | tap-spec",
-    "test:integration": "cross-env tape 'test/integration/**/*-test.js' | tap-spec",
+    "test:unit": "cross-env tape 'test/unit/**/*-test.js' | tap-arc",
+    "test:integration": "cross-env tape 'test/integration/**/*-test.js' | tap-arc",
     "coverage": "nyc --reporter=lcov --reporter=text npm run test:unit",
     "test": "npm run lint && npm run coverage",
     "rc": "npm version prerelease --preid RC"
@@ -21,19 +21,19 @@
   "author": "Brian LeRoux <b@brian.io>",
   "license": "Apache-2.0",
   "dependencies": {
-    "@architect/inventory": "~3.1.0",
-    "@architect/utils": "~3.1.0"
+    "@architect/inventory": "~3.1.1",
+    "@architect/utils": "~3.1.1"
   },
   "devDependencies": {
     "@architect/eslint-config": "~2.0.1",
     "aws-sdk": "2.1001.0",
     "cross-env": "^7.0.3",
-    "eslint": "^8.11.0",
+    "eslint": "^8.15.0",
     "mock-fs": "~5.1.2",
     "nyc": "^15.1.0",
     "run-parallel": "~1.2.0",
-    "tap-spec": "^5.0.0",
-    "tape": "^5.5.2"
+    "tap-arc": "^0.3.4",
+    "tape": "^5.5.3"
   },
   "eslintConfig": {
     "extends": "@architect/eslint-config"
