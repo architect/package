@@ -22,7 +22,7 @@ function getPaths (routes, payloadFormatVersion) {
   let paths = {}
 
   routes.forEach(route => {
-    let { method, path } = route
+    let { method, path, config: { provisionedConcurrency } } = route
     // Special API Gateway OpenAPI impl for `any` method
     let m = method === 'any' ? 'x-amazon-apigateway-any-method' : method
     let cfPath = renderRoute(path)
@@ -33,7 +33,7 @@ function getPaths (routes, payloadFormatVersion) {
           payloadFormatVersion,
           type: 'aws_proxy',
           httpMethod: 'POST',
-          uri: getURI({ path, method }),
+          uri: getURI({ path, method, provisionedConcurrency }),
           connectionType: 'INTERNET',
           // TODO currently ignored, reimplement when respected by HTTP APIs
           // cacheNamespace: xlr8r,
@@ -53,6 +53,7 @@ let getName = ({ path, method }) => toLogicalID(`${method}${getLambdaName(path).
 
 function getURI (route) {
   let name = getName(route)
-  let arn = `arn:aws:apigateway:\${AWS::Region}:lambda:path/2015-03-31/functions/\${${name}HTTPLambda.Arn}/invocations`
+  let alias = route.provisionedConcurrency ? ':live' : ''
+  let arn = `arn:aws:apigateway:\${AWS::Region}:lambda:path/2015-03-31/functions/\${${name}HTTPLambda.Arn}${alias}/invocations`
   return { 'Fn::Sub': arn }
 }

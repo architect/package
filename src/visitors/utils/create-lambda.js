@@ -3,7 +3,7 @@ let getLambdaEnv = require('./get-lambda-env')
 module.exports = function createLambda (params) {
   let { lambda, inventory, template } = params
   let { build, src, config } = lambda
-  let { architecture, timeout, memory, runtime, storage, runtimeConfig, handler, concurrency, layers, policies } = config
+  let { architecture, timeout, memory, runtime, storage, runtimeConfig, handler, concurrency, provisionedConcurrency, layers, policies } = config
   let Variables = getLambdaEnv({ config, inventory, lambda, runtime })
   let Runtime = runtimeConfig?.baseRuntime || runtime
 
@@ -31,6 +31,13 @@ module.exports = function createLambda (params) {
 
   if (concurrency !== 'unthrottled') {
     item.Properties.ReservedConcurrentExecutions = concurrency
+  }
+
+  if (provisionedConcurrency) {
+    item.Properties.ProvisionedConcurrencyConfig = {
+      ProvisionedConcurrentExecutions: provisionedConcurrency
+    }
+    item.Properties.AutoPublishAlias = 'live'
   }
 
   if (layers.length > 0) {
