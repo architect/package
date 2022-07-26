@@ -2,6 +2,14 @@
 
 ---
 
+## [8.1.4] 2022-07-26
+
+### Changed
+
+- Updated dependencies
+
+---
+
 ## [8.1.3] 2022-05-10
 
 ### Changed
