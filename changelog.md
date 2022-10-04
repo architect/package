@@ -6,9 +6,9 @@
 
 ### Added
 
-- Add `provisionedConcurrency` project manifest option to configure AWS Lambda
-  provisioned concurrency, which can reduce latency by avoiding cold starts.
-  For more information, see: https://docs.aws.amazon.com/lambda/latest/dg/provisioned-concurrency.html
+- Add `provisionedConcurrency` project manifest option to configure AWS Lambda provisioned concurrency
+  - For more information, see: https://docs.aws.amazon.com/lambda/latest/dg/provisioned-concurrency.html
+  - Thanks, @lpsinger!
 
 ---
 
