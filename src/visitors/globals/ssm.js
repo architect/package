@@ -1,6 +1,7 @@
 let { toLogicalID } = require('@architect/utils')
 
 module.exports = function ssm ({ inv }, template) {
+  let { deployStage } = inv._arc
   let hasParams = false
 
   if (inv.tables) {
@@ -69,6 +70,11 @@ module.exports = function ssm ({ inv }, template) {
 
   if (inv.static) {
     hasParams = true
+
+    let Value = { Ref: 'StaticBucket' }
+    if (inv?.static?.[deployStage]) {
+      Value = inv?.static?.[deployStage]
+    }
     template.Resources.StaticBucketParam = {
       Type: 'AWS::SSM::Parameter',
       Properties: {
@@ -79,7 +85,7 @@ module.exports = function ssm ({ inv }, template) {
             { key: 'bucket' }
           ]
         },
-        Value: { Ref: 'StaticBucket' }
+        Value
       }
     }
 

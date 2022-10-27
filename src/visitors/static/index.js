@@ -24,22 +24,31 @@ function getBucketUrlForRegion (region) {
  */
 module.exports = function visitStatic (inventory, template) {
   let { inv } = inventory
+  let { deployStage } = inv._arc
+
   if (!inv.static) return template
 
-  // Leave the bucket name generation up to CloudFormation
-  template.Resources.StaticBucket = {
-    Type: 'AWS::S3::Bucket',
-    Properties: {
-      OwnershipControls: {
-        Rules: [
-          {
-            ObjectOwnership: 'BucketOwnerEnforced'
-          }
-        ]
-      },
-      WebsiteConfiguration: {
-        IndexDocument: 'index.html',
-        ErrorDocument: '404.html'
+  let bukkit = { Ref: 'StaticBucket' }
+  if (inv?.static?.[deployStage]) {
+    // User already has a bucket on hand they're using
+    bukkit = inv?.static?.[deployStage]
+  }
+  else {
+    // Otherwise leave the bucket name generation up to CloudFormation
+    template.Resources.StaticBucket = {
+      Type: 'AWS::S3::Bucket',
+      Properties: {
+        OwnershipControls: {
+          Rules: [
+            {
+              ObjectOwnership: 'BucketOwnerEnforced'
+            }
+          ]
+        },
+        WebsiteConfiguration: {
+          IndexDocument: 'index.html',
+          ErrorDocument: '404.html'
+        }
       }
     }
   }
@@ -50,7 +59,7 @@ module.exports = function visitStatic (inventory, template) {
     Value: {
       'Fn::Sub': [
         getBucketUrlForRegion(inv.aws.region),
-        { bukkit: { Ref: 'StaticBucket' } }
+        { bukkit }
       ]
     }
   }
@@ -59,7 +68,7 @@ module.exports = function visitStatic (inventory, template) {
   template.Resources.StaticBucketPolicy = {
     Type: 'AWS::S3::BucketPolicy',
     Properties: {
-      Bucket: { Ref: 'StaticBucket' },
+      Bucket: bukkit,
       PolicyDocument: {
         Version: '2012-10-17',
         Statement: [
@@ -70,7 +79,7 @@ module.exports = function visitStatic (inventory, template) {
             Resource: [ {
               'Fn::Sub': [
                 'arn:aws:s3:::${bukkit}/*',
-                { bukkit: { Ref: 'StaticBucket' } }
+                { bukkit }
               ]
             } ],
             Sid: 'PublicReadGetObject'

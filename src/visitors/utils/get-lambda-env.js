@@ -14,7 +14,11 @@ module.exports = function getEnv (params) {
 
   // add the ARC_STATIC_BUCKET if defined
   if (inv.static) {
-    env.ARC_STATIC_BUCKET = { Ref: 'StaticBucket' }
+    let Ref = 'StaticBucket'
+    if (inv?.static?.[deployStage]) {
+      Ref = inv?.static?.[deployStage]
+    }
+    env.ARC_STATIC_BUCKET = { Ref }
   }
 
   // add the ARC_WSS_URL if defined
