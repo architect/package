@@ -8,6 +8,7 @@ let { toLogicalID } = require('@architect/utils')
  */
 module.exports = function visitGlobals (inventory, template) {
   let { inv } = inventory
+  let { deployStage } = inv._arc
 
   // construct a least priv iam role
   template.Resources.Role = {
@@ -46,6 +47,10 @@ module.exports = function visitGlobals (inventory, template) {
 
   // allow lambdas read/write on the static bucket
   if (inv.static) {
+    let bukkit = { Ref: 'StaticBucket' }
+    if (inv?.static?.[deployStage]) {
+      bukkit = inv?.static?.[deployStage]
+    }
     template.Resources.Role.Properties.Policies.push({
       PolicyName: 'ArcStaticBucketPolicy',
       PolicyDocument: {
@@ -61,13 +66,13 @@ module.exports = function visitGlobals (inventory, template) {
           Resource: [ {
             'Fn::Sub': [
               'arn:aws:s3:::${bukkit}',
-              { bukkit: { Ref: 'StaticBucket' } }
+              { bukkit }
             ]
           },
           {
             'Fn::Sub': [
               'arn:aws:s3:::${bukkit}/*',
-              { bukkit: { Ref: 'StaticBucket' } }
+              { bukkit }
             ]
           } ]
         } ]

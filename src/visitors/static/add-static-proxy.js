@@ -1,4 +1,11 @@
 module.exports = function addStatic (inventory, template) {
+  let bukkit = { Ref: 'StaticBucket' }
+  let { inv } = inventory
+  let { deployStage } = inv._arc
+  if (inv?.static?.[deployStage]) {
+    bukkit = inv?.static?.[deployStage]
+  }
+
   template.Resources.HTTP.Properties.DefinitionBody.paths['/_static/{proxy+}'] = {
     get: {
       'x-amazon-apigateway-integration': {
@@ -8,7 +15,7 @@ module.exports = function addStatic (inventory, template) {
         uri: {
           'Fn::Sub': [
             'https://${bukkit}.s3.${AWS::Region}.amazonaws.com/{proxy}',
-            { bukkit: { Ref: 'StaticBucket' } }
+            { bukkit }
           ]
         },
         connectionType: 'INTERNET',

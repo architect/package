@@ -2,6 +2,14 @@
 
 ---
 
+## [8.2.1] 2022-10-27
+
+### Fixed
+
+- Fix missing support for legacy `@static staging|production` setting
+
+---
+
 ## [8.2.0] 2022-10-04
 
 ### Added
