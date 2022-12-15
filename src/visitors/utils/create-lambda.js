@@ -2,7 +2,7 @@ let getLambdaEnv = require('./get-lambda-env')
 
 module.exports = function createLambda (params) {
   let { lambda, inventory, template } = params
-  let { build, config, name, pragma, src } = lambda
+  let { build, config, name, method, path, pragma, src } = lambda
   let { architecture, timeout, memory, runtime, storage, runtimeConfig, handler, concurrency, provisionedConcurrency, layers, policies } = config
   let Variables = getLambdaEnv({ config, inventory, lambda, runtime })
   let Runtime = runtimeConfig?.baseRuntime || runtime
@@ -28,8 +28,10 @@ module.exports = function createLambda (params) {
       Events: {}
     },
     ArcMetadata: {
-      pragma,
+      pragma: pragma || 'custom',
       name,
+      method,
+      path,
     },
   }
 
