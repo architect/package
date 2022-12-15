@@ -2,6 +2,14 @@
 
 ---
 
+## [8.3.0] 2022-12-15
+
+### Added
+
+- Add Architect-specific metadata to Lambdas in CloudFormation
+
+---
+
 ## [8.2.2] 2022-11-24
 
 ### Added
