@@ -2,6 +2,14 @@
 
 ---
 
+## [8.4.1] 2023-02-01
+
+### Added
+
+- Add additional metadata to ASAP Lambdas in CloudFormation
+
+---
+
 ## [8.4.0] 2023-01-18
 
 ### Added
