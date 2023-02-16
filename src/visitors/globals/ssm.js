@@ -108,7 +108,6 @@ module.exports = function ssm ({ inv }, template) {
   if (hasParams) {
     template.Resources.ParameterStorePolicy = {
       Type: 'AWS::IAM::Policy',
-      DependsOn: 'Role',
       Properties: {
         PolicyName: `ArcParameterStorePolicy`,
         PolicyDocument: {
