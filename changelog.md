@@ -2,6 +2,14 @@
 
 ---
 
+## [8.5.0] 2023-04-08
+
+### Added
+
+- Added support for publishing compiled runtimes
+
+---
+
 ## [8.4.1] 2023-02-01
 
 ### Added

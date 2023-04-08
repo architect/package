@@ -2,18 +2,23 @@ let getLambdaEnv = require('./get-lambda-env')
 
 module.exports = function createLambda (params) {
   let { lambda, inventory, template } = params
-  let { arcStaticAssetProxy, build, config, name, method, path, pragma, src } = lambda
+  let { arcStaticAssetProxy, build, config, handlerFile, name, method, path, pragma, src } = lambda
   let { architecture, timeout, memory, runtime, storage, runtimeConfig, handler, concurrency, provisionedConcurrency, layers, policies } = config
 
   let Variables = getLambdaEnv({ config, inventory, lambda, runtime })
   let Runtime = runtimeConfig?.baseRuntime || runtime
+
+  let CodeUri = build || src
+  if (runtimeConfig?.type === 'compiled') {
+    CodeUri = handlerFile
+  }
 
   // Add Lambda resources
   let item = {
     Type: 'AWS::Serverless::Function',
     Properties: {
       Handler: handler,
-      CodeUri: build || src,
+      CodeUri,
       Runtime,
       Architectures: [ architecture ],
       MemorySize: memory,
