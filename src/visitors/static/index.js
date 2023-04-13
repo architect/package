@@ -48,7 +48,13 @@ module.exports = function visitStatic (inventory, template) {
         WebsiteConfiguration: {
           IndexDocument: 'index.html',
           ErrorDocument: '404.html'
-        }
+        },
+        PublicAccessBlockConfiguration: {
+          BlockPublicAcls: false,
+          BlockPublicPolicy: false,
+          IgnorePublicAcls: false,
+          RestrictPublicBuckets: false,
+        },
       }
     }
   }
