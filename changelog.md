@@ -2,6 +2,14 @@
 
 ---
 
+## [8.4.2] 2023-04-13
+
+### Fixed
+
+- Fixed public bucket permissions impacted by AWS's 2023-04 S3 security changes; thanks @brianleroux!
+
+---
+
 ## [8.4.1] 2023-02-01
 
 ### Added
