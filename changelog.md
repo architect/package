@@ -2,6 +2,19 @@
 
 ---
 
+## [8.5.0] 2023-04-22
+
+### Added
+
+- Added support for publishing compiled runtimes
+
+
+### Changed
+
+- Updated dependencies
+
+---
+
 ## [8.4.2] 2023-04-13
 
 ### Fixed
@@ -23,6 +36,7 @@
 ### Added
 
 - Added support for defining projection attributes on table `@indexes` (relates to [#1083](https://github.com/architect/architect/issues/1083))
+
 
 ### Changed
 

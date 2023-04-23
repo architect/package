@@ -21,14 +21,14 @@
   "author": "Brian LeRoux <b@brian.io>",
   "license": "Apache-2.0",
   "dependencies": {
-    "@architect/inventory": "~3.4.0",
-    "@architect/utils": "~3.1.2"
+    "@architect/inventory": "~3.5.0",
+    "@architect/utils": "~3.1.7"
   },
   "devDependencies": {
     "@architect/eslint-config": "~2.1.1",
-    "aws-sdk": "2.1055.0",
+    "aws-sdk": "^2.1363.0",
     "cross-env": "^7.0.3",
-    "eslint": "^8.32.0",
+    "eslint": "^8.39.0",
     "mock-fs": "~5.2.0",
     "nyc": "^15.1.0",
     "run-parallel": "~1.2.0",
