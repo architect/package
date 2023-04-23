@@ -1,4 +1,5 @@
 // eslint-disable-next-line
+require('aws-sdk/lib/maintenance_mode_message').suppress = true
 let aws = require('aws-sdk')
 let series = require('run-series')
 let parallel = require('run-parallel')
