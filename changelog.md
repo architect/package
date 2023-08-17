@@ -8,6 +8,11 @@
 
 - Updated dependencies
 
+
+### Fixed
+
+- Fixed issue where `ARC_SESSION_TABLE_NAME` could only be configured by setting the `SESSION_TABLE_NAME` env var
+
 ---
 
 ## [8.5.0] 2023-04-22
