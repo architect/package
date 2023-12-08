@@ -1,4 +1,4 @@
-let mockFs = require('mock-fs')
+let mockTmp = require('mock-tmp')
 let inventory = require('@architect/inventory')
 let test = require('tape')
 let package = require('../../')
@@ -360,12 +360,12 @@ concurrency ${concurrency}
 layers ${layer(2)}
 policies ${policy(2)}
 `
-  mockFs({
+  let tmp = mockTmp({
     'src/events/an-event/.arc-config': Buffer.from(arcConfig)
   })
-  inv = await inventory({ rawArc, deployStage })
+  inv = await inventory({ cwd: tmp, rawArc, deployStage })
   props = package(inv).Resources.AnEventEventLambda.Properties
-  mockFs.restore()
+  mockTmp.reset()
   t.equal(props['Timeout'], timeout, `Timeout: ${props['Timeout']}`)
   t.equal(props['MemorySize'], memory, `Memory: ${props['MemorySize']}`)
   t.equal(props['Runtime'], runtime, `Runtime: ${props['Runtime']}`)
