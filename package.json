@@ -28,7 +28,6 @@
     "@architect/eslint-config": "~2.1.2",
     "@aws-lite/client": "~0.12.2",
     "@aws-lite/s3": "~0.1.5",
-    "aws-sdk": "^2.1363.0",
     "cross-env": "^7.0.3",
     "eslint": "~8.55.0",
     "mock-tmp": "~0.0.2",
