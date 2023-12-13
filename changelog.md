@@ -2,6 +2,14 @@
 
 ---
 
+## [8.5.3] 2023-12-13
+
+### Changed
+
+- Switched from `aws-sdk` to `aws-lite`
+
+---
+
 ## [8.5.2] 2023-08-22
 
 ### Changed
