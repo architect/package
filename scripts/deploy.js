@@ -1,6 +1,3 @@
-// eslint-disable-next-line
-require('aws-sdk/lib/maintenance_mode_message').suppress = true
-let aws = require('aws-sdk')
 let series = require('run-series')
 let parallel = require('run-parallel')
 let pkg = require('../')
@@ -10,6 +7,7 @@ let path = require('path')
 let fs = require('fs')
 let sam = require('./package')
 let spawn = require('./spawn')
+let awsLite = require('@aws-lite/client')
 
 /**
  * deploy
@@ -75,6 +73,7 @@ module.exports = function deploy (params = {}, callback) {
   let bucket
   let appname
   let name
+  let aws
 
   series([
     function getInv (callback) {
@@ -111,16 +110,23 @@ module.exports = function deploy (params = {}, callback) {
       }), callback)
     },
 
+    function getAws (callback) {
+      awsLite()
+        .then(_aws => {
+          aws = _aws
+          callback()
+        })
+        .catch(err => callback(err))
+    },
+
     function uploadToS3 (callback) {
-      let s3 = new aws.S3
       parallel(Object.keys(cfn).map(k => {
         return function uploads (callback) {
           let Key = k.replace('json', 'yaml')
-          let Body = fs.readFileSync(path.join(process.cwd(), Key))
-          s3.putObject({
+          aws.s3.PutObject({
             Bucket: bucket,
             Key,
-            Body,
+            File: path.join(process.cwd(), Key),
           }, callback)
         }
       }), callback)

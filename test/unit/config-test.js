@@ -324,7 +324,7 @@ test('.arc-config overrides root config', async t => {
 
   let timeout = 10
   let memory = 3008
-  let runtime = 'python3.8'
+  let runtime = 'python3.9'
   let concurrency = 1337
 
   // Control
@@ -350,7 +350,7 @@ policies ${policy(1)}
   // Overlay settings
   timeout = 15
   memory = 128
-  runtime = 'ruby2.7'
+  runtime = 'ruby3.2'
   concurrency = 100
   let arcConfig = `@aws
 timeout ${timeout}
