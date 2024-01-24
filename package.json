@@ -21,20 +21,20 @@
   "author": "Brian LeRoux <b@brian.io>",
   "license": "Apache-2.0",
   "dependencies": {
-    "@architect/inventory": "~3.6.6-RC.0",
-    "@architect/utils": "~4.0.0-RC.1"
+    "@architect/inventory": "~4.0.0-RC.2",
+    "@architect/utils": "~4.0.0-RC.3"
   },
   "devDependencies": {
     "@architect/eslint-config": "~2.1.2",
-    "@aws-lite/client": "~0.12.2",
-    "@aws-lite/s3": "~0.1.5",
+    "@aws-lite/client": "~0.14.2",
+    "@aws-lite/s3": "~0.1.12",
     "cross-env": "^7.0.3",
-    "eslint": "~8.55.0",
+    "eslint": "~8.56.0",
     "mock-tmp": "~0.0.2",
     "nyc": "^15.1.0",
     "run-parallel": "~1.2.0",
     "tap-arc": "~1.2.2",
-    "tape": "~5.7.2"
+    "tape": "~5.7.3"
   },
   "eslintConfig": {
     "extends": "@architect/eslint-config"
