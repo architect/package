@@ -10,6 +10,14 @@
 - Added Node.js 20.x to test matrix
 - Breaking change: removed support for Node.js 14.x (now EOL, and no longer available to created in AWS Lambda)
 
+
+### Fixed
+
+- Potentially breaking fix: resolved mismatch between `RouteSelectionExpression` in deployed Architect apps vs. locally in Sandbox
+  - The `RouteSelectionExpression` is now `$request.body.action`, meaning WebSocket code running locally (but not on AWS) should be updated from `ws.send(JSON.stringify({ message: 'custom-endpoint', ... }))` to  `ws.send(JSON.stringify({ action: 'custom-endpoint', ... }))`
+  - This fixes #768; thanks @mawdesley + @MartinRamm!
+
+
 ---
 
 ## [8.5.2] 2023-08-22

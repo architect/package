@@ -16,7 +16,7 @@ module.exports = function visitWebSockets (inventory, template) {
     Properties: {
       Name,
       ProtocolType: 'WEBSOCKET',
-      RouteSelectionExpression: '$request.body.message'
+      RouteSelectionExpression: '$request.body.action'
     }
   }
 
