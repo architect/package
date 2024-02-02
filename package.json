@@ -21,12 +21,12 @@
   "author": "Brian LeRoux <b@brian.io>",
   "license": "Apache-2.0",
   "dependencies": {
-    "@architect/inventory": "~4.0.0-RC.2",
-    "@architect/utils": "~4.0.0-RC.3"
+    "@architect/inventory": "~4.0.0",
+    "@architect/utils": "~4.0.0"
   },
   "devDependencies": {
     "@architect/eslint-config": "~2.1.2",
-    "@aws-lite/client": "^0.15.1",
+    "@aws-lite/client": "^0.15.2",
     "@aws-lite/s3": "^0.1.16",
     "cross-env": "^7.0.3",
     "eslint": "~8.56.0",
