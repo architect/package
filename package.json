@@ -26,7 +26,7 @@
   },
   "devDependencies": {
     "@architect/eslint-config": "~2.1.2",
-    "@aws-lite/client": "^0.15.2",
+    "@aws-lite/client": "^0.16.1",
     "@aws-lite/s3": "^0.1.16",
     "cross-env": "^7.0.3",
     "eslint": "~8.56.0",
