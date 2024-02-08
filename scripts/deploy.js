@@ -111,7 +111,7 @@ module.exports = function deploy (params = {}, callback) {
     },
 
     function getAws (callback) {
-      awsLite()
+      awsLite({ plugins: [ '@aws-lite/s3' ] })
         .then(_aws => {
           aws = _aws
           callback()
