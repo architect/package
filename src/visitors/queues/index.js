@@ -28,16 +28,16 @@ module.exports = function visitQueues (inventory, template) {
     template.Resources[queueLambda].Properties.Events[queueEvent] = {
       Type: 'SQS',
       Properties: {
-        Queue: { 'Fn::GetAtt': [ queueQueue, 'Arn' ] }
-      }
+        Queue: { 'Fn::GetAtt': [ queueQueue, 'Arn' ] },
+      },
     }
 
     // Create the sqs queue
     template.Resources[queueQueue] = {
       Type: 'AWS::SQS::Queue',
       Properties: {
-        VisibilityTimeout: timeout
-      }
+        VisibilityTimeout: timeout,
+      },
     }
 
     // Only add fifo when true; false will cause cfn to fail =/

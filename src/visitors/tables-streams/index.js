@@ -28,13 +28,13 @@ module.exports = function visitTablesStreams (inventory, template) {
         BatchSize: 10,
         EventSourceArn: { 'Fn::GetAtt': [ tableTable, 'StreamArn' ] },
         FunctionName: { 'Fn::GetAtt': [ streamLambda, 'Arn' ] },
-        StartingPosition: 'TRIM_HORIZON'
-      }
+        StartingPosition: 'TRIM_HORIZON',
+      },
     }
 
     // Create the stream
     template.Resources[tableTable].Properties.StreamSpecification = {
-      StreamViewType: 'NEW_AND_OLD_IMAGES'
+      StreamViewType: 'NEW_AND_OLD_IMAGES',
     }
   })
   return template

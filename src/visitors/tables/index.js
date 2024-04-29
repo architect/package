@@ -26,7 +26,7 @@ module.exports = function visitTables (inventory, template) {
         KeySchema,
         AttributeDefinitions,
         BillingMode: 'PAY_PER_REQUEST',
-      }
+      },
     }
 
     if (encrypt) {
@@ -40,14 +40,14 @@ module.exports = function visitTables (inventory, template) {
 
     if (pitr || table.PointInTimeRecovery) {
       template.Resources[tableTable].Properties.PointInTimeRecoverySpecification = {
-        PointInTimeRecoveryEnabled: true
+        PointInTimeRecoveryEnabled: true,
       }
     }
 
     if (ttl) {
       template.Resources[tableTable].Properties.TimeToLiveSpecification = {
         AttributeName: ttl,
-        Enabled: true
+        Enabled: true,
       }
     }
   })

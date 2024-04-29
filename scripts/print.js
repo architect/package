@@ -37,8 +37,8 @@ module.exports = function pretty ({ log, verbose }) {
       if (!log) return
       let check = chalk.green('✓')
       let msg = chalk.grey('Deployed')
-      let time = chalk.green.bold((Date.now() - ts) / 1000 + ' seconds')
+      let time = chalk.green.bold(((Date.now() - ts) / 1000) + ' seconds')
       console.log(check, msg, time)
-    }
+    },
   }
 }

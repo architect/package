@@ -13,7 +13,7 @@ module.exports = function getHttpApiProperties (inventory) {
       openapi: '3.0.1',
       info: { title: { Ref: 'AWS::StackName' } },
       paths,
-    }
+    },
   }
   return Properties
 }
@@ -40,7 +40,7 @@ function getPaths (routes, payloadFormatVersion) {
           // cacheKeyParameters: [
           //   'method.request.path.proxy'
           // ]
-        }
+        },
       }
     }
   })

@@ -34,10 +34,10 @@ module.exports = function visitScheduled (inventory, template) {
         Targets: [
           {
             Arn: { 'Fn::GetAtt': [ scheduleLambda, 'Arn' ] },
-            Id: scheduleLambda
-          }
-        ]
-      }
+            Id: scheduleLambda,
+          },
+        ],
+      },
     }
 
     // Wire the permission
@@ -47,8 +47,8 @@ module.exports = function visitScheduled (inventory, template) {
         Action: 'lambda:InvokeFunction',
         FunctionName: { Ref: scheduleLambda },
         Principal: 'events.amazonaws.com',
-        SourceArn: { 'Fn::GetAtt': [ scheduleEvent, 'Arn' ] }
-      }
+        SourceArn: { 'Fn::GetAtt': [ scheduleEvent, 'Arn' ] },
+      },
     }
   })
 

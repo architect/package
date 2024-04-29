@@ -19,13 +19,13 @@ module.exports = function visitGlobals (inventory, template) {
         Statement: [ {
           Effect: 'Allow',
           Principal: {
-            Service: 'lambda.amazonaws.com'
+            Service: 'lambda.amazonaws.com',
           },
-          Action: 'sts:AssumeRole'
-        } ]
+          Action: 'sts:AssumeRole',
+        } ],
       },
-      Policies: []
-    }
+      Policies: [],
+    },
   }
 
   // Enables logs and capability reflection
@@ -38,11 +38,11 @@ module.exports = function visitGlobals (inventory, template) {
           'logs:CreateLogGroup',
           'logs:CreateLogStream',
           'logs:PutLogEvents',
-          'logs:DescribeLogStreams'
+          'logs:DescribeLogStreams',
         ],
-        Resource: 'arn:aws:logs:*:*:*'
-      } ]
-    }
+        Resource: 'arn:aws:logs:*:*:*',
+      } ],
+    },
   })
 
   // allow lambdas read/write on the static bucket
@@ -66,17 +66,17 @@ module.exports = function visitGlobals (inventory, template) {
           Resource: [ {
             'Fn::Sub': [
               'arn:aws:s3:::${bukkit}',
-              { bukkit }
-            ]
+              { bukkit },
+            ],
           },
           {
             'Fn::Sub': [
               'arn:aws:s3:::${bukkit}/*',
-              { bukkit }
-            ]
-          } ]
-        } ]
-      }
+              { bukkit },
+            ],
+          } ],
+        } ],
+      },
     })
   }
 
@@ -98,8 +98,8 @@ module.exports = function visitGlobals (inventory, template) {
               'Fn::Sub': 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/*',
             },
           },
-        ]
-      }
+        ],
+      },
     })
     function getTableArns (tables) {
       return tables.map(table => {
@@ -107,14 +107,14 @@ module.exports = function visitGlobals (inventory, template) {
         return [ {
           'Fn::Sub': [
             'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tablename}',
-            { tablename: { Ref: name } }
-          ]
+            { tablename: { Ref: name } },
+          ],
         },
         {
           'Fn::Sub': [
             'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tablename}/*',
-            { tablename: { Ref: name } }
-          ]
+            { tablename: { Ref: name } },
+          ],
         } ]
       }).reduce((a, b) => a.concat(b), [])
     }
@@ -131,15 +131,15 @@ module.exports = function visitGlobals (inventory, template) {
             'sns:Publish',
           ],
           Resource: getTopicArn(),
-        } ]
-      }
+        } ],
+      },
     })
     function getTopicArn () {
       return {
         'Fn::Sub': [
           'arn:aws:sns:${AWS::Region}:${AWS::AccountId}:${AWS::StackName}*',
-          {}
-        ]
+          {},
+        ],
       }
     }
   }
@@ -158,9 +158,9 @@ module.exports = function visitGlobals (inventory, template) {
             'sqs:DeleteMessage',
             'sqs:GetQueueAttributes',
           ],
-          Resource: '*'
-        } ]
-      }
+          Resource: '*',
+        } ],
+      },
     })
   }
 

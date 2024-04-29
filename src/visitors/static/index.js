@@ -41,13 +41,13 @@ module.exports = function visitStatic (inventory, template) {
         OwnershipControls: {
           Rules: [
             {
-              ObjectOwnership: 'BucketOwnerEnforced'
-            }
-          ]
+              ObjectOwnership: 'BucketOwnerEnforced',
+            },
+          ],
         },
         WebsiteConfiguration: {
           IndexDocument: 'index.html',
-          ErrorDocument: '404.html'
+          ErrorDocument: '404.html',
         },
         PublicAccessBlockConfiguration: {
           BlockPublicAcls: false,
@@ -55,7 +55,7 @@ module.exports = function visitStatic (inventory, template) {
           IgnorePublicAcls: false,
           RestrictPublicBuckets: false,
         },
-      }
+      },
     }
   }
 
@@ -65,9 +65,9 @@ module.exports = function visitStatic (inventory, template) {
     Value: {
       'Fn::Sub': [
         getBucketUrlForRegion(inv.aws.region),
-        { bukkit }
-      ]
-    }
+        { bukkit },
+      ],
+    },
   }
 
   // Allow public read access to all objects in the static bucket
@@ -85,14 +85,14 @@ module.exports = function visitStatic (inventory, template) {
             Resource: [ {
               'Fn::Sub': [
                 'arn:aws:s3:::${bukkit}/*',
-                { bukkit }
-              ]
+                { bukkit },
+              ],
             } ],
-            Sid: 'PublicReadGetObject'
-          }
-        ]
-      }
-    }
+            Sid: 'PublicReadGetObject',
+          },
+        ],
+      },
+    },
   }
 
   // if an api is defined then add _static proxy and attempt to serialize ./public

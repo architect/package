@@ -8,6 +8,6 @@ module.exports = function samPackage ({ filename, bucket, log, verbose }, callba
     '--output-template-file',
     filename.replace('json', 'yaml'),
     '--s3-bucket',
-    bucket
+    bucket,
   ], { log, verbose }, callback)
 }

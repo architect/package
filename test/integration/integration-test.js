@@ -61,7 +61,7 @@ test('Transform SAM to CFN', t => {
     'package',
     '--template-file', `sam.json`,
     '--output-template-file', `sam.yaml`,
-    '--s3-bucket', bucket
+    '--s3-bucket', bucket,
   ],
   function done (err) {
     if (err) t.fail(err)
@@ -78,7 +78,7 @@ test('Deploy', t => {
     '--stack-name', 'PackageTestApp1',
     '--s3-bucket', bucket,
     '--capabilities',
-    'CAPABILITY_IAM CAPABILITY_AUTO_EXPAND'
+    'CAPABILITY_IAM CAPABILITY_AUTO_EXPAND',
   ],
   function done (err) {
     if (err) t.fail(err)

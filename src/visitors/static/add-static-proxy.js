@@ -15,8 +15,8 @@ module.exports = function addStatic (inventory, template) {
         uri: {
           'Fn::Sub': [
             'https://${bukkit}.s3.${AWS::Region}.amazonaws.com/{proxy}',
-            { bukkit }
-          ]
+            { bukkit },
+          ],
         },
         connectionType: 'INTERNET',
         timeoutInMillis: 30000,
@@ -29,8 +29,8 @@ module.exports = function addStatic (inventory, template) {
         // cacheKeyParameters: [
         //   'method.request.path.proxy'
         // ]
-      }
-    }
+      },
+    },
   }
   return template
 }

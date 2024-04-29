@@ -5,14 +5,14 @@ module.exports = function getAttributeDefinitions (table) {
   // Always handle partition key
   defs.push({
     AttributeName: partitionKey,
-    AttributeType: convert(partitionKeyType)
+    AttributeType: convert(partitionKeyType),
   })
 
   // Handle sort key if necessary
   if (sortKey) {
     defs.push({
       AttributeName: sortKey,
-      AttributeType: convert(sortKeyType)
+      AttributeType: convert(sortKeyType),
     })
   }
 
@@ -22,6 +22,6 @@ module.exports = function getAttributeDefinitions (table) {
 function convert (v) {
   return ({
     'String': 'S',
-    'Number': 'N'
+    'Number': 'N',
   })[v]
 }

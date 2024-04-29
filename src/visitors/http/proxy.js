@@ -11,9 +11,9 @@ module.exports = function proxy ({ inv }, template) {
         httpMethod: 'ANY',
         uri: inv.proxy[deployStage],
         connectionType: 'INTERNET',
-        timeoutInMillis: 30000
-      }
-    }
+        timeoutInMillis: 30000,
+      },
+    },
   }
 
   return template

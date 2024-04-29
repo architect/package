@@ -26,8 +26,8 @@ module.exports = function getEnv (params) {
     env.ARC_WSS_URL = {
       'Fn::Sub': [
         'wss://${WS}.execute-api.${AWS::Region}.amazonaws.com/' + deployStage,
-        {}
-      ]
+        {},
+      ],
     }
   }
 

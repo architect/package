@@ -16,8 +16,8 @@ module.exports = function visitWebSockets (inventory, template) {
     Properties: {
       Name,
       ProtocolType: 'WEBSOCKET',
-      RouteSelectionExpression: '$request.body.action'
-    }
+      RouteSelectionExpression: '$request.body.action',
+    },
   }
 
   template.Resources.WebsocketDeployment = {
@@ -25,11 +25,11 @@ module.exports = function visitWebSockets (inventory, template) {
     DependsOn: [
       'ConnectWSRoute',
       'DefaultWSRoute',
-      'DisconnectWSRoute'
+      'DisconnectWSRoute',
     ],
     Properties: {
       ApiId: { Ref: 'WS' },
-    }
+    },
   }
 
   template.Resources.WebsocketStage = {
@@ -38,7 +38,7 @@ module.exports = function visitWebSockets (inventory, template) {
       StageName: deployStage,
       DeploymentId: { Ref: 'WebsocketDeployment' },
       ApiId: { Ref: 'WS' },
-    }
+    },
   }
 
   // augment the lambdas role
@@ -52,18 +52,18 @@ module.exports = function visitWebSockets (inventory, template) {
           Effect: 'Allow',
           Action: [
             'execute-api:Invoke',
-            'execute-api:ManageConnections'
+            'execute-api:ManageConnections',
           ],
           Resource: [
             { 'Fn::Sub': [
               'arn:aws:execute-api:${AWS::Region}:*:${api}/*',
-              { api: { Ref: 'WS' } }
-            ] }
-          ]
-        } ]
+              { api: { Ref: 'WS' } },
+            ] },
+          ],
+        } ],
       },
-      Roles: [ { Ref: 'Role' } ]
-    }
+      Roles: [ { Ref: 'Role' } ],
+    },
   }
 
   inv.ws.forEach(route => {
@@ -88,9 +88,9 @@ module.exports = function visitWebSockets (inventory, template) {
         RouteKey: defaults.includes(route.name) ? `$${route.name}` : route.name,
         OperationName: wsRoute,
         Target: {
-          'Fn::Join': [ '/', [ 'integrations', { Ref: wsIntegration } ] ]
-        }
-      }
+          'Fn::Join': [ '/', [ 'integrations', { Ref: wsIntegration } ] ],
+        },
+      },
     }
 
     template.Resources[wsIntegration] = {
@@ -101,10 +101,10 @@ module.exports = function visitWebSockets (inventory, template) {
         IntegrationUri: {
           'Fn::Sub': [
             'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${' + wsLambda + '.Arn}/invocations',
-            {}
-          ]
-        }
-      }
+            {},
+          ],
+        },
+      },
     }
 
     template.Resources[wsPermission] = {
@@ -113,8 +113,8 @@ module.exports = function visitWebSockets (inventory, template) {
       Properties: {
         Action: 'lambda:InvokeFunction',
         FunctionName: { Ref: wsLambda },
-        Principal: 'apigateway.amazonaws.com'
-      }
+        Principal: 'apigateway.amazonaws.com',
+      },
     }
   })
 
@@ -124,9 +124,9 @@ module.exports = function visitWebSockets (inventory, template) {
       'Fn::Sub': [
         // Always default to staging; mutate to production via macro where necessary
         'wss://${WS}.execute-api.${AWS::Region}.amazonaws.com/' + deployStage,
-        {}
-      ]
-    }
+        {},
+      ],
+    },
   }
 
   return template

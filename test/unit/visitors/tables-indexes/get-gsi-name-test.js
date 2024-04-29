@@ -4,7 +4,7 @@ let gsiName = require('../../../../src/visitors/tables-indexes/get-gsi-name')
 let index = {
   name: 'accounts',
   partitionKeyType: 'string',
-  partitionKey: 'email'
+  partitionKey: 'email',
 }
 
 test('get-gsi-name should throw is no partition key or partition key type is provided', t => {

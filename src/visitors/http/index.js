@@ -45,8 +45,8 @@ module.exports = function visitHttp (inventory, template) {
       Properties: {
         Path: path,
         Method: method.toUpperCase(),
-        ApiId: { Ref: 'HTTP' }
-      }
+        ApiId: { Ref: 'HTTP' },
+      },
     }
   })
 
@@ -57,14 +57,14 @@ module.exports = function visitHttp (inventory, template) {
       'Fn::Sub': [
         // Always default to staging; mutate to production via macro where necessary
         'https://${ApiId}.execute-api.${AWS::Region}.amazonaws.com',
-        { ApiId: { Ref: 'HTTP' } }
-      ]
-    }
+        { ApiId: { Ref: 'HTTP' } },
+      ],
+    },
   }
 
   template.Outputs.ApiId = {
     Description: 'API ID (ApiId)',
-    Value: { Ref: 'HTTP' }
+    Value: { Ref: 'HTTP' },
   }
 
   // Backfill @static

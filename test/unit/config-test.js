@@ -289,7 +289,7 @@ layers
     let inv = await inventory({ rawArc, deployStage })
     package(inv)
   }
-  catch (err) {
+  catch {
     t.pass('Too many layers fails')
   }
 
@@ -301,7 +301,7 @@ layers a:b:c:us-west-2:d
     let inv = await inventory({ rawArc, deployStage })
     package(inv)
   }
-  catch (err) {
+  catch {
     t.pass('Incorrect (.arc) layer region fails')
   }
 
@@ -313,7 +313,7 @@ layers a:b:c:us-west-2:d
     let inv = await inventory({ rawArc, deployStage })
     package(inv)
   }
-  catch (err) {
+  catch {
     t.pass('Incorrect (env) layer region fails')
   }
   delete process.env.AWS_REGION
@@ -361,7 +361,7 @@ layers ${layer(2)}
 policies ${policy(2)}
 `
   let tmp = mockTmp({
-    'src/events/an-event/.arc-config': Buffer.from(arcConfig)
+    'src/events/an-event/.arc-config': Buffer.from(arcConfig),
   })
   inv = await inventory({ cwd: tmp, rawArc, deployStage })
   props = package(inv).Resources.AnEventEventLambda.Properties

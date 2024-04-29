@@ -28,10 +28,10 @@ module.exports = function createLambda (params) {
       Role: {
         'Fn::Sub': [
           'arn:aws:iam::${AWS::AccountId}:role/${roleName}',
-          { roleName: { Ref: 'Role' } }
-        ]
+          { roleName: { Ref: 'Role' } },
+        ],
       },
-      Events: {}
+      Events: {},
     },
     ArcMetadata: {
       pragma: pragma || 'custom',
@@ -51,7 +51,7 @@ module.exports = function createLambda (params) {
 
   if (provisionedConcurrency) {
     item.Properties.ProvisionedConcurrencyConfig = {
-      ProvisionedConcurrentExecutions: provisionedConcurrency
+      ProvisionedConcurrentExecutions: provisionedConcurrency,
     }
     item.Properties.AutoPublishAlias = 'live'
   }

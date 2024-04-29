@@ -17,11 +17,11 @@ module.exports = function ssm ({ inv }, template) {
           Name: {
             'Fn::Sub': [
               '/${AWS::StackName}/tables/${tablename}',
-              { tablename: name }
-            ]
+              { tablename: name },
+            ],
           },
-          Value: { Ref: TableName }
-        }
+          Value: { Ref: TableName },
+        },
       }
     })
   }
@@ -38,11 +38,11 @@ module.exports = function ssm ({ inv }, template) {
           Name: {
             'Fn::Sub': [
               '/${AWS::StackName}/events/${event}',
-              { event: name }
-            ]
+              { event: name },
+            ],
           },
-          Value: { Ref: Event }
-        }
+          Value: { Ref: Event },
+        },
       }
     })
   }
@@ -59,11 +59,11 @@ module.exports = function ssm ({ inv }, template) {
           Name: {
             'Fn::Sub': [
               '/${AWS::StackName}/queues/${queue}',
-              { queue: name }
-            ]
+              { queue: name },
+            ],
           },
-          Value: { Ref: Queue }
-        }
+          Value: { Ref: Queue },
+        },
       }
     })
   }
@@ -82,11 +82,11 @@ module.exports = function ssm ({ inv }, template) {
         Name: {
           'Fn::Sub': [
             '/${AWS::StackName}/static/${key}',
-            { key: 'bucket' }
-          ]
+            { key: 'bucket' },
+          ],
         },
-        Value
-      }
+        Value,
+      },
     }
 
     let fingerprint = inv.static.fingerprint ? true : false
@@ -97,11 +97,11 @@ module.exports = function ssm ({ inv }, template) {
         Name: {
           'Fn::Sub': [
             '/${AWS::StackName}/static/${key}',
-            { key: 'fingerprint' }
-          ]
+            { key: 'fingerprint' },
+          ],
         },
-        Value: `${fingerprint}`
-      }
+        Value: `${fingerprint}`,
+      },
     }
   }
 
@@ -122,9 +122,9 @@ module.exports = function ssm ({ inv }, template) {
               Resource: {
                 'Fn::Sub': [
                   'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AWS::StackName}',
-                  {}
-                ]
-              }
+                  {},
+                ],
+              },
             },
             {
               Effect: 'Allow',
@@ -135,9 +135,9 @@ module.exports = function ssm ({ inv }, template) {
               Resource: {
                 'Fn::Sub': [
                   'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AWS::StackName}/*',
-                  {}
-                ]
-              }
+                  {},
+                ],
+              },
             },
             {
               Effect: 'Allow',
@@ -148,14 +148,14 @@ module.exports = function ssm ({ inv }, template) {
               Resource: {
                 'Fn::Sub': [
                   'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AWS::StackName}/*/*',
-                  {}
-                ]
-              }
+                  {},
+                ],
+              },
             },
-          ]
+          ],
         },
         Roles: [ { Ref: 'Role' } ],
-      }
+      },
     }
   }
 

@@ -25,8 +25,8 @@ module.exports = function visitEvents (inventory, template) {
     template.Resources[eventLambda].Properties.Events[eventEvent] = {
       Type: 'SNS',
       Properties: {
-        Topic: { Ref: eventTopic }
-      }
+        Topic: { Ref: eventTopic },
+      },
     }
 
     // Create the SNS topic
@@ -34,8 +34,8 @@ module.exports = function visitEvents (inventory, template) {
       Type: 'AWS::SNS::Topic',
       Properties: {
         DisplayName: name,
-        Subscription: []
-      }
+        Subscription: [],
+      },
     }
 
     template.Outputs[eventTopic] = {

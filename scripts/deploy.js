@@ -137,7 +137,7 @@ module.exports = function deploy (params = {}, callback) {
         '--template-file', `${appname}-cfn.yaml`,
         '--stack-name', name,
         '--s3-bucket', bucket,
-        '--capabilities', 'CAPABILITY_AUTO_EXPAND', 'CAPABILITY_IAM'
+        '--capabilities', 'CAPABILITY_AUTO_EXPAND', 'CAPABILITY_IAM',
       ], { log, verbose }, callback)
     },
 
@@ -152,7 +152,7 @@ module.exports = function deploy (params = {}, callback) {
       else {
         callback()
       }
-    }
+    },
 
   ], callback)
   return promise
