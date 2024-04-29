@@ -12,7 +12,7 @@
     "rc": "npm version prerelease --preid RC"
   },
   "engines": {
-    "node": ">=14"
+    "node": ">=16"
   },
   "repository": {
     "type": "git",
@@ -21,16 +21,16 @@
   "author": "Brian LeRoux <b@brian.io>",
   "license": "Apache-2.0",
   "dependencies": {
-    "@architect/inventory": "~4.0.4",
-    "@architect/utils": "~4.0.4"
+    "@architect/inventory": "~4.0.5",
+    "@architect/utils": "~4.0.6"
   },
   "devDependencies": {
-    "@architect/eslint-config": "~2.1.2",
-    "@aws-lite/client": "^0.20.0",
-    "@aws-lite/s3": "^0.1.20",
+    "@architect/eslint-config": "~3.0.0",
+    "@aws-lite/client": "^0.21.1",
+    "@aws-lite/s3": "^0.1.21",
     "cross-env": "^7.0.3",
-    "eslint": "~8.57.0",
-    "mock-tmp": "~0.0.3",
+    "eslint": "~9.1.1",
+    "mock-tmp": "~0.0.4",
     "nyc": "^15.1.0",
     "run-parallel": "~1.2.0",
     "tap-arc": "~1.2.2",
