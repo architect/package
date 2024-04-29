@@ -36,8 +36,5 @@
     "run-parallel": "~1.2.0",
     "tap-arc": "~1.2.2",
     "tape": "~5.7.5"
-  },
-  "eslintConfig": {
-    "extends": "@architect/eslint-config"
   }
 }
