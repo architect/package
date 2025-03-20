@@ -2,6 +2,14 @@
 
 ---
 
+## [9.0.4] 2025-03-19
+
+### Fixed
+
+- Fixed a bug where the logical ID for Lambda HTTP Events was using duplicate identifiers, potentially leading to identifiers longer than 255 characters which could cause CloudFormation errors upon deployment. Fixed in [#168](https://github.com/architect/package/pull/168) - thank you @MartinRamm!
+
+---
+
 ## [9.0.3] 2024-04-29
 
 ### Changed
