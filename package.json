@@ -8,7 +8,7 @@
     "test": "npm run lint && npm run coverage",
     "test:nolint": "npm run coverage",
     "test:unit": "cross-env tape 'test/unit/**/*-test.js'",
-    "test:integration": "cross-env tape 'test/integration/**/*-test.js' | tap-arc",
+    "test:integration": "cross-env tape 'test/integration/**/*-test.js'",
     "coverage": "nyc --reporter=lcov --reporter=text npm run test:unit",
     "rc": "npm version prerelease --preid RC"
   },
