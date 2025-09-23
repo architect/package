@@ -7,13 +7,13 @@
     "lint": "eslint . --fix",
     "test": "npm run lint && npm run coverage",
     "test:nolint": "npm run coverage",
-    "test:unit": "cross-env tape 'test/unit/**/*-test.js' | tap-arc",
+    "test:unit": "cross-env tape 'test/unit/**/*-test.js'",
     "test:integration": "cross-env tape 'test/integration/**/*-test.js' | tap-arc",
     "coverage": "nyc --reporter=lcov --reporter=text npm run test:unit",
     "rc": "npm version prerelease --preid RC"
   },
   "engines": {
-    "node": ">=16"
+    "node": ">=20"
   },
   "repository": {
     "type": "git",
@@ -22,19 +22,17 @@
   "author": "Brian LeRoux <b@brian.io>",
   "license": "Apache-2.0",
   "dependencies": {
-    "@architect/inventory": "~4.0.5",
-    "@architect/utils": "~4.0.6"
+    "@architect/inventory": "~4.0.10-RC.0",
+    "@architect/utils": "~5.0.0"
   },
   "devDependencies": {
     "@architect/eslint-config": "~3.0.0",
-    "@aws-lite/client": "^0.21.1",
-    "@aws-lite/s3": "^0.1.21",
-    "cross-env": "^7.0.3",
-    "eslint": "~9.1.1",
+    "@aws-lite/client": "~0.23.2",
+    "@aws-lite/s3": "~0.2.6",
+    "cross-env": "~10.0.0",
+    "eslint": "~9.36.0",
     "mock-tmp": "~0.0.4",
-    "nyc": "^15.1.0",
-    "run-parallel": "~1.2.0",
-    "tap-arc": "~1.2.2",
-    "tape": "~5.7.5"
+    "nyc": "~17.1.0",
+    "tape": "~5.9.0"
   }
 }

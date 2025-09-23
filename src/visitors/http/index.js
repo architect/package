@@ -30,7 +30,7 @@ module.exports = function visitHttp (inventory, template) {
     let lambdaName = getLambdaName(route.path)
     let name = toLogicalID(`${method}${lambdaName.replace(/000/g, '')}`) // GetIndex
     let routeLambda = `${name}HTTPLambda`
-    let routeEvent = 'HTTPEvent' //AWS appends the lambda name
+    let routeEvent = 'HTTPEvent' // AWS appends the lambda name
 
     // Create the Lambda
     template.Resources[routeLambda] = createLambda({

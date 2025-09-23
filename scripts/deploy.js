@@ -1,13 +1,13 @@
-let series = require('run-series')
-let parallel = require('run-parallel')
-let pkg = require('../')
-let { toLogicalID } = require('@architect/utils')
+let { series, parallel, toLogicalID } = require('@architect/utils')
+let awsLite = require('@aws-lite/client')
 let _inventory = require('@architect/inventory')
+
 let path = require('path')
 let fs = require('fs')
+
+let pkg = require('../')
 let sam = require('./package')
 let spawn = require('./spawn')
-let awsLite = require('@aws-lite/client')
 
 /**
  * deploy
