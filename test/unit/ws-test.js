@@ -1,5 +1,6 @@
+const { test } = require('node:test')
+const assert = require('node:assert')
 let inventory = require('@architect/inventory')
-let test = require('tape')
 let pkg = require('../../')
 
 let rawArc = `
@@ -9,10 +10,9 @@ myapp
 `
 let deployStage = 'staging'
 
-test('WebSockets have a policy doc', async t => {
-  t.plan(2)
+test('WebSockets have a policy doc', async () => {
   let inv = await inventory({ rawArc, deployStage })
   let cfn = pkg(inv)
-  t.ok(pkg, 'pkg')
-  t.ok(cfn.Resources.WebSocketPolicy, 'WebSocketPolicy')
+  assert.ok(pkg, 'pkg')
+  assert.ok(cfn.Resources.WebSocketPolicy, 'WebSocketPolicy')
 })
