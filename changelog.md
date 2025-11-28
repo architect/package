@@ -2,6 +2,13 @@
 
 ---
 
+## [11.0.0 - 11.0.1] 2025-11-28
+
+- updated to >= node22
+- moved to native node test runner
+
+---
+
 ## [9.0.4] 2025-03-19
 
 ### Fixed
