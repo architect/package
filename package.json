@@ -7,7 +7,7 @@
     "lint": "eslint . --fix",
     "test": "npm run lint && npm run coverage",
     "test:unit": "node --test 'test/unit/**/*-test.js'",
-    "coverage": "node --test --experimental-test-coverage --test-reporter=lcov --test-reporter-destination=coverage/lcov.info --test-reporter=spec --test-reporter-destination=stdout 'test/unit/**/*-test.js'",
+    "coverage": "mkdir -p coverage && node --test --experimental-test-coverage --test-reporter=lcov --test-reporter-destination=coverage/lcov.info --test-reporter=spec --test-reporter-destination=stdout 'test/unit/**/*-test.js'",
     "rc": "npm version prerelease --preid RC"
   },
   "engines": {
@@ -27,7 +27,6 @@
     "@architect/eslint-config": "~3.0.0",
     "@aws-lite/client": "~0.23.2",
     "@aws-lite/s3": "~0.2.6",
-    "eslint": "~9.36.0",
-    "mock-tmp": "~0.0.4"
+    "eslint": "~9.36.0"
   }
 }

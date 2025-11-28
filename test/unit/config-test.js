@@ -1,6 +1,8 @@
 const { test } = require('node:test')
 const assert = require('node:assert')
-let mockTmp = require('mock-tmp')
+const fs = require('node:fs')
+const os = require('node:os')
+const path = require('node:path')
 let inventory = require('@architect/inventory')
 let package = require('../../')
 
@@ -352,12 +354,18 @@ concurrency ${concurrency}
 layers ${layer(2)}
 policies ${policy(2)}
 `
-  let tmp = mockTmp({
-    'src/events/an-event/.arc-config': Buffer.from(arcConfig),
-  })
+  // Create temporary directory structure
+  let tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'arc-test-'))
+  let configDir = path.join(tmp, 'src', 'events', 'an-event')
+  fs.mkdirSync(configDir, { recursive: true })
+  fs.writeFileSync(path.join(configDir, '.arc-config'), arcConfig)
+
   inv = await inventory({ cwd: tmp, rawArc, deployStage })
   props = package(inv).Resources.AnEventEventLambda.Properties
-  mockTmp.reset()
+
+  // Cleanup
+  fs.rmSync(tmp, { recursive: true, force: true })
+
   assert.strictEqual(props['Timeout'], timeout, `Timeout: ${props['Timeout']}`)
   assert.strictEqual(props['MemorySize'], memory, `Memory: ${props['MemorySize']}`)
   assert.strictEqual(props['Runtime'], runtime, `Runtime: ${props['Runtime']}`)
