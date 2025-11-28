@@ -1,15 +1,13 @@
 {
   "name": "@architect/package",
-  "version": "11.0.0",
+  "version": "11.0.1",
   "description": "Package .arc for deployment with CloudFormation",
   "main": "src/index.js",
   "scripts": {
     "lint": "eslint . --fix",
     "test": "npm run lint && npm run coverage",
-    "test:nolint": "npm run coverage",
-    "test:unit": "cross-env tape 'test/unit/**/*-test.js'",
-    "test:integration": "cross-env tape 'test/integration/**/*-test.js'",
-    "coverage": "nyc --reporter=lcov --reporter=text npm run test:unit",
+    "test:unit": "node --test 'test/unit/**/*-test.js'",
+    "coverage": "mkdir -p coverage && node --test --experimental-test-coverage --test-reporter=lcov --test-reporter-destination=coverage/lcov.info --test-reporter=spec --test-reporter-destination=stdout 'test/unit/**/*-test.js'",
     "rc": "npm version prerelease --preid RC"
   },
   "engines": {
@@ -29,10 +27,6 @@
     "@architect/eslint-config": "~3.0.0",
     "@aws-lite/client": "~0.23.2",
     "@aws-lite/s3": "~0.2.6",
-    "cross-env": "~10.0.0",
-    "eslint": "~9.36.0",
-    "mock-tmp": "~0.0.4",
-    "nyc": "~17.1.0",
-    "tape": "~5.9.0"
+    "eslint": "~9.36.0"
   }
 }
