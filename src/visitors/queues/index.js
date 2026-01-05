@@ -10,7 +10,7 @@ module.exports = function visitQueues (inventory, template) {
 
   inv.queues.forEach(queue => {
     let { config } = queue
-    let { timeout, fifo } = config
+    let { timeout, fifo, batchSize } = config
 
     let name = toLogicalID(queue.name)
     let queueLambda = `${name}QueueLambda`
@@ -36,7 +36,7 @@ module.exports = function visitQueues (inventory, template) {
     template.Resources[queueQueue] = {
       Type: 'AWS::SQS::Queue',
       Properties: {
-        VisibilityTimeout: timeout,
+        VisibilityTimeout: timeout * 6,
       },
     }
 
@@ -44,6 +44,9 @@ module.exports = function visitQueues (inventory, template) {
     if (fifo) {
       template.Resources[queueQueue].Properties.FifoQueue = fifo
       template.Resources[queueQueue].Properties.ContentBasedDeduplication = true
+
+      template.Resources[queueLambda].Properties.ReservedConcurrentExecutions = batchSize || 1
+      template.Resources[queueLambda].Properties.Events[queueEvent].Properties.BatchSize = 1
     }
 
     template.Outputs[`${name}SqsQueue`] = {
