@@ -47,6 +47,7 @@ module.exports = function visitQueues (inventory, template) {
 
       template.Resources[queueLambda].Properties.ReservedConcurrentExecutions = batchSize || 1
       template.Resources[queueLambda].Properties.Events[queueEvent].Properties.BatchSize = 1
+      template.Resources[queueLambda].Properties.Events[queueEvent].Properties.MaximumBatchingWindowInSeconds = 0
     }
 
     template.Outputs[`${name}SqsQueue`] = {
