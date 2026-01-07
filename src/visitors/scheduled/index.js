@@ -8,6 +8,24 @@ module.exports = function visitScheduled (inventory, template) {
   let { inv } = inventory
   if (!inv.scheduled) return template
 
+  // Create a single shared IAM role for EventBridge Scheduler to invoke all scheduled Lambdas
+  template.Resources.SchedulerRole = {
+    Type: 'AWS::IAM::Role',
+    Properties: {
+      AssumeRolePolicyDocument: {
+        Version: '2012-10-17',
+        Statement: [ {
+          Effect: 'Allow',
+          Principal: {
+            Service: 'scheduler.amazonaws.com',
+          },
+          Action: 'sts:AssumeRole',
+        } ],
+      },
+      Policies: [],
+    },
+  }
+
   inv.scheduled.forEach(schedule => {
     let { rate, cron, timezone } = schedule
     let rule = rate || cron
@@ -16,7 +34,6 @@ module.exports = function visitScheduled (inventory, template) {
     let name = toLogicalID(schedule.name)
     let scheduleLambda = `${name}ScheduledLambda`
     let scheduleEvent = `${name}ScheduledEvent`
-    let scheduleRole = `${name}ScheduledRole`
 
     // Create the Lambda
     template.Resources[scheduleLambda] = createLambda({
@@ -25,33 +42,18 @@ module.exports = function visitScheduled (inventory, template) {
       template,
     })
 
-    // Create IAM role for EventBridge Scheduler to invoke the Lambda
-    template.Resources[scheduleRole] = {
-      Type: 'AWS::IAM::Role',
-      Properties: {
-        AssumeRolePolicyDocument: {
-          Version: '2012-10-17',
-          Statement: [ {
-            Effect: 'Allow',
-            Principal: {
-              Service: 'scheduler.amazonaws.com',
-            },
-            Action: 'sts:AssumeRole',
-          } ],
-        },
-        Policies: [ {
-          PolicyName: 'InvokeLambdaPolicy',
-          PolicyDocument: {
-            Version: '2012-10-17',
-            Statement: [ {
-              Effect: 'Allow',
-              Action: 'lambda:InvokeFunction',
-              Resource: { 'Fn::GetAtt': [ scheduleLambda, 'Arn' ] },
-            } ],
-          },
+    // Add policy to the shared scheduler role to invoke this Lambda
+    template.Resources.SchedulerRole.Properties.Policies.push({
+      PolicyName: `${name}InvokeLambdaPolicy`,
+      PolicyDocument: {
+        Version: '2012-10-17',
+        Statement: [ {
+          Effect: 'Allow',
+          Action: 'lambda:InvokeFunction',
+          Resource: { 'Fn::GetAtt': [ scheduleLambda, 'Arn' ] },
         } ],
       },
-    }
+    })
 
     // Create the schedule using AWS::Scheduler::Schedule
     template.Resources[scheduleEvent] = {
@@ -63,7 +65,7 @@ module.exports = function visitScheduled (inventory, template) {
         },
         Target: {
           Arn: { 'Fn::GetAtt': [ scheduleLambda, 'Arn' ] },
-          RoleArn: { 'Fn::GetAtt': [ scheduleRole, 'Arn' ] },
+          RoleArn: { 'Fn::GetAtt': [ 'SchedulerRole', 'Arn' ] },
         },
       },
     }
