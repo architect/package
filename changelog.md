@@ -2,6 +2,12 @@
 
 ---
 
+## [11.0.1 - 11.1.0] 2026-01-07
+
+- Add support for `timezone` property for scheduled functions
+
+---
+
 ## [11.0.0 - 11.0.1] 2025-11-28
 
 - updated to >= node22
