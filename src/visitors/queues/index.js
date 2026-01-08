@@ -12,6 +12,8 @@ module.exports = function visitQueues (inventory, template) {
     let { config } = queue
     let { timeout, fifo, batchSize } = config
 
+    console.dir(config, {depth:8})
+
     let name = toLogicalID(queue.name)
     let queueLambda = `${name}QueueLambda`
     let queueEvent = `${name}QueueEvent`
