@@ -7,6 +7,7 @@
     "lint": "eslint . --fix",
     "test": "npm run lint && npm run coverage",
     "test:unit": "node --test 'test/unit/**/*-test.js'",
+    "test:integration": "node --test 'test/integration/**/*-test.js'",
     "coverage": "mkdir -p coverage && node --test --experimental-test-coverage --test-reporter=lcov --test-reporter-destination=coverage/lcov.info --test-reporter=spec --test-reporter-destination=stdout 'test/unit/**/*-test.js'",
     "rc": "npm version prerelease --preid RC"
   },
@@ -20,7 +21,7 @@
   "author": "Brian LeRoux <b@brian.io>",
   "license": "Apache-2.0",
   "dependencies": {
-    "@architect/inventory": "~6.0.0",
+    "@architect/inventory": "~6.1.0-RC.0",
     "@architect/utils": "~6.0.0"
   },
   "devDependencies": {
