@@ -43,7 +43,7 @@ test('batchSize respected', async () => {
 myapp
 @queues
 test-q
-  batchSize 5`
+  batchSize 5`,
   })
 
   let sam = package(inv)
@@ -71,7 +71,7 @@ myapp
 @queues
 test-q
   batchSize 5
-  batchWindow 30`
+  batchWindow 30`,
   })
 
   let sam = package(inv)

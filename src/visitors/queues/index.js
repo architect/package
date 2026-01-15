@@ -35,8 +35,8 @@ module.exports = function visitQueues (inventory, template) {
     template.Resources[queueQueue] = {
       Type: 'AWS::SQS::Queue',
       Properties: {
-        VisibilityTimeout: config.timeout
-      }
+        VisibilityTimeout: config.timeout,
+      },
     }
 
     // Only add fifo when true; false will cause cfn to fail =/
