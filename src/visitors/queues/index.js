@@ -11,6 +11,9 @@ module.exports = function visitQueues (inventory, template) {
   inv.queues.forEach(queue => {
     let { config, batchSize, batchWindow, fifo } = queue
 
+    // for backwards compat; if fifo isn't on the queue itself it could be within the config
+    if (!fifo) fifo = config.fifo
+
     let name = toLogicalID(queue.name)
     let queueLambda = `${name}QueueLambda`
     let queueEvent = `${name}QueueEvent`
