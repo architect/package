@@ -9,8 +9,10 @@ module.exports = function visitQueues (inventory, template) {
   if (!inv.queues) return template
 
   inv.queues.forEach(queue => {
-    let { config } = queue
-    let { timeout, fifo } = config
+    let { config, batchSize, batchWindow, fifo } = queue
+
+    // for backwards compat; if fifo isn't on the queue itself it could be within the config
+    if (!fifo) fifo = config.fifo
 
     let name = toLogicalID(queue.name)
     let queueLambda = `${name}QueueLambda`
@@ -36,7 +38,7 @@ module.exports = function visitQueues (inventory, template) {
     template.Resources[queueQueue] = {
       Type: 'AWS::SQS::Queue',
       Properties: {
-        VisibilityTimeout: timeout,
+        VisibilityTimeout: config.timeout,
       },
     }
 
@@ -44,6 +46,16 @@ module.exports = function visitQueues (inventory, template) {
     if (fifo) {
       template.Resources[queueQueue].Properties.FifoQueue = fifo
       template.Resources[queueQueue].Properties.ContentBasedDeduplication = true
+
+      template.Resources[queueLambda].Properties.ReservedConcurrentExecutions = batchSize || 1
+      template.Resources[queueLambda].Properties.Events[queueEvent].Properties.BatchSize = 1
+      template.Resources[queueLambda].Properties.Events[queueEvent].Properties.MaximumBatchingWindowInSeconds = 0
+
+      if (batchWindow) {
+        // When batchWindow is defined we adjust all the timeouts
+        template.Resources[queueQueue].Properties.VisibilityTimeout = batchWindow * 6
+        template.Resources[queueLambda].Properties.Timeout = batchWindow
+      }
     }
 
     template.Outputs[`${name}SqsQueue`] = {
