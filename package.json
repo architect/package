@@ -20,7 +20,7 @@
   "author": "Brian LeRoux <b@brian.io>",
   "license": "Apache-2.0",
   "dependencies": {
-    "@architect/inventory": "~6.0.0",
+    "@architect/inventory": "~6.1.0",
     "@architect/utils": "~6.0.0"
   },
   "devDependencies": {
