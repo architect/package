@@ -1,6 +1,6 @@
 const { test } = require('node:test')
 const assert = require('node:assert')
-let inventory = require('../../../../../inventory')
+let inventory = require('@architect/inventory')
 let pkg = require('../../../../')
 
 let base = `@app
