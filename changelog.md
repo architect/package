@@ -2,11 +2,14 @@
 
 ---
 
-## [11.0.1 - 11.1.0] 2026-01-07
+## [11.0.3] 2026-01-19
+
+- Queue now accepts `batchSize` and `batchWindow` properties; only works with `fifo true`
+- Queue can now directly configure `fifo true|false` explicitly (default is `true`)
+
+## [11.0.2] 2026-01-07
 
 - Add support for `timezone` property for scheduled functions
-
----
 
 ## [11.0.0 - 11.0.1] 2025-11-28
 
