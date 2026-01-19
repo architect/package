@@ -2,6 +2,11 @@
 
 ---
 
+## [11.0.3] 2026-01-19
+
+- Queue now accepts `batchSize` and `batchWindow` properties; only works with `fifo true`
+- Queue can now directly configure `fifo true|false` explicitly (default is `true`)
+
 ## [11.0.0 - 11.0.1] 2025-11-28
 
 - updated to >= node22
