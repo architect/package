@@ -25,8 +25,8 @@ daily-task rate(1 day)
   let cfn = pkg(inv)
 
   // Check the schedule resource exists and has correct type
-  assert.ok(cfn.Resources.DailyTaskScheduledEvent, 'schedule event resource exists')
-  assert.strictEqual(cfn.Resources.DailyTaskScheduledEvent.Type, 'AWS::Scheduler::Schedule', 'uses AWS::Scheduler::Schedule type')
+  assert.ok(cfn.Resources.DailyTaskScheduleEvent, 'schedule event resource exists')
+  assert.strictEqual(cfn.Resources.DailyTaskScheduleEvent.Type, 'AWS::Scheduler::Schedule', 'uses AWS::Scheduler::Schedule type')
 })
 
 test('Scheduled visitor creates AWS::Scheduler::Schedule resource for cron expression', async () => {
@@ -36,9 +36,9 @@ hourly-job cron(0 * * * ? *)
   let inv = await inventory({ rawArc, deployStage })
   let cfn = pkg(inv)
 
-  assert.ok(cfn.Resources.HourlyJobScheduledEvent, 'schedule event resource exists')
-  assert.strictEqual(cfn.Resources.HourlyJobScheduledEvent.Type, 'AWS::Scheduler::Schedule', 'uses AWS::Scheduler::Schedule type')
-  assert.ok(cfn.Resources.HourlyJobScheduledEvent.Properties.ScheduleExpression.startsWith('cron('), 'schedule expression is a cron expression')
+  assert.ok(cfn.Resources.HourlyJobScheduleEvent, 'schedule event resource exists')
+  assert.strictEqual(cfn.Resources.HourlyJobScheduleEvent.Type, 'AWS::Scheduler::Schedule', 'uses AWS::Scheduler::Schedule type')
+  assert.ok(cfn.Resources.HourlyJobScheduleEvent.Properties.ScheduleExpression.startsWith('cron('), 'schedule expression is a cron expression')
 })
 
 test('Scheduled visitor creates Lambda function resource', async () => {
@@ -48,8 +48,8 @@ my-task rate(5 minutes)
   let inv = await inventory({ rawArc, deployStage })
   let cfn = pkg(inv)
 
-  assert.ok(cfn.Resources.MyTaskScheduledLambda, 'Lambda resource exists')
-  assert.strictEqual(cfn.Resources.MyTaskScheduledLambda.Type, 'AWS::Serverless::Function', 'Lambda has correct type')
+  assert.ok(cfn.Resources.MyTaskScheduleLambda, 'Lambda resource exists')
+  assert.strictEqual(cfn.Resources.MyTaskScheduleLambda.Type, 'AWS::Serverless::Function', 'Lambda has correct type')
 })
 
 test('Scheduled visitor creates shared IAM role for EventBridge Scheduler', async () => {
@@ -83,7 +83,7 @@ my-task rate(1 hour)
   let inv = await inventory({ rawArc, deployStage })
   let cfn = pkg(inv)
 
-  let flexWindow = cfn.Resources.MyTaskScheduledEvent.Properties.FlexibleTimeWindow
+  let flexWindow = cfn.Resources.MyTaskScheduleEvent.Properties.FlexibleTimeWindow
   assert.ok(flexWindow, 'FlexibleTimeWindow exists')
   assert.strictEqual(flexWindow.Mode, 'OFF', 'FlexibleTimeWindow mode is OFF')
 })
@@ -95,13 +95,13 @@ my-task rate(1 hour)
   let inv = await inventory({ rawArc, deployStage })
   let cfn = pkg(inv)
 
-  let target = cfn.Resources.MyTaskScheduledEvent.Properties.Target
+  let target = cfn.Resources.MyTaskScheduleEvent.Properties.Target
   assert.ok(target, 'Target exists')
   assert.ok(target.Arn, 'Target has Arn')
   assert.ok(target.RoleArn, 'Target has RoleArn')
 
   // Verify the Arn references the Lambda
-  assert.deepStrictEqual(target.Arn, { 'Fn::GetAtt': [ 'MyTaskScheduledLambda', 'Arn' ] }, 'Target Arn references Lambda')
+  assert.deepStrictEqual(target.Arn, { 'Fn::GetAtt': [ 'MyTaskScheduleLambda', 'Arn' ] }, 'Target Arn references Lambda')
 
   // Verify the RoleArn references the shared scheduler role
   assert.deepStrictEqual(target.RoleArn, { 'Fn::GetAtt': [ 'SchedulerRole', 'Arn' ] }, 'Target RoleArn references shared scheduler role')
@@ -116,8 +116,8 @@ my-task
   let inv = await inventory({ rawArc, deployStage })
   let cfn = pkg(inv)
 
-  assert.ok(cfn.Resources.MyTaskScheduledEvent.Properties.ScheduleExpressionTimezone, 'timezone property exists')
-  assert.strictEqual(cfn.Resources.MyTaskScheduledEvent.Properties.ScheduleExpressionTimezone, 'America/New_York', 'timezone is set correctly')
+  assert.ok(cfn.Resources.MyTaskScheduleEvent.Properties.ScheduleExpressionTimezone, 'timezone property exists')
+  assert.strictEqual(cfn.Resources.MyTaskScheduleEvent.Properties.ScheduleExpressionTimezone, 'America/New_York', 'timezone is set correctly')
 })
 
 test('Scheduled visitor does not add timezone when not specified', async () => {
@@ -127,7 +127,7 @@ my-task rate(1 hour)
   let inv = await inventory({ rawArc, deployStage })
   let cfn = pkg(inv)
 
-  assert.strictEqual(cfn.Resources.MyTaskScheduledEvent.Properties.ScheduleExpressionTimezone, undefined, 'timezone property is not set')
+  assert.strictEqual(cfn.Resources.MyTaskScheduleEvent.Properties.ScheduleExpressionTimezone, undefined, 'timezone property is not set')
 })
 
 test('Scheduled visitor creates resources for multiple scheduled functions with shared role', async () => {
@@ -139,11 +139,11 @@ task-two rate(1 day)
   let cfn = pkg(inv)
 
   // Check both Lambdas and schedule events exist
-  assert.ok(cfn.Resources.TaskOneScheduledLambda, 'first Lambda exists')
-  assert.ok(cfn.Resources.TaskOneScheduledEvent, 'first schedule event exists')
+  assert.ok(cfn.Resources.TaskOneScheduleLambda, 'first Lambda exists')
+  assert.ok(cfn.Resources.TaskOneScheduleEvent, 'first schedule event exists')
 
-  assert.ok(cfn.Resources.TaskTwoScheduledLambda, 'second Lambda exists')
-  assert.ok(cfn.Resources.TaskTwoScheduledEvent, 'second schedule event exists')
+  assert.ok(cfn.Resources.TaskTwoScheduleLambda, 'second Lambda exists')
+  assert.ok(cfn.Resources.TaskTwoScheduleEvent, 'second schedule event exists')
 
   // Check there is only one shared scheduler role
   assert.ok(cfn.Resources.SchedulerRole, 'shared scheduler role exists')
@@ -176,8 +176,8 @@ my-hyphenated-task rate(1 hour)
   let inv = await inventory({ rawArc, deployStage })
   let cfn = pkg(inv)
 
-  assert.ok(cfn.Resources.MyHyphenatedTaskScheduledLambda, 'Lambda with hyphenated name exists')
-  assert.ok(cfn.Resources.MyHyphenatedTaskScheduledEvent, 'schedule event with hyphenated name exists')
+  assert.ok(cfn.Resources.MyHyphenatedTaskScheduleLambda, 'Lambda with hyphenated name exists')
+  assert.ok(cfn.Resources.MyHyphenatedTaskScheduleEvent, 'schedule event with hyphenated name exists')
   assert.ok(cfn.Resources.SchedulerRole, 'shared scheduler role exists')
 
   // Check the policy name uses the logical ID
