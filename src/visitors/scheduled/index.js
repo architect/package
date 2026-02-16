@@ -32,8 +32,8 @@ module.exports = function visitScheduled (inventory, template) {
     rule = `${rate ? 'rate' : 'cron'}(${rule.expression})`
 
     let name = toLogicalID(schedule.name)
-    let scheduleLambda = `${name}ScheduledLambda`
-    let scheduleEvent = `${name}ScheduledEvent`
+    let scheduleLambda = `${name}ScheduleLambda`
+    let scheduleEvent = `${name}ScheduleEvent`
 
     // Create the Lambda
     template.Resources[scheduleLambda] = createLambda({
